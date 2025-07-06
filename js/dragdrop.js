@@ -269,6 +269,36 @@ class DragDropSystem {
 
             element.appendChild(pointElement);
         }
+        
+        // Interaktive Schalter hinzufügen
+        if (component.type === 'switch') {
+            const switchButton = document.createElement('div');
+            switchButton.className = 'switch-button';
+            switchButton.dataset.componentId = component.id;
+            switchButton.style.cssText = `
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 20px;
+                height: 15px;
+                background: ${component.definition.state === 'closed' ? '#28a745' : '#dc3545'};
+                border: 2px solid #fff;
+                border-radius: 3px;
+                cursor: pointer;
+                z-index: 20;
+                transition: all 0.3s ease;
+            `;
+            switchButton.title = component.definition.state === 'closed' ? 'EIN - Klicken zum Ausschalten' : 'AUS - Klicken zum Einschalten';
+            
+            // Click-Event für Schalter
+            switchButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleSwitch(component.id);
+            });
+            
+            element.appendChild(switchButton);
+        }
     }
 
     // Canvas Mouse Events für platzierte Komponenten
@@ -548,6 +578,29 @@ class DragDropSystem {
                 this.updateComponentCount(componentData.type);
             });
         }
+    }
+
+    // Neue Funktion: Schalter umschalten
+    toggleSwitch(componentId) {
+        const component = this.placedComponents.find(comp => comp.id === componentId);
+        if (!component || component.type !== 'switch') return;
+        
+        // Zustand umschalten
+        const newState = component.definition.state === 'closed' ? 'open' : 'closed';
+        component.definition.state = newState;
+        
+        // Button-Farbe aktualisieren
+        const switchButton = this.gameArea.querySelector(`[data-component-id="${componentId}"] .switch-button`);
+        if (switchButton) {
+            switchButton.style.background = newState === 'closed' ? '#28a745' : '#dc3545';
+            switchButton.title = newState === 'closed' ? 'EIN - Klicken zum Ausschalten' : 'AUS - Klicken zum Einschalten';
+        }
+        
+        // Event für Schalter-Änderung
+        this.dispatchEvent('switchToggled', { component, newState });
+        
+        // Visual Feedback
+        this.showMessage(`Schalter ${newState === 'closed' ? 'EIN' : 'AUS'}geschaltet`, 'info');
     }
 }
 
