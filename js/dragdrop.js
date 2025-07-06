@@ -490,21 +490,35 @@ class DragDropSystem {
         const componentData = this.getComponentData(componentType);
         const usedCount = this.getUsedComponentCount(componentType);
         
+        if (!componentData) {
+            console.warn('Component data not found for:', componentType);
+            return;
+        }
+        
         const componentItem = document.querySelector(`[data-component-type="${componentType}"]`);
-        if (componentItem && componentData) {
-            const countElement = componentItem.querySelector('.component-count');
-            if (countElement) {
-                const remaining = componentData.count - usedCount;
-                countElement.textContent = remaining;
-                countElement.style.display = remaining > 0 ? 'flex' : 'none';
-            }
+        if (!componentItem) {
+            console.warn('Component item not found for:', componentType);
+            return;
+        }
+        
+        const remaining = componentData.count - usedCount;
+        
+        const countElement = componentItem.querySelector('.component-count');
+        if (countElement) {
+            countElement.textContent = remaining;
+            countElement.style.display = remaining > 0 ? 'flex' : 'none';
+        }
 
-            // Komponente deaktivieren wenn keine mehr verfügbar
-            if (remaining <= 0) {
-                componentItem.classList.add('disabled');
-                componentItem.style.opacity = '0.5';
-                componentItem.style.cursor = 'not-allowed';
-            }
+        // Komponente deaktivieren wenn keine mehr verfügbar
+        if (remaining <= 0) {
+            componentItem.classList.add('disabled');
+            componentItem.style.opacity = '0.5';
+            componentItem.style.cursor = 'not-allowed';
+        } else {
+            // Komponente wieder aktivieren falls sie deaktiviert war
+            componentItem.classList.remove('disabled');
+            componentItem.style.opacity = '1';
+            componentItem.style.cursor = 'pointer';
         }
     }
 
