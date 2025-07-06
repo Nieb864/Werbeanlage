@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Debug Helper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+        .warning { color: #ffc107; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #results {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug Helper für Werbetechnik-Spiel</h1>
+    
+    <div class="debug-section">
+        <h3>1. Browser-Info</h3>
+        <div id="browserInfo"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>2. Datei-Tests</h3>
+        <button onclick="testFiles()">📁 Teste alle Dateien</button>
+        <button onclick="testScripts()">📜 Teste JavaScript</button>
+        <button onclick="testStyles()">🎨 Teste CSS</button>
+    </div>
+
+    <div class="debug-section">
+        <h3>3. Schnell-Tests</h3>
+        <button onclick="testBasicGame()">🔧 Basis-Spiel testen</button>
+        <button onclick="testWerbetechnik()">🏗️ Werbetechnik testen</button>
+        <button onclick="clearCache()">🗑️ Cache leeren</button>
+    </div>
+
+    <div class="debug-section">
+        <h3>4. Ergebnisse</h3>
+        <div id="results">Klicke auf einen Test-Button...</div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            results.innerHTML += `[${timestamp}] ${icon} ${message}\n`;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        // Browser Info
+        function showBrowserInfo() {
+            const info = {
+                'User Agent': navigator.userAgent,
+                'URL': window.location.href,
+                'Protocol': window.location.protocol,
+                'Host': window.location.host,
+                'Pathname': window.location.pathname
+            };
+            
+            let html = '';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<strong>${key}:</strong> ${value}<br>`;
+            }
+            document.getElementById('browserInfo').innerHTML = html;
+        }
+
+        // Datei-Tests
+        async function testFiles() {
+            clearResults();
+            log('🔍 Teste Datei-Verfügbarkeit...');
+            
+            const files = [
+                'index.html',
+                'werbetechnik.html',
+                'werbetechnik-game.html',
+                'css/styles.css',
+                'css/game.css',
+                'js/levels.js',
+                'js/werbetechnik-levels.js',
+                'js/werbetechnik-circuit.js',
+                'js/dragdrop.js',
+                'js/wiring.js',
+                'js/circuit.js',
+                'js/feedback.js',
+                'js/game.js',
+                'js/main.js'
+            ];
+
+            for (const file of files) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        log(`✅ ${file} - OK (${response.status})`, 'success');
+                    } else {
+                        log(`❌ ${file} - Fehler ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    log(`❌ ${file} - Nicht erreichbar: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // Script-Tests
+        function testScripts() {
+            clearResults();
+            log('📜 Teste JavaScript-Module...');
+            
+            // Test GameLevels
+            if (typeof GameLevels !== 'undefined') {
+                log(`✅ GameLevels verfügbar (${GameLevels.getAllLevels().length} Level)`, 'success');
+            } else {
+                log('❌ GameLevels nicht verfügbar', 'error');
+            }
+
+            // Test WerbetechnikLevels
+            if (typeof WerbetechnikLevels !== 'undefined') {
+                log(`✅ WerbetechnikLevels verfügbar (${WerbetechnikLevels.getAllLevels().length} Level)`, 'success');
+            } else {
+                log('❌ WerbetechnikLevels nicht verfügbar', 'error');
+            }
+
+            // Test WerbetechnikCircuitSystem
+            if (typeof WerbetechnikCircuitSystem !== 'undefined') {
+                log('✅ WerbetechnikCircuitSystem verfügbar', 'success');
+            } else {
+                log('❌ WerbetechnikCircuitSystem nicht verfügbar', 'error');
+            }
+
+            // Test andere Systeme
+            const systems = ['DragDropSystem', 'WiringSystem', 'CircuitSystem', 'FeedbackSystem'];
+            systems.forEach(system => {
+                if (typeof window[system] !== 'undefined') {
+                    log(`✅ ${system} verfügbar`, 'success');
+                } else {
+                    log(`❌ ${system} nicht verfügbar`, 'error');
+                }
+            });
+        }
+
+        // Style-Tests
+        function testStyles() {
+            clearResults();
+            log('🎨 Teste CSS-Dateien...');
+            
+            const stylesheets = document.styleSheets;
+            for (let i = 0; i < stylesheets.length; i++) {
+                const sheet = stylesheets[i];
+                if (sheet.href) {
+                    log(`✅ CSS geladen: ${sheet.href}`, 'success');
+                } else {
+                    log(`✅ Inline CSS vorhanden`, 'success');
+                }
+            }
+        }
+
+        // Basis-Spiel Test
+        function testBasicGame() {
+            clearResults();
+            log('🔧 Teste Basis-Spiel...');
+            
+            try {
+                // Test ob Level-Auswahl funktioniert
+                const levelsGrid = document.querySelector('.levels-grid, #levelsGrid');
+                if (levelsGrid) {
+                    log('✅ Level-Grid gefunden', 'success');
+                } else {
+                    log('❌ Level-Grid nicht gefunden', 'error');
+                }
+
+                // Test Links
+                const gameLink = document.querySelector('a[href*="game.html"]');
+                if (gameLink) {
+                    log('✅ Game-Link gefunden', 'success');
+                } else {
+                    log('❌ Game-Link nicht gefunden', 'error');
+                }
+
+            } catch (error) {
+                log(`❌ Basis-Spiel Fehler: ${error.message}`, 'error');
+            }
+        }
+
+        // Werbetechnik Test
+        function testWerbetechnik() {
+            clearResults();
+            log('🏗️ Teste Werbetechnik...');
+            
+            try {
+                // Test Werbetechnik-Link
+                const werbetechnikLink = document.querySelector('a[href*="werbetechnik.html"]');
+                if (werbetechnikLink) {
+                    log('✅ Werbetechnik-Link gefunden', 'success');
+                } else {
+                    log('❌ Werbetechnik-Link nicht gefunden', 'error');
+                }
+
+                // Test WerbetechnikLevels
+                if (typeof WerbetechnikLevels !== 'undefined') {
+                    const levels = WerbetechnikLevels.getAllLevels();
+                    log(`✅ ${levels.length} Werbetechnik-Level verfügbar`, 'success');
+                    
+                    levels.forEach(level => {
+                        log(`   📋 Level ${level.id}: ${level.title} (${level.components.length} Komponenten)`);
+                    });
+                } else {
+                    log('❌ WerbetechnikLevels nicht geladen', 'error');
+                }
+
+            } catch (error) {
+                log(`❌ Werbetechnik Fehler: ${error.message}`, 'error');
+            }
+        }
+
+        // Cache leeren
+        function clearCache() {
+            clearResults();
+            log('🗑️ Leere Browser-Cache...');
+            
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    names.forEach(function(name) {
+                        caches.delete(name);
+                    });
+                });
+                log('✅ Service Worker Cache geleert', 'success');
+            }
+            
+            // localStorage leeren
+            localStorage.clear();
+            sessionStorage.clear();
+            log('✅ LocalStorage geleert', 'success');
+            
+            log('ℹ️ Drücke Strg+F5 zum kompletten Reload', 'warning');
+        }
+
+        // Automatische Browser-Info beim Laden
+        window.addEventListener('DOMContentLoaded', showBrowserInfo);
+
+        // Console-Fehler abfangen
+        window.addEventListener('error', function(event) {
+            log(`❌ JavaScript Fehler: ${event.message} in ${event.filename}:${event.lineno}`, 'error');
+        });
+
+        // Automatischer Test beim Laden
+        setTimeout(() => {
+            log('🚀 Automatischer Start-Test...');
+            testScripts();
+        }, 1000);
+    </script>
+
+    <!-- Lade alle Scripts zum Testen -->
+    <script src="js/levels.js"></script>
+    <script src="js/werbetechnik-levels.js"></script>
+    <script src="js/werbetechnik-circuit.js"></script>
+</body>
+</html>

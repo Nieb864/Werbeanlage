@@ -39,5 +39,32 @@
 
     <script src="js/levels.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        // Debug-Hilfe für Homepage
+        console.log('🔧 Homepage lädt...');
+        
+        window.addEventListener('error', function(event) {
+            console.error('❌ JavaScript Fehler:', event.message, 'in', event.filename, 'Zeile', event.lineno);
+            
+            // Zeige Fehlermeldung auf der Seite
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = 'background: #ff6b6b; color: white; padding: 10px; margin: 10px; border-radius: 5px; position: fixed; top: 10px; right: 10px; z-index: 9999; max-width: 400px;';
+            errorDiv.innerHTML = `<strong>⚠️ Fehler:</strong><br>${event.message}<br><small>${event.filename}:${event.lineno}</small>`;
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => errorDiv.remove(), 10000);
+        });
+
+        // Test ob GameLevels lädt
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (typeof GameLevels === 'undefined') {
+                    console.error('❌ GameLevels nicht verfügbar - js/levels.js nicht geladen?');
+                } else {
+                    console.log('✅ GameLevels verfügbar:', GameLevels.getAllLevels().length, 'Level');
+                }
+            }, 100);
+        });
+    </script>
 </body>
 </html>
