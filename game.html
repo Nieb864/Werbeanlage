@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elektronik Lernspiel - Spiel</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <div class="level-info">
+                <button id="backBtn" class="btn btn-secondary">← Zurück</button>
+                <h2 id="levelTitle">Level wird geladen...</h2>
+                <div class="level-progress">
+                    <span id="levelProgress">0/0</span>
+                </div>
+            </div>
+            <div class="game-controls">
+                <button id="resetBtn" class="btn btn-warning">Zurücksetzen</button>
+                <button id="testBtn" class="btn btn-primary">Schaltung testen</button>
+            </div>
+        </header>
+
+        <div class="game-layout">
+            <aside class="components-panel">
+                <h3>Verfügbare Bauteile</h3>
+                <div id="componentsPalette" class="components-palette">
+                    <!-- Bauteile werden dynamisch geladen -->
+                </div>
+                
+                <div class="task-panel">
+                    <h3>Aufgabe</h3>
+                    <p id="taskDescription">Lade Level...</p>
+                </div>
+            </aside>
+
+            <main class="game-area">
+                <canvas id="gameCanvas" class="game-canvas"></canvas>
+                <div id="feedbackOverlay" class="feedback-overlay hidden">
+                    <div class="feedback-content">
+                        <div id="feedbackIcon" class="feedback-icon"></div>
+                        <h3 id="feedbackTitle">Feedback</h3>
+                        <p id="feedbackMessage">Nachricht</p>
+                        <button id="feedbackClose" class="btn btn-primary">Weiter</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/levels.js"></script>
+    <script src="js/dragdrop.js"></script>
+    <script src="js/wiring.js"></script>
+    <script src="js/feedback.js"></script>
+    <script src="js/circuit.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
