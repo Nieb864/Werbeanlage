@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Werbetechnik Lernspiel - Professionelle 230V Installationen lernen">
+    <title>🏗️ Werbetechnik Lernspiel</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Werbetechnik-spezifische Styles */
+        .container {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+        }
+        
+        .level-card {
+            border-left: 4px solid #FF6B35;
+        }
+        
+        .level-card:hover {
+            border-color: #E55A2B;
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+        }
+        
+        .werbetechnik-badge {
+            background: linear-gradient(135deg, #FF6B35, #F7931E);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .voltage-warning {
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid #dc3545;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #721c24;
+        }
+        
+        .voltage-warning h3 {
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ Werbetechnik Lernspiel</h1>
+            <p>Professionelle 230V Installationen sicher planen und umsetzen</p>
+            <span class="werbetechnik-badge">230V AC/DC</span>
+        </header>
+
+        <div class="voltage-warning">
+            <h3>⚠️ Sicherheitshinweis</h3>
+            <p><strong>Dieses Spiel behandelt 230V Installationen!</strong> Alle gezeigten Schaltungen entsprechen realen Werbetechnik-Installationen. In der Praxis dürfen solche Arbeiten nur von qualifizierten Elektrofachkräften ausgeführt werden.</p>
+            <ul>
+                <li>✅ Immer LS- und FI-Schutzschalter verwenden</li>
+                <li>✅ Trafo-Leistungen beachten (Überlast = Defekt)</li>
+                <li>✅ Korrekte Spannungen für LED-Module</li>
+                <li>⚠️ 12V LEDs an 24V = Blinken/Defekt</li>
+            </ul>
+        </div>
+
+        <main class="level-selection">
+            <h2>Werbetechnik Level</h2>
+            <div class="levels-grid" id="levelsGrid">
+                <!-- Levels werden dynamisch geladen -->
+            </div>
+        </main>
+
+        <footer>
+            <p>🔌 Drag & Drop die 230V Komponenten und verkabele sie sicher!</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">
+                <a href="index.html" style="color: rgba(255,255,255,0.8);">← Zurück zum Basis-Spiel (12V)</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="js/werbetechnik-levels.js"></script>
+    <script>
+        // Werbetechnik-spezifische Hauptlogik
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWerbetechnikLevelSelection();
+        });
+
+        function initializeWerbetechnikLevelSelection() {
+            const levelsGrid = document.getElementById('levelsGrid');
+            if (!levelsGrid) return;
+
+            const levels = WerbetechnikLevels.getAllLevels();
+            const completedLevels = WerbetechnikLevels.getCompletedLevels();
+
+            // Level-Karten erstellen
+            levels.forEach(level => {
+                const levelCard = createWerbetechnikLevelCard(level, completedLevels);
+                levelsGrid.appendChild(levelCard);
+            });
+        }
+
+        function createWerbetechnikLevelCard(level, completedLevels) {
+            const isCompleted = completedLevels.includes(level.id);
+            const isUnlocked = WerbetechnikLevels.isLevelUnlocked(level.id);
+            
+            const card = document.createElement('div');
+            card.className = `level-card ${!isUnlocked ? 'locked' : ''}`;
+            
+            // Level-Header
+            const header = document.createElement('div');
+            header.className = 'level-header';
+            
+            const icon = document.createElement('div');
+            icon.className = 'level-icon';
+            icon.textContent = isCompleted ? '✅' : (isUnlocked ? level.icon : '🔒');
+            
+            const title = document.createElement('div');
+            title.className = 'level-title';
+            title.textContent = level.title;
+            
+            const difficulty = document.createElement('span');
+            difficulty.className = `level-difficulty difficulty-${level.difficulty}`;
+            difficulty.textContent = getDifficultyText(level.difficulty);
+            
+            header.appendChild(icon);
+            header.appendChild(title);
+            header.appendChild(difficulty);
+            
+            // Level-Beschreibung
+            const description = document.createElement('div');
+            description.className = 'level-description';
+            description.textContent = level.description;
+            
+            // Werbetechnik-spezifische Infos
+            const techInfo = document.createElement('div');
+            techInfo.style.cssText = `
+                background: rgba(255, 107, 53, 0.1);
+                border-radius: 5px;
+                padding: 10px;
+                margin: 10px 0;
+                font-size: 0.85em;
+            `;
+            
+            const components = level.components;
+            const has230V = components.some(c => c.type === 'power230v');
+            const hasTrafos = components.filter(c => c.type.includes('trafo_'));
+            const hasLEDs = components.filter(c => c.type.includes('led_'));
+            
+            let techDetails = [];
+            if (has230V) techDetails.push('230V AC');
+            if (hasTrafos.length > 0) {
+                const trafoTypes = hasTrafos.map(t => `${t.name}`).join(', ');
+                techDetails.push(trafoTypes);
+            }
+            if (hasLEDs.length > 0) {
+                const ledTypes = [...new Set(hasLEDs.map(l => l.name))].join(', ');
+                techDetails.push(ledTypes);
+            }
+            
+            techInfo.innerHTML = `<strong>Komponenten:</strong> ${techDetails.join(' • ')}`;
+            
+            // Level-Statistiken
+            const stats = document.createElement('div');
+            stats.className = 'level-stats';
+            
+            const componentCount = document.createElement('div');
+            componentCount.className = 'level-components';
+            componentCount.textContent = `${components.length} Bauteile`;
+            
+            const status = document.createElement('div');
+            status.textContent = isCompleted ? 'Abgeschlossen' : (isUnlocked ? 'Verfügbar' : 'Gesperrt');
+            status.style.color = isCompleted ? '#28a745' : (isUnlocked ? '#FF6B35' : '#6c757d');
+            status.style.fontWeight = 'bold';
+            
+            stats.appendChild(componentCount);
+            stats.appendChild(status);
+            
+            // Zusammensetzen
+            card.appendChild(header);
+            card.appendChild(description);
+            card.appendChild(techInfo);
+            card.appendChild(stats);
+            
+            // Event Listener
+            if (isUnlocked) {
+                card.addEventListener('click', () => startWerbetechnikLevel(level.id));
+                card.style.cursor = 'pointer';
+            }
+            
+            return card;
+        }
+
+        function getDifficultyText(difficulty) {
+            const texts = {
+                easy: 'Einsteiger',
+                medium: 'Fortgeschritten',
+                hard: 'Experte'
+            };
+            return texts[difficulty] || difficulty;
+        }
+
+        function startWerbetechnikLevel(levelId) {
+            // Zur Werbetechnik-Spielseite
+            window.location.href = `werbetechnik-game.html?level=${levelId}`;
+        }
+
+        // Progress-Anzeige
+        function updateWerbetechnikProgress() {
+            const completedLevels = WerbetechnikLevels.getCompletedLevels();
+            const totalLevels = WerbetechnikLevels.getAllLevels().length;
+            
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            progressContainer.style.cssText = `
+                text-align: center;
+                margin: 20px 0;
+                color: rgba(255, 255, 255, 0.9);
+                font-size: 1.1em;
+            `;
+            
+            const progressText = document.createElement('div');
+            progressText.textContent = `Werbetechnik-Fortschritt: ${completedLevels.length}/${totalLevels} Level abgeschlossen`;
+            
+            const progressBar = document.createElement('div');
+            progressBar.style.cssText = `
+                width: 100%;
+                max-width: 400px;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 4px;
+                margin: 10px auto;
+                overflow: hidden;
+            `;
+            
+            const progressFill = document.createElement('div');
+            progressFill.style.cssText = `
+                width: ${(completedLevels.length / totalLevels) * 100}%;
+                height: 100%;
+                background: linear-gradient(90deg, #FF6B35, #F7931E);
+                border-radius: 4px;
+                transition: width 0.3s ease;
+            `;
+            
+            progressBar.appendChild(progressFill);
+            progressContainer.appendChild(progressText);
+            progressContainer.appendChild(progressBar);
+            
+            const levelsGrid = document.getElementById('levelsGrid');
+            if (levelsGrid && levelsGrid.parentNode) {
+                levelsGrid.parentNode.insertBefore(progressContainer, levelsGrid);
+            }
+        }
+
+        // Initialisierung erweitern
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWerbetechnikLevelSelection();
+            updateWerbetechnikProgress();
+            
+            // Erfolgs-Animation
+            const urlParams = new URLSearchParams(window.location.search);
+            const completedLevelId = parseInt(urlParams.get('completed'));
+            
+            if (completedLevelId) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                setTimeout(() => {
+                    showWerbetechnikCompletion(completedLevelId);
+                }, 500);
+            }
+        });
+
+        function showWerbetechnikCompletion(levelId) {
+            const celebration = document.createElement('div');
+            celebration.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                border-radius: 15px;
+                padding: 40px;
+                text-align: center;
+                z-index: 10000;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            `;
+            
+            const level = WerbetechnikLevels.getAllLevels().find(l => l.id === levelId);
+            
+            celebration.innerHTML = `
+                <div style="font-size: 4em; margin-bottom: 20px;">🏗️⚡</div>
+                <h2 style="color: #FF6B35; margin-bottom: 10px;">Werbetechnik Level Abgeschlossen!</h2>
+                <p style="color: #666; margin-bottom: 20px;">${level ? level.title : 'Level ' + levelId}</p>
+                <p style="font-size: 0.9em; color: #888;">Professionelle 230V Installation erfolgreich!</p>
+                <button class="btn btn-primary" onclick="this.parentElement.remove()" style="background: linear-gradient(135deg, #FF6B35, #F7931E); margin-top: 15px;">Weiter</button>
+            `;
+            
+            document.body.appendChild(celebration);
+            
+            setTimeout(() => {
+                if (celebration.parentNode) {
+                    celebration.remove();
+                }
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

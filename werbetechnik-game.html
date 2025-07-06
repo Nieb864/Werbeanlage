@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏗️ Werbetechnik Game</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/game.css">
+    <style>
+        /* Werbetechnik-spezifische Game-Styles */
+        .game-container {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+        
+        .component-palette {
+            background: linear-gradient(180deg, #FF6B35 0%, #F7931E 100%);
+        }
+        
+        .werbetechnik-info {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: #721c24;
+        }
+        
+        .power-display {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid #FF6B35;
+            border-radius: 5px;
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 0.8em;
+        }
+        
+        .voltage-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .voltage-ac { background: #dc3545; }
+        .voltage-12v { background: #007bff; }
+        .voltage-24v { background: #28a745; }
+        .voltage-off { background: #6c757d; }
+        
+        .trafo-status {
+            background: rgba(108, 117, 125, 0.1);
+            border-left: 3px solid #6c757d;
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 0.8em;
+        }
+        
+        .trafo-ok { border-color: #28a745; }
+        .trafo-overload { border-color: #dc3545; background: rgba(220, 53, 69, 0.1); }
+        
+        .protection-status {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 0.8em;
+            color: #155724;
+        }
+        
+        .component.protection-device {
+            border: 2px solid #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+        }
+        
+        .component.power-source {
+            border: 2px solid #dc3545;
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
+        }
+        
+        .component.transformer {
+            border: 2px solid #6c757d;
+            box-shadow: 0 0 10px rgba(108, 117, 125, 0.3);
+        }
+        
+        .component.overloaded {
+            border-color: #dc3545 !important;
+            animation: pulse-red 1s infinite;
+        }
+        
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 10px rgba(220, 53, 69, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(220, 53, 69, 0.8); }
+        }
+        
+        .wire.ac-power {
+            stroke: #dc3545;
+            stroke-width: 4;
+            filter: drop-shadow(0 0 3px #dc3545);
+        }
+        
+        .wire.dc-power {
+            stroke: #007bff;
+            stroke-width: 3;
+        }
+        
+        .wire.overload {
+            stroke: #ff6b35;
+            stroke-width: 5;
+            animation: pulse-orange 0.5s infinite;
+        }
+        
+        @keyframes pulse-orange {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <div class="level-info">
+                <h1 id="levelTitle">🏗️ Werbetechnik Level</h1>
+                <p id="levelDescription">230V Installation</p>
+            </div>
+            <div class="header-controls">
+                <button class="btn btn-secondary" onclick="window.location.href='werbetechnik.html'">Zurück</button>
+                <button class="btn btn-primary" id="simulateBtn" onclick="runWerbetechnikSimulation()">Simulation starten</button>
+                <button class="btn btn-success" id="checkBtn" onclick="checkWerbetechnikSolution()" disabled>Lösung prüfen</button>
+            </div>
+        </header>
+
+        <!-- Werbetechnik-Warnung -->
+        <div class="werbetechnik-info">
+            <strong>⚠️ 230V Werbetechnik:</strong> Verwende LS- und FI-Schutzschalter! Beachte Trafo-Leistungen und LED-Spannungen.
+        </div>
+
+        <!-- Hauptspielbereich -->
+        <div class="game-main">
+            <!-- Component Palette -->
+            <div class="component-palette">
+                <h3>🔌 230V Komponenten</h3>
+                <div id="componentList"></div>
+                
+                <!-- Live-Status -->
+                <div class="status-panel">
+                    <h4>Status</h4>
+                    <div id="protectionStatus"></div>
+                    <div id="powerStatus"></div>
+                    <div id="trafoStatus"></div>
+                </div>
+            </div>
+
+            <!-- Game Canvas -->
+            <div class="game-canvas">
+                <canvas id="wiringCanvas"></canvas>
+                <div id="componentsCanvas" class="components-area"></div>
+                
+                <!-- Task Panel -->
+                <div class="task-panel">
+                    <h4>Aufgabe</h4>
+                    <p id="taskDescription">Verkabele die Werbetechnik-Installation</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Panel -->
+        <div id="feedbackPanel" class="feedback-panel" style="display: none;">
+            <div class="feedback-content">
+                <div id="feedbackIcon">⚡</div>
+                <h3 id="feedbackTitle">Simulation</h3>
+                <p id="feedbackMessage">Ergebnis wird angezeigt...</p>
+                <div id="feedbackDetails"></div>
+                <div class="feedback-actions">
+                    <button class="btn btn-secondary" onclick="closeFeedback()">Schließen</button>
+                    <button class="btn btn-primary" id="nextLevelBtn" onclick="goToNextWerbetechnikLevel()" style="display: none;">Nächstes Level</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/werbetechnik-levels.js"></script>
+    <script src="js/werbetechnik-circuit.js"></script>
+    <script src="js/dragdrop.js"></script>
+    <script src="js/wiring.js"></script>
+    <script src="js/feedback.js"></script>
+    
+    <script>
+        // Werbetechnik Game Controller
+        class WerbetechnikGame {
+            constructor() {
+                this.currentLevel = null;
+                this.circuitSystem = new WerbetechnikCircuitSystem();
+                this.dragDropSystem = null;
+                this.wiringSystem = null;
+                this.feedbackSystem = null;
+                this.components = [];
+                this.wires = [];
+                this.simulationRunning = false;
+            }
+
+            async initialize() {
+                // Level laden
+                const urlParams = new URLSearchParams(window.location.search);
+                const levelId = parseInt(urlParams.get('level')) || 1;
+                this.currentLevel = WerbetechnikLevels.getCurrentLevel();
+                
+                if (!this.currentLevel) {
+                    console.error('Level nicht gefunden!');
+                    return;
+                }
+
+                // UI initialisieren
+                this.initializeUI();
+                this.initializeComponentPalette();
+                this.initializeSystems();
+                
+                console.log('Werbetechnik Game initialisiert:', this.currentLevel.title);
+            }
+
+            initializeUI() {
+                document.getElementById('levelTitle').textContent = this.currentLevel.title;
+                document.getElementById('levelDescription').textContent = this.currentLevel.description;
+                document.getElementById('taskDescription').textContent = this.currentLevel.taskDescription;
+            }
+
+            initializeComponentPalette() {
+                const componentList = document.getElementById('componentList');
+                componentList.innerHTML = '';
+
+                this.currentLevel.components.forEach(componentDef => {
+                    const count = componentDef.count || 1;
+                    
+                    for (let i = 0; i < count; i++) {
+                        const componentElement = this.createWerbetechnikComponent(componentDef, i);
+                        componentList.appendChild(componentElement);
+                    }
+                });
+            }
+
+            createWerbetechnikComponent(componentDef, instance) {
+                const div = document.createElement('div');
+                div.className = `component-item ${this.getComponentClass(componentDef.type)}`;
+                div.setAttribute('data-type', componentDef.type);
+                div.setAttribute('data-instance', instance);
+                
+                // Component image und info
+                div.innerHTML = `
+                    <img src="${componentDef.image}" alt="${componentDef.name}">
+                    <div class="component-info">
+                        <div class="component-name">${componentDef.name}</div>
+                        <div class="component-specs">${this.getComponentSpecs(componentDef)}</div>
+                    </div>
+                `;
+                
+                return div;
+            }
+
+            getComponentClass(type) {
+                if (type === 'power230v') return 'power-source';
+                if (type.includes('switch')) return 'protection-device';
+                if (type.includes('trafo_')) return 'transformer';
+                if (type.includes('led_')) return 'led-load';
+                return '';
+            }
+
+            getComponentSpecs(componentDef) {
+                const specs = [];
+                
+                if (componentDef.power) specs.push(`${componentDef.power}W`);
+                if (componentDef.voltage) specs.push(`${componentDef.voltage}V`);
+                if (componentDef.voltage_out) specs.push(`${componentDef.voltage_out}V DC`);
+                if (componentDef.rating) specs.push(`${componentDef.rating}A`);
+                
+                return specs.join(' • ');
+            }
+
+            initializeSystems() {
+                // Drag & Drop System anpassen
+                this.dragDropSystem = new DragDropSystem(
+                    document.getElementById('componentsCanvas'),
+                    () => this.onComponentsChanged()
+                );
+
+                // Wiring System
+                this.wiringSystem = new WiringSystem(
+                    document.getElementById('wiringCanvas'),
+                    () => this.onWiringChanged()
+                );
+
+                // Feedback System
+                this.feedbackSystem = new FeedbackSystem();
+
+                // Event Listeners
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Component Drops
+                document.addEventListener('componentDropped', (event) => {
+                    this.handleComponentDrop(event.detail);
+                });
+
+                // Wire Events
+                document.addEventListener('wireCreated', (event) => {
+                    this.handleWireCreated(event.detail);
+                });
+
+                document.addEventListener('wireRemoved', (event) => {
+                    this.handleWireRemoved(event.detail);
+                });
+            }
+
+            handleComponentDrop(componentData) {
+                const definition = WerbetechnikLevels.getComponentDefinition(componentData.type);
+                
+                const component = {
+                    id: `${componentData.type}_${Date.now()}_${Math.random()}`,
+                    type: componentData.type,
+                    instance: componentData.instance,
+                    definition: definition,
+                    data: componentData,
+                    x: componentData.x,
+                    y: componentData.y
+                };
+
+                this.components.push(component);
+                this.updateWiringSystem();
+                this.onComponentsChanged();
+            }
+
+            handleWireCreated(wireData) {
+                this.wires.push(wireData);
+                this.onWiringChanged();
+            }
+
+            handleWireRemoved(wireData) {
+                this.wires = this.wires.filter(wire => wire.id !== wireData.id);
+                this.onWiringChanged();
+            }
+
+            onComponentsChanged() {
+                this.updateStatus();
+                this.enableSimulationIfReady();
+            }
+
+            onWiringChanged() {
+                this.updateStatus();
+                this.enableSimulationIfReady();
+            }
+
+            updateWiringSystem() {
+                // Verbindungspunkte für Wiring System aktualisieren
+                const connectionPoints = [];
+                
+                this.components.forEach(component => {
+                    const definition = component.definition;
+                    if (definition && definition.connectionPoints) {
+                        Object.entries(definition.connectionPoints).forEach(([pointName, pointData]) => {
+                            connectionPoints.push({
+                                componentId: component.id,
+                                pointName: pointName,
+                                x: component.x + pointData.x,
+                                y: component.y + pointData.y,
+                                type: pointData.type
+                            });
+                        });
+                    }
+                });
+
+                if (this.wiringSystem) {
+                    this.wiringSystem.updateConnectionPoints(connectionPoints);
+                }
+            }
+
+            enableSimulationIfReady() {
+                const hasComponents = this.components.length > 0;
+                const hasWires = this.wires.length > 0;
+                
+                document.getElementById('simulateBtn').disabled = !(hasComponents && hasWires);
+            }
+
+            updateStatus() {
+                this.updateProtectionStatus();
+                this.updatePowerStatus();
+                this.updateTrafoStatus();
+            }
+
+            updateProtectionStatus() {
+                const protectionDiv = document.getElementById('protectionStatus');
+                if (!protectionDiv) return;
+
+                const lsSwitch = this.components.find(c => c.type === 'ls_switch');
+                const fiSwitch = this.components.find(c => c.type === 'fi_switch');
+
+                let statusHTML = '<div class="protection-status">';
+                statusHTML += `<div>LS-Schalter: ${lsSwitch ? '✅' : '❌'}</div>`;
+                statusHTML += `<div>FI-Schalter: ${fiSwitch ? '✅' : '❌'}</div>`;
+                statusHTML += '</div>';
+
+                protectionDiv.innerHTML = statusHTML;
+            }
+
+            updatePowerStatus() {
+                const powerDiv = document.getElementById('powerStatus');
+                if (!powerDiv) return;
+
+                const powerSource = this.components.find(c => c.type === 'power230v');
+                
+                let statusHTML = '<div class="power-display">';
+                statusHTML += `<span class="voltage-indicator voltage-ac"></span>`;
+                statusHTML += `230V AC: ${powerSource ? 'Verfügbar' : 'Nicht angeschlossen'}`;
+                statusHTML += '</div>';
+
+                powerDiv.innerHTML = statusHTML;
+            }
+
+            updateTrafoStatus() {
+                const trafoDiv = document.getElementById('trafoStatus');
+                if (!trafoDiv) return;
+
+                const trafos = this.components.filter(c => c.type.includes('trafo_'));
+                
+                let statusHTML = '';
+                trafos.forEach(trafo => {
+                    statusHTML += '<div class="trafo-status trafo-ok">';
+                    statusHTML += `${trafo.data.name}: ${trafo.definition.power}W`;
+                    statusHTML += '</div>';
+                });
+
+                trafoDiv.innerHTML = statusHTML;
+            }
+        }
+
+        // Globale Funktionen
+        let werbetechnikGame;
+
+        async function runWerbetechnikSimulation() {
+            if (!werbetechnikGame || werbetechnikGame.simulationRunning) return;
+
+            werbetechnikGame.simulationRunning = true;
+            const simulateBtn = document.getElementById('simulateBtn');
+            const checkBtn = document.getElementById('checkBtn');
+            
+            simulateBtn.disabled = true;
+            simulateBtn.textContent = 'Simuliere...';
+
+            try {
+                // Circuit System mit aktuellen Daten laden
+                werbetechnikGame.circuitSystem.loadCircuit(werbetechnikGame.components, werbetechnikGame.wires);
+                
+                // Simulation ausführen
+                const result = werbetechnikGame.circuitSystem.simulate();
+                
+                // Ergebnisse anzeigen
+                showWerbetechnikSimulationResult(result);
+                
+                // Komponenten-Zustände visualisieren
+                updateWerbetechnikComponentStates(result);
+                
+                // Check-Button aktivieren wenn Simulation erfolgreich
+                if (result.success) {
+                    checkBtn.disabled = false;
+                }
+
+            } catch (error) {
+                console.error('Simulation error:', error);
+                showWerbetechnikSimulationResult({
+                    success: false,
+                    error: 'Simulationsfehler: ' + error.message
+                });
+            } finally {
+                werbetechnikGame.simulationRunning = false;
+                simulateBtn.disabled = false;
+                simulateBtn.textContent = 'Simulation starten';
+            }
+        }
+
+        function showWerbetechnikSimulationResult(result) {
+            const feedbackPanel = document.getElementById('feedbackPanel');
+            const feedbackIcon = document.getElementById('feedbackIcon');
+            const feedbackTitle = document.getElementById('feedbackTitle');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const feedbackDetails = document.getElementById('feedbackDetails');
+
+            if (result.success) {
+                feedbackIcon.textContent = '⚡';
+                feedbackTitle.textContent = 'Simulation Erfolgreich';
+                feedbackMessage.textContent = 'Werbetechnik-Installation simuliert!';
+                
+                // Details anzeigen
+                let detailsHTML = '<div style="text-align: left; margin-top: 15px;">';
+                
+                if (result.loadAnalysis) {
+                    result.loadAnalysis.trafos.forEach((trafoData, trafoId) => {
+                        const statusClass = trafoData.overloaded ? 'trafo-overload' : 'trafo-ok';
+                        detailsHTML += `<div class="trafo-status ${statusClass}">`;
+                        detailsHTML += `Trafo: ${trafoData.totalPower.toFixed(1)}W / ${trafoData.maxPower}W`;
+                        if (trafoData.overloaded) {
+                            detailsHTML += ' ⚠️ ÜBERLAST!';
+                        }
+                        detailsHTML += '</div>';
+                    });
+                }
+
+                if (result.faultAnalysis && result.faultAnalysis.overloadedTrafos.length > 0) {
+                    detailsHTML += '<div style="color: #dc3545; margin-top: 10px; font-weight: bold;">⚠️ Trafos überlastet!</div>';
+                }
+
+                if (result.faultAnalysis && result.faultAnalysis.wrongVoltages.length > 0) {
+                    detailsHTML += '<div style="color: #dc3545; margin-top: 5px;">⚠️ Falsche LED-Spannungen!</div>';
+                }
+
+                detailsHTML += '</div>';
+                feedbackDetails.innerHTML = detailsHTML;
+
+            } else {
+                feedbackIcon.textContent = '❌';
+                feedbackTitle.textContent = 'Simulation Fehler';
+                feedbackMessage.textContent = result.error || 'Unbekannter Fehler';
+                feedbackDetails.innerHTML = '';
+            }
+
+            feedbackPanel.style.display = 'flex';
+        }
+
+        function updateWerbetechnikComponentStates(result) {
+            if (!result.success || !result.componentStates) return;
+
+            // Component-Visualisierung aktualisieren
+            result.componentStates.forEach((state, componentId) => {
+                const componentElement = document.querySelector(`[data-component-id="${componentId}"]`);
+                if (componentElement) {
+                    // CSS-Klassen basierend auf Status
+                    componentElement.classList.remove('overloaded', 'normal', 'error');
+                    componentElement.classList.add(state.status);
+                    
+                    // Tooltip mit Details
+                    componentElement.title = state.message;
+                }
+            });
+
+            // Wire-Visualisierung aktualisieren
+            if (result.wireStates && werbetechnikGame.wiringSystem) {
+                result.wireStates.forEach((state, wireId) => {
+                    werbetechnikGame.wiringSystem.updateWireStyle(wireId, state);
+                });
+            }
+        }
+
+        async function checkWerbetechnikSolution() {
+            if (!werbetechnikGame || !werbetechnikGame.currentLevel) return;
+
+            try {
+                const validation = werbetechnikGame.circuitSystem.validateAgainstSolution(
+                    werbetechnikGame.currentLevel.solution
+                );
+
+                showWerbetechnikValidationResult(validation);
+
+                if (validation.correct) {
+                    // Level als abgeschlossen markieren
+                    WerbetechnikLevels.markLevelCompleted(werbetechnikGame.currentLevel.id);
+                    
+                    // Nächstes Level freischalten
+                    const nextLevel = WerbetechnikLevels.getNextLevel(werbetechnikGame.currentLevel.id);
+                    if (nextLevel) {
+                        document.getElementById('nextLevelBtn').style.display = 'inline-block';
+                    }
+                }
+
+            } catch (error) {
+                console.error('Validation error:', error);
+                showWerbetechnikValidationResult({
+                    correct: false,
+                    feedback: 'Validierungsfehler: ' + error.message
+                });
+            }
+        }
+
+        function showWerbetechnikValidationResult(validation) {
+            const feedbackPanel = document.getElementById('feedbackPanel');
+            const feedbackIcon = document.getElementById('feedbackIcon');
+            const feedbackTitle = document.getElementById('feedbackTitle');
+            const feedbackMessage = document.getElementById('feedbackMessage');
+            const feedbackDetails = document.getElementById('feedbackDetails');
+
+            if (validation.correct) {
+                feedbackIcon.textContent = '🏗️⚡';
+                feedbackTitle.textContent = 'Werbetechnik Installation Erfolgreich!';
+                feedbackMessage.textContent = 'Perfekt! Professionelle 230V Installation korrekt ausgeführt.';
+                feedbackDetails.innerHTML = `
+                    <div style="color: #28a745; margin-top: 15px; text-align: center;">
+                        <div style="font-size: 1.2em; margin-bottom: 10px;">✅ Alle Anforderungen erfüllt</div>
+                        <div>• Schutzeinrichtungen korrekt installiert</div>
+                        <div>• Trafo-Leistungen nicht überschritten</div>
+                        <div>• LED-Spannungen korrekt</div>
+                    </div>
+                `;
+            } else {
+                feedbackIcon.textContent = '⚠️';
+                feedbackTitle.textContent = 'Installation Fehlerhaft';
+                feedbackMessage.textContent = validation.feedback;
+                
+                let detailsHTML = '';
+                if (validation.errors && validation.errors.length > 0) {
+                    detailsHTML = '<div style="text-align: left; margin-top: 15px; color: #dc3545;">';
+                    detailsHTML += '<strong>Probleme:</strong><ul>';
+                    validation.errors.forEach(error => {
+                        detailsHTML += `<li>${error}</li>`;
+                    });
+                    detailsHTML += '</ul></div>';
+                }
+                
+                if (validation.completeness) {
+                    detailsHTML += `<div style="margin-top: 10px;">Fortschritt: ${Math.round(validation.completeness * 100)}%</div>`;
+                }
+                
+                feedbackDetails.innerHTML = detailsHTML;
+            }
+
+            feedbackPanel.style.display = 'flex';
+        }
+
+        function goToNextWerbetechnikLevel() {
+            const nextLevel = WerbetechnikLevels.getNextLevel(werbetechnikGame.currentLevel.id);
+            if (nextLevel) {
+                window.location.href = `werbetechnik-game.html?level=${nextLevel.id}`;
+            } else {
+                window.location.href = `werbetechnik.html?completed=${werbetechnikGame.currentLevel.id}`;
+            }
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedbackPanel').style.display = 'none';
+        }
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', async function() {
+            werbetechnikGame = new WerbetechnikGame();
+            await werbetechnikGame.initialize();
+        });
+    </script>
+</body>
+</html>

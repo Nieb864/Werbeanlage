@@ -2,7 +2,17 @@
 
 Ein webbasiertes interaktives Lernspiel für Elektronik-Grundlagen. Lerne durch praktisches Experimentieren mit elektronischen Bauteilen und Schaltkreisen!
 
-## 🎯 Features
+## � Neu: Werbetechnik-Modus
+
+**Professionelle 230V Installationen** - Erweitert das Basis-Spiel um realistische Werbetechnik-Szenarien:
+
+🏗️ **230V AC/DC Systeme** - Echte Netzspannung mit Transformatoren  
+⚡ **Schutzeinrichtungen** - LS-Schalter (Überlast) und FI-Schalter (Fehlerstrom)  
+🌙 **Automatisierung** - Dämmerungsschalter und programmierbare Zeitschaltuhren  
+💡 **Leistungsberechnung** - Realistische Trafo-Limits und LED-Kompatibilität  
+⚠️ **Sicherheitsaspekte** - Schutzschalter sind Pflicht, falsche Spannungen = Defekt
+
+## �🎯 Features
 
 - **Drag & Drop Interface**: Intuitive Platzierung von elektronischen Bauteilen
 - **Bezier-Kabel**: Realistische Verkabelung mit mehreren Adern
@@ -56,6 +66,20 @@ Erweitere Schaltungen um Schalter für manuelle Kontrolle.
 
 ### Level 4: Komplexe Schaltung
 Meistere fortgeschrittene Schaltungen mit mehreren unabhängigen Stromkreisen.
+
+## 🏗️ Werbetechnik-Level
+
+### Level 1: Grundschaltung 230V
+Lerne die Grundlagen einer 230V Werbetechnik-Installation mit LS- und FI-Schutzschaltern. Sicherer Anschluss von 12V LED-Modulen über Transformator.
+
+### Level 2: Mischbetrieb 12V/24V  
+Baue eine professionelle Installation mit zwei verschiedenen Spannungsebenen. Beachte die Leistungsgrenzen der Transformatoren!
+
+### Level 3: Automatische Steuerung
+Erweiterte Werbetechnik mit Dämmerungsschalter für automatische Tag/Nacht-Steuerung der LED-Beleuchtung.
+
+### Level 4: Zeitgesteuerte Installation
+Meisterklasse: Komplexe Installation mit programmierbarer Zeitschaltuhr und gemischten 12V/24V LED-Systemen.
 
 ## 🛠️ Technische Details
 
@@ -129,16 +153,20 @@ Hauptstyles in `css/styles.css` und Spiel-spezifische Styles in `css/game.css`.
 ```
 elektronik-lernspiel/
 ├── index.html              # Startseite mit Level-Auswahl
-├── game.html               # Hauptspielseite
+├── game.html               # Basis-Elektronik Spiel (12V)
+├── werbetechnik.html       # Werbetechnik Startseite (230V)
+├── werbetechnik-game.html  # Werbetechnik Spielseite
 ├── css/
 │   ├── styles.css          # Allgemeine Styles
 │   └── game.css            # Spiel-spezifische Styles
 ├── js/
 │   ├── main.js             # Startseiten-Logik
-│   ├── levels.js           # Level-Definitionen
+│   ├── levels.js           # Basis-Level-Definitionen
+│   ├── werbetechnik-levels.js  # Werbetechnik Level-Definitionen
+│   ├── werbetechnik-circuit.js # 230V AC/DC Simulation
 │   ├── dragdrop.js         # Drag & Drop System
 │   ├── wiring.js           # Verkabelungssystem
-│   ├── circuit.js          # Schaltkreis-Simulation
+│   ├── circuit.js          # Basis Schaltkreis-Simulation
 │   ├── feedback.js         # Feedback-System
 │   └── game.js             # Hauptspiel-Controller
 ├── assets/
