@@ -6,6 +6,220 @@
     <meta name="description" content="Elektronik Lernspiel - Lerne Schaltkreise durch praktisches Experimentieren">
     <title>Elektronik Lernspiel</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Einheitliche Spiel-Container */
+        .game-section {
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            padding: 25px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .werbetechnik-header {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+        }
+        
+        .section-content {
+            padding: 0;
+        }
+        
+        .level-selector {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .level-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .level-tab:hover {
+            background: #e9ecef;
+        }
+        
+        .level-tab.active {
+            background: white;
+            border-bottom: 3px solid #007bff;
+        }
+        
+        .werbetechnik .level-tab.active {
+            border-bottom-color: #FF6B35;
+        }
+        
+        .game-interface {
+            display: none;
+            min-height: 600px;
+        }
+        
+        .game-interface.active {
+            display: flex;
+        }
+        
+        .components-panel {
+            width: 280px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .game-area {
+            flex: 1;
+            position: relative;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .game-canvas {
+            width: 100%;
+            height: 600px;
+            border: none;
+            display: block;
+        }
+        
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .component-item {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .component-item:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .werbetechnik .component-item:hover {
+            border-color: #FF6B35;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+        }
+        
+        .component-item img {
+            width: 50px;
+            height: 30px;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+        
+        .component-name {
+            font-size: 11px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .component-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .game-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+        }
+        
+        .control-btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .control-btn:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+        }
+        
+        .status-display {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 100;
+        }
+        
+        .voltage-warning {
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid #dc3545;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 20px;
+            color: #721c24;
+            font-size: 13px;
+        }
+        
+        .voltage-warning h4 {
+            color: #dc3545;
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .game-interface {
+                flex-direction: column;
+            }
+            
+            .components-panel {
+                width: 100%;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .game-canvas {
+                height: 400px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -14,56 +228,347 @@
             <p>Lerne Schaltkreise durch praktisches Experimentieren!</p>
         </header>
 
-        <main class="level-selection">
-            <h2>Wähle ein Level</h2>
-            <div class="levels-grid" id="levelsGrid">
-                <!-- Levels werden dynamisch geladen -->
+        <!-- GRUNDLAGEN SEKTION -->
+        <section class="game-section" id="grundlagenSection">
+            <div class="section-header">
+                <h2>🔋 Grundlagen</h2>
+                <p>Einfache 12V Elektronik-Schaltungen</p>
             </div>
-        </main>
+            
+            <div class="section-content">
+                <div class="level-selector">
+                    <button class="level-tab active" data-level="1">Level 1: LED Schaltung</button>
+                    <button class="level-tab" data-level="2">Level 2: Mit Schalter</button>
+                    <button class="level-tab" data-level="3">Level 3: Parallel LEDs</button>
+                    <button class="level-tab" data-level="4">Level 4: Komplexe Schaltung</button>
+                </div>
+                
+                <div class="game-interface active" id="grundlagenGame">
+                    <div class="components-panel">
+                        <h3>Bauteile</h3>
+                        <div class="components-grid" id="grundlagenComponents">
+                            <!-- Komponenten werden hier geladen -->
+                        </div>
+                    </div>
+                    
+                    <div class="game-area" id="grundlagenGameArea">
+                        <canvas class="game-canvas" id="grundlagenCanvas"></canvas>
+                        
+                        <div class="game-controls">
+                            <button class="control-btn" onclick="resetGrundlagenLevel()">🔄 Reset</button>
+                            <button class="control-btn" onclick="checkGrundlagenCircuit()">✓ Prüfen</button>
+                        </div>
+                        
+                        <div class="status-display" id="grundlagenStatus">
+                            Ziehe Bauteile und verbinde sie
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WERBEANLAGEN SEKTION -->
+        <section class="game-section werbetechnik" id="werbeanlagenSection">
+            <div class="section-header werbetechnik-header">
+                <h2>🏗️ Werbeanlagen</h2>
+                <p>Professionelle 230V AC/DC Installationen</p>
+            </div>
+            
+            <div class="voltage-warning">
+                <h4>⚠️ Sicherheitshinweis</h4>
+                <p><strong>230V Installationen!</strong> Alle Schaltungen mit LS- und FI-Schutzschaltern. In der Praxis nur durch Elektrofachkräfte!</p>
+            </div>
+            
+            <div class="section-content">
+                <div class="level-selector">
+                    <button class="level-tab active" data-level="1">Level 1: 230V Basis</button>
+                    <button class="level-tab" data-level="2">Level 2: 12V/24V Mix</button>
+                    <button class="level-tab" data-level="3">Level 3: Dämmerung</button>
+                    <button class="level-tab" data-level="4">Level 4: Zeitschaltung</button>
+                </div>
+                
+                <div class="game-interface active" id="werbeanlagenGame">
+                    <div class="components-panel">
+                        <h3>230V Komponenten</h3>
+                        <div class="components-grid" id="werbeanlagenComponents">
+                            <!-- Werbetechnik-Komponenten werden hier geladen -->
+                        </div>
+                    </div>
+                    
+                    <div class="game-area" id="werbeanlagenGameArea">
+                        <canvas class="game-canvas" id="werbeanlagenCanvas"></canvas>
+                        
+                        <div class="game-controls">
+                            <button class="control-btn" onclick="resetWerbeanlagenLevel()">🔄 Reset</button>
+                            <button class="control-btn" onclick="checkWerbeanlagenCircuit()">✓ Prüfen</button>
+                        </div>
+                        
+                        <div class="status-display" id="werbeanlagenStatus">
+                            230V Komponenten sicher verkabeln
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <footer>
             <p>🔧 Drag & Drop die Bauteile und verbinde sie mit Kabeln!</p>
-            <div style="margin-top: 20px; padding: 15px; background: rgba(255, 107, 53, 0.1); border-radius: 10px; border: 1px solid #FF6B35;">
-                <h3 style="color: #FF6B35; margin-bottom: 10px;">🏗️ Neu: Werbetechnik!</h3>
-                <p style="margin-bottom: 15px;">Professionelle 230V Installationen mit realistischen Komponenten:</p>
-                <ul style="text-align: left; margin: 10px 0; color: #666;">
-                    <li>✅ 230V AC Stromversorgung mit Schutzschaltern</li>
-                    <li>⚡ Realistische Transformatoren 12V/24V</li>
-                    <li>🌙 Dämmerungsschalter und Zeitschaltuhren</li>
-                    <li>💡 Leistungsberechnung und Überlastschutz</li>
-                </ul>
-                <a href="werbetechnik.html" style="display: inline-block; background: linear-gradient(135deg, #FF6B35, #F7931E); color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; margin-top: 10px;">Werbetechnik spielen →</a>
-            </div>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">
+                Grundlagen: 12V Elektronik • Werbeanlagen: 230V AC/DC Installationen
+            </p>
         </footer>
     </div>
 
+    <!-- Scripts -->
     <script src="js/levels.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/werbetechnik-levels.js"></script>
+    <script src="js/dragdrop.js"></script>
+    <script src="js/wiresystem.js"></script>
+    <script src="js/circuitsimulation.js"></script>
+    <script src="js/werbetechnik-circuit.js"></script>
+    <script src="js/game.js"></script>
+    
     <script>
-        // Debug-Hilfe für Homepage
-        console.log('🔧 Homepage lädt...');
+        // Haupt-Controller für beide Spielbereiche
+        class GameController {
+            constructor() {
+                this.currentSection = 'grundlagen';
+                this.currentLevels = {
+                    grundlagen: 1,
+                    werbeanlagen: 1
+                };
+                this.gameInstances = {};
+                
+                this.initializeSections();
+                this.setupEventListeners();
+            }
+            
+            initializeSections() {
+                // Grundlagen initialisieren
+                this.loadGrundlagenLevel(1);
+                
+                // Werbeanlagen initialisieren  
+                this.loadWerbeanlagenLevel(1);
+            }
+            
+            setupEventListeners() {
+                // Level-Tab Clicks für beide Sektionen
+                document.querySelectorAll('.level-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        const level = parseInt(e.target.dataset.level);
+                        const section = e.target.closest('.game-section');
+                        
+                        if (section.id === 'grundlagenSection') {
+                            this.switchGrundlagenLevel(level);
+                        } else {
+                            this.switchWerbeanlagenLevel(level);
+                        }
+                    });
+                });
+            }
+            
+            switchGrundlagenLevel(level) {
+                // Tab-Status aktualisieren
+                const section = document.getElementById('grundlagenSection');
+                section.querySelectorAll('.level-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                section.querySelector(`[data-level="${level}"]`).classList.add('active');
+                
+                this.currentLevels.grundlagen = level;
+                this.loadGrundlagenLevel(level);
+            }
+            
+            switchWerbeanlagenLevel(level) {
+                // Tab-Status aktualisieren
+                const section = document.getElementById('werbeanlagenSection');
+                section.querySelectorAll('.level-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                section.querySelector(`[data-level="${level}"]`).classList.add('active');
+                
+                this.currentLevels.werbeanlagen = level;
+                this.loadWerbeanlagenLevel(level);
+            }
+            
+            loadGrundlagenLevel(levelNumber) {
+                console.log(`🔋 Lade Grundlagen Level ${levelNumber}`);
+                
+                const levelData = GameLevels.getLevel(levelNumber);
+                if (!levelData) {
+                    console.error('Grundlagen Level nicht gefunden:', levelNumber);
+                    return;
+                }
+                
+                // Komponenten-Panel füllen
+                this.populateComponentsPanel('grundlagenComponents', levelData.components);
+                
+                // Status aktualisieren
+                const status = document.getElementById('grundlagenStatus');
+                status.textContent = `Level ${levelNumber}: ${levelData.title}`;
+                
+                // Canvas resetten
+                const canvas = document.getElementById('grundlagenCanvas');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Game-Instanz erstellen falls noch nicht vorhanden
+                if (!this.gameInstances.grundlagen) {
+                    this.initializeGrundlagenGame();
+                }
+            }
+            
+            loadWerbeanlagenLevel(levelNumber) {
+                console.log(`🏗️ Lade Werbeanlagen Level ${levelNumber}`);
+                
+                const levelData = WerbetechnikLevels.getLevel(levelNumber);
+                if (!levelData) {
+                    console.error('Werbeanlagen Level nicht gefunden:', levelNumber);
+                    return;
+                }
+                
+                // Komponenten-Panel füllen
+                this.populateComponentsPanel('werbeanlagenComponents', levelData.components);
+                
+                // Status aktualisieren
+                const status = document.getElementById('werbeanlagenStatus');
+                status.textContent = `Level ${levelNumber}: ${levelData.title}`;
+                
+                // Canvas resetten
+                const canvas = document.getElementById('werbeanlagenCanvas');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Game-Instanz erstellen falls noch nicht vorhanden
+                if (!this.gameInstances.werbeanlagen) {
+                    this.initializeWerbeanlagenGame();
+                }
+            }
+            
+            populateComponentsPanel(panelId, components) {
+                const panel = document.getElementById(panelId);
+                if (!panel) return;
+                
+                panel.innerHTML = '';
+                
+                components.forEach(component => {
+                    const item = document.createElement('div');
+                    item.className = 'component-item';
+                    item.dataset.componentType = component.type;
+                    item.draggable = true;
+                    
+                    item.innerHTML = `
+                        <img src="${component.image}" alt="${component.name}" loading="lazy">
+                        <div class="component-name">${component.name}</div>
+                        <div class="component-count">${component.count}</div>
+                    `;
+                    
+                    panel.appendChild(item);
+                });
+            }
+            
+            initializeGrundlagenGame() {
+                console.log('🎮 Initialisiere Grundlagen Spiel');
+                // Hier würde die Game-Engine initialisiert werden
+                // Da wir momentan den Drag&Drop Fehler haben, erstmal placeholder
+            }
+            
+            initializeWerbeanlagenGame() {
+                console.log('🎮 Initialisiere Werbeanlagen Spiel');
+                // Hier würde die Werbetechnik Game-Engine initialisiert werden
+            }
+        }
         
+        // Global Functions für Button-Callbacks
+        function resetGrundlagenLevel() {
+            if (window.gameController) {
+                const level = window.gameController.currentLevels.grundlagen;
+                window.gameController.loadGrundlagenLevel(level);
+            }
+        }
+        
+        function checkGrundlagenCircuit() {
+            console.log('🔍 Prüfe Grundlagen Schaltung');
+            // Implementierung folgt
+        }
+        
+        function resetWerbeanlagenLevel() {
+            if (window.gameController) {
+                const level = window.gameController.currentLevels.werbeanlagen;
+                window.gameController.loadWerbeanlagenLevel(level);
+            }
+        }
+        
+        function checkWerbeanlagenCircuit() {
+            console.log('🔍 Prüfe Werbeanlagen Schaltung');
+            // Implementierung folgt
+        }
+        
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Starte einheitliche Elektronik-Spielseite');
+            
+            // Canvas-Elemente korrekt dimensionieren
+            initializeCanvases();
+            
+            // Prüfe ob alle Scripts geladen sind
+            const requiredClasses = ['GameLevels', 'WerbetechnikLevels'];
+            const missingClasses = requiredClasses.filter(cls => typeof window[cls] === 'undefined');
+            
+            if (missingClasses.length > 0) {
+                console.error('❌ Fehlende Klassen:', missingClasses);
+                return;
+            }
+            
+            // Game Controller starten
+            window.gameController = new GameController();
+            console.log('✅ Game Controller gestartet');
+        });
+        
+        // Canvas-Initialisierung
+        function initializeCanvases() {
+            const canvases = ['grundlagenCanvas', 'werbeanlagenCanvas'];
+            
+            canvases.forEach(canvasId => {
+                const canvas = document.getElementById(canvasId);
+                if (canvas) {
+                    const container = canvas.parentElement;
+                    const rect = container.getBoundingClientRect();
+                    
+                    // Canvas-Dimensionen setzen
+                    canvas.width = container.offsetWidth || 800;
+                    canvas.height = 600;
+                    
+                    // Canvas-Stil anpassen
+                    canvas.style.width = '100%';
+                    canvas.style.height = '600px';
+                    
+                    console.log(`✅ Canvas ${canvasId} initialisiert: ${canvas.width}x${canvas.height}`);
+                }
+            });
+        }
+        
+        // Error Handling
         window.addEventListener('error', function(event) {
             console.error('❌ JavaScript Fehler:', event.message, 'in', event.filename, 'Zeile', event.lineno);
             
-            // Zeige Fehlermeldung auf der Seite
             const errorDiv = document.createElement('div');
-            errorDiv.style.cssText = 'background: #ff6b6b; color: white; padding: 10px; margin: 10px; border-radius: 5px; position: fixed; top: 10px; right: 10px; z-index: 9999; max-width: 400px;';
-            errorDiv.innerHTML = `<strong>⚠️ Fehler:</strong><br>${event.message}<br><small>${event.filename}:${event.lineno}</small>`;
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: #dc3545;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                z-index: 9999;
+                max-width: 400px;
+                font-size: 14px;
+            `;
+            errorDiv.innerHTML = `<strong>⚠️ Fehler:</strong><br>${event.message}`;
             document.body.appendChild(errorDiv);
             
-            setTimeout(() => errorDiv.remove(), 10000);
-        });
-
-        // Test ob GameLevels lädt
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                if (typeof GameLevels === 'undefined') {
-                    console.error('❌ GameLevels nicht verfügbar - js/levels.js nicht geladen?');
-                } else {
-                    console.log('✅ GameLevels verfügbar:', GameLevels.getAllLevels().length, 'Level');
-                }
-            }, 100);
+            setTimeout(() => errorDiv.remove(), 5000);
         });
     </script>
 </body>
