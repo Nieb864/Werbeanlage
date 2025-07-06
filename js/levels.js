@@ -10,9 +10,9 @@ const GameLevels = {
             description: "Verbinde eine LED mit einer Batterie über einen Widerstand. Lerne die Grundlagen eines einfachen Stromkreises.",
             taskDescription: "Verbinde die Batterie (+ und -) mit einer LED über einen Widerstand. Achte auf die richtige Polung der LED!",
             components: [
-                { type: "battery", name: "Batterie", image: "assets/battery.png", count: 1, connections: ["positive", "negative"] },
-                { type: "led", name: "LED", image: "assets/led.png", count: 1, connections: ["anode", "cathode"] },
-                { type: "resistor", name: "Widerstand", image: "assets/resistor.png", count: 1, connections: ["terminal1", "terminal2"] }
+                { type: "battery", name: "Batterie", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA2MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMTAiIHk9IjE1IiB3aWR0aD0iMzAiIGhlaWdodD0iMTAiIGZpbGw9IiMzMzMiLz4KPHJlY3QgeD0iNDAiIHk9IjE3IiB3aWR0aD0iNSIgaGVpZ2h0PSI2IiBmaWxsPSIjRkYwMDAwIi8+CjxyZWN0IHg9IjUiIHk9IjE3IiB3aWR0aD0iNSIgaGVpZ2h0PSI2IiBmaWxsPSIjMDAwIi8+Cjx0ZXh0IHg9IjIwIiB5PSIzNSIgZm9udC1zaXplPSI4IiBmaWxsPSIjMzMzIj45VjwvdGV4dD4KPC9zdmc+", count: 1, connections: ["positive", "negative"] },
+                { type: "led", name: "LED", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTAiIGZpbGw9IiNGRkVFMDAiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjxwb2x5Z29uIHBvaW50cz0iMTUsOCAyNSw4IDIwLDE4IiBmaWxsPSIjRkYwMDAwIi8+Cjx0ZXh0IHg9IjEwIiB5PSIzNSIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj5MRUQgKCspPC90ZXh0Pgo8L3N2Zz4=", count: 1, connections: ["anode", "cathode"] },
+                { type: "resistor", name: "Widerstand", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA1MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMTAiIHk9IjgiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0IiBmaWxsPSIjOEI0NTEzIi8+CjxyZWN0IHg9IjE1IiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkYwMDAwIi8+CjxyZWN0IHg9IjIwIiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkZBNTAwIi8+CjxyZWN0IHg9IjI1IiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkZGRjAwIi8+CjxyZWN0IHg9IjMwIiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkYwMDAwIi8+Cjx0ZXh0IHg9IjE1IiB5PSIxOCIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj4yMjDOqTwvdGV4dD4KPC9zdmc+", count: 1, connections: ["terminal1", "terminal2"] }
             ],
             solution: [
                 { from: { component: "battery", connection: "positive" }, to: { component: "resistor", connection: "terminal1" } },
@@ -35,9 +35,9 @@ const GameLevels = {
             description: "Baue eine Parallelschaltung mit zwei LEDs. Lerne wie sich Strom in parallelen Zweigen aufteilt.",
             taskDescription: "Verbinde zwei LEDs parallel zueinander mit einer Batterie. Jede LED benötigt ihren eigenen Widerstand.",
             components: [
-                { type: "battery", name: "Batterie", image: "assets/battery.png", count: 1, connections: ["positive", "negative"] },
-                { type: "led", name: "LED", image: "assets/led.png", count: 2, connections: ["anode", "cathode"] },
-                { type: "resistor", name: "Widerstand", image: "assets/resistor.png", count: 2, connections: ["terminal1", "terminal2"] }
+                { type: "battery", name: "Batterie", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA2MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMTAiIHk9IjE1IiB3aWR0aD0iMzAiIGhlaWdodD0iMTAiIGZpbGw9IiMzMzMiLz4KPHJlY3QgeD0iNDAiIHk9IjE3IiB3aWR0aD0iNSIgaGVpZ2h0PSI2IiBmaWxsPSIjRkYwMDAwIi8+CjxyZWN0IHg9IjUiIHk9IjE3IiB3aWR0aD0iNSIgaGVpZ2h0PSI2IiBmaWxsPSIjMDAwIi8+Cjx0ZXh0IHg9IjIwIiB5PSIzNSIgZm9udC1zaXplPSI4IiBmaWxsPSIjMzMzIj45VjwvdGV4dD4KPC9zdmc+", count: 1, connections: ["positive", "negative"] },
+                { type: "led", name: "LED", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTAiIGZpbGw9IiNGRkVFMDAiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjxwb2x5Z29uIHBvaW50cz0iMTUsOCAyNSw4IDIwLDE4IiBmaWxsPSIjRkYwMDAwIi8+Cjx0ZXh0IHg9IjEwIiB5PSIzNSIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj5MRUQgKCspPC90ZXh0Pgo8L3N2Zz4=", count: 2, connections: ["anode", "cathode"] },
+                { type: "resistor", name: "Widerstand", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA1MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMTAiIHk9IjgiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0IiBmaWxsPSIjOEI0NTEzIi8+CjxyZWN0IHg9IjE1IiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkYwMDAwIi8+CjxyZWN0IHg9IjIwIiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkZBNTAwIi8+CjxyZWN0IHg9IjI1IiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkZGRjAwIi8+CjxyZWN0IHg9IjMwIiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkYwMDAwIi8+Cjx0ZXh0IHg9IjE1IiB5PSIxOCIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj4yMjDOqTwvdGV4dD4KPC9zdmc+", count: 2, connections: ["terminal1", "terminal2"] }
             ],
             solution: [
                 { from: { component: "battery", connection: "positive" }, to: { component: "resistor", connection: "terminal1", instance: 0 } },
@@ -62,10 +62,10 @@ const GameLevels = {
             description: "Erweitere den Stromkreis um einen Schalter. Lerne die Kontrolle über den Stromfluss.",
             taskDescription: "Baue eine LED-Schaltung mit einem Schalter, um die LED ein- und ausschalten zu können.",
             components: [
-                { type: "battery", name: "Batterie", image: "assets/battery.png", count: 1, connections: ["positive", "negative"] },
-                { type: "led", name: "LED", image: "assets/led.png", count: 1, connections: ["anode", "cathode"] },
-                { type: "resistor", name: "Widerstand", image: "assets/resistor.png", count: 1, connections: ["terminal1", "terminal2"] },
-                { type: "switch", name: "Schalter", image: "assets/switch.png", count: 1, connections: ["input", "output"] }
+                { type: "battery", name: "Batterie", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA2MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMTAiIHk9IjE1IiB3aWR0aD0iMzAiIGhlaWdodD0iMTAiIGZpbGw9IiMzMzMiLz4KPHJlY3QgeD0iNDAiIHk9IjE3IiB3aWR0aD0iNSIgaGVpZ2h0PSI2IiBmaWxsPSIjRkYwMDAwIi8+CjxyZWN0IHg9IjUiIHk9IjE3IiB3aWR0aD0iNSIgaGVpZ2h0PSI2IiBmaWxsPSIjMDAwIi8+Cjx0ZXh0IHg9IjIwIiB5PSIzNSIgZm9udC1zaXplPSI4IiBmaWxsPSIjMzMzIj45VjwvdGV4dD4KPC9zdmc+", count: 1, connections: ["positive", "negative"] },
+                { type: "led", name: "LED", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTAiIGZpbGw9IiNGRkVFMDAiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjxwb2x5Z29uIHBvaW50cz0iMTUsOCAyNSw4IDIwLDE4IiBmaWxsPSIjRkYwMDAwIi8+Cjx0ZXh0IHg9IjEwIiB5PSIzNSIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj5MRUQgKCspPC90ZXh0Pgo8L3N2Zz4=", count: 1, connections: ["anode", "cathode"] },
+                { type: "resistor", name: "Widerstand", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA1MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMTAiIHk9IjgiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0IiBmaWxsPSIjOEI0NTEzIi8+CjxyZWN0IHg9IjE1IiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkYwMDAwIi8+CjxyZWN0IHg9IjIwIiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkZBNTAwIi8+CjxyZWN0IHg9IjI1IiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkZGRjAwIi8+CjxyZWN0IHg9IjMwIiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkYwMDAwIi8+Cjx0ZXh0IHg9IjE1IiB5PSIxOCIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj4yMjDOqTwvdGV4dD4KPC9zdmc+", count: 1, connections: ["terminal1", "terminal2"] },
+                { type: "switch", name: "Schalter", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCA0MCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iOCIgY3k9IjE1IiByPSIzIiBmaWxsPSIjMzMzIi8+CjxjaXJjbGUgY3g9IjMyIiBjeT0iMTUiIHI9IjMiIGZpbGw9IiMzMzMiLz4KPGxpbmUgeDE9IjgiIHkxPSIxNSIgeDI9IjI4IiB5Mj0iMTAiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxyZWN0IHg9IjE1IiB5PSIyIiB3aWR0aD0iMTAiIGhlaWdodD0iNiIgZmlsbD0iI0ZGMDAwMCIvPgo8dGV4dCB4PSI4IiB5PSIyOCIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj5PTi9PRkY8L3RleHQ+Cjwvc3ZnPg==", count: 1, connections: ["input", "output"] }
             ],
             solution: [
                 { from: { component: "battery", connection: "positive" }, to: { component: "switch", connection: "input" } },
@@ -88,10 +88,10 @@ const GameLevels = {
             description: "Baue eine erweiterte Schaltung mit mehreren Komponenten und verschiedenen Pfaden.",
             taskDescription: "Erstelle eine Schaltung mit zwei LEDs, die unabhängig voneinander geschaltet werden können.",
             components: [
-                { type: "battery", name: "Batterie", image: "assets/battery.png", count: 1, connections: ["positive", "negative"] },
-                { type: "led", name: "LED", image: "assets/led.png", count: 2, connections: ["anode", "cathode"] },
-                { type: "resistor", name: "Widerstand", image: "assets/resistor.png", count: 2, connections: ["terminal1", "terminal2"] },
-                { type: "switch", name: "Schalter", image: "assets/switch.png", count: 2, connections: ["input", "output"] }
+                { type: "battery", name: "Batterie", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA2MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMTAiIHk9IjE1IiB3aWR0aD0iMzAiIGhlaWdodD0iMTAiIGZpbGw9IiMzMzMiLz4KPHJlY3QgeD0iNDAiIHk9IjE3IiB3aWR0aD0iNSIgaGVpZ2h0PSI2IiBmaWxsPSIjRkYwMDAwIi8+CjxyZWN0IHg9IjUiIHk9IjE3IiB3aWR0aD0iNSIgaGVpZ2h0PSI2IiBmaWxsPSIjMDAwIi8+Cjx0ZXh0IHg9IjIwIiB5PSIzNSIgZm9udC1zaXplPSI4IiBmaWxsPSIjMzMzIj45VjwvdGV4dD4KPC9zdmc+", count: 1, connections: ["positive", "negative"] },
+                { type: "led", name: "LED", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTAiIGZpbGw9IiNGRkVFMDAiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjxwb2x5Z29uIHBvaW50cz0iMTUsOCAyNSw4IDIwLDE4IiBmaWxsPSIjRkYwMDAwIi8+Cjx0ZXh0IHg9IjEwIiB5PSIzNSIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj5MRUQgKCspPC90ZXh0Pgo8L3N2Zz4=", count: 2, connections: ["anode", "cathode"] },
+                { type: "resistor", name: "Widerstand", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCA1MCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iMTAiIHk9IjgiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0IiBmaWxsPSIjOEI0NTEzIi8+CjxyZWN0IHg9IjE1IiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkYwMDAwIi8+CjxyZWN0IHg9IjIwIiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkZBNTAwIi8+CjxyZWN0IHg9IjI1IiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkZGRjAwIi8+CjxyZWN0IHg9IjMwIiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkYwMDAwIi8+Cjx0ZXh0IHg9IjE1IiB5PSIxOCIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj4yMjDOqTwvdGV4dD4KPC9zdmc+", count: 2, connections: ["terminal1", "terminal2"] },
+                { type: "switch", name: "Schalter", image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCA0MCAzMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iOCIgY3k9IjE1IiByPSIzIiBmaWxsPSIjMzMzIi8+CjxjaXJjbGUgY3g9IjMyIiBjeT0iMTUiIHI9IjMiIGZpbGw9IiMzMzMiLz4KPGxpbmUgeDE9IjgiIHkxPSIxNSIgeDI9IjI4IiB5Mj0iMTAiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxyZWN0IHg9IjE1IiB5PSIyIiB3aWR0aD0iMTAiIGhlaWdodD0iNiIgZmlsbD0iI0ZGMDAwMCIvPgo8dGV4dCB4PSI4IiB5PSIyOCIgZm9udC1zaXplPSI2IiBmaWxsPSIjMzMzIj5PTi9PRkY8L3RleHQ+Cjwvc3ZnPg==", count: 2, connections: ["input", "output"] }
             ],
             solution: [
                 // Erster LED-Kreis
@@ -183,7 +183,7 @@ const GameLevels = {
                     input: { x: 5, y: 15, type: "input" },
                     output: { x: 35, y: 15, type: "output" }
                 },
-                state: "open" // open oder closed
+                state: "closed" // open oder closed - für Demo standardmäßig geschlossen
             }
         };
         
