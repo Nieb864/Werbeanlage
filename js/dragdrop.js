@@ -237,6 +237,8 @@ class DragDropSystem {
             width: ${component.width}px;
             height: ${component.height}px;
             cursor: move;
+            pointer-events: auto;
+            z-index: 15;
         `;
 
         const img = document.createElement('img');
@@ -245,6 +247,7 @@ class DragDropSystem {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            pointer-events: none;
         `;
 
         componentElement.appendChild(img);
@@ -265,7 +268,17 @@ class DragDropSystem {
                 position: absolute;
                 left: ${point.x - component.x}px;
                 top: ${point.y - component.y}px;
+                width: 12px;
+                height: 12px;
+                background: #28a745;
+                border: 2px solid white;
+                border-radius: 50%;
+                cursor: pointer;
+                pointer-events: auto;
+                z-index: 20;
+                transform: translate(-50%, -50%);
             `;
+            pointElement.title = `${component.type} - ${name}`;
 
             element.appendChild(pointElement);
         }
@@ -396,6 +409,26 @@ class DragDropSystem {
             
             this.dispatchEvent('componentMoved', { component: this.draggedComponent });
             this.draggedComponent = null;
+        }
+    }
+
+    // Canvas Drop Handler (fehlende Methode)
+    handleCanvasDrop(event) {
+        event.preventDefault();
+        
+        // HTML5 Drag & Drop handling
+        const dragData = event.dataTransfer?.getData('text/plain');
+        if (dragData) {
+            try {
+                const componentData = JSON.parse(dragData);
+                const rect = this.canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                
+                this.placeComponentOnCanvas(componentData.type, x, y);
+            } catch (error) {
+                console.error('Fehler beim Drop-Handling:', error);
+            }
         }
     }
 

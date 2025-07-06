@@ -40,7 +40,10 @@ class ElectronicsGame {
             this.setupEventListeners();
             
             this.isInitialized = true;
-            console.log('Spiel erfolgreich initialisiert');
+            console.log('✅ Spiel erfolgreich initialisiert');
+            console.log('📋 Level:', this.currentLevel.title);
+            console.log('🎮 Canvas-Größe:', this.gameCanvas.width, 'x', this.gameCanvas.height);
+            console.log('📦 Komponenten-Container:', this.componentsContainer);
             
         } catch (error) {
             console.error('Fehler beim Initialisieren des Spiels:', error);
@@ -52,18 +55,40 @@ class ElectronicsGame {
         this.gameCanvas = document.getElementById('gameCanvas');
         this.gameArea = document.querySelector('.game-area');
         
-        if (!this.gameCanvas || !this.gameArea) {
-            throw new Error('Erforderliche DOM-Elemente nicht gefunden');
+        if (!this.gameCanvas) {
+            throw new Error('Canvas-Element (gameCanvas) nicht gefunden');
         }
+        
+        if (!this.gameArea) {
+            throw new Error('Game-Area-Element nicht gefunden');
+        }
+        
+        // Zusätzlichen Container für platzierte Komponenten erstellen
+        let componentsContainer = this.gameArea.querySelector('.components-container');
+        if (!componentsContainer) {
+            componentsContainer = document.createElement('div');
+            componentsContainer.className = 'components-container';
+            componentsContainer.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 10;
+            `;
+            this.gameArea.appendChild(componentsContainer);
+        }
+        this.componentsContainer = componentsContainer;
     }
 
     initializeSystems() {
-        // Drag & Drop System
-        this.dragDropSystem = new DragDropSystem(this.gameCanvas, this.gameArea);
+        // Drag & Drop System - nutze den spezifischen Container für Komponenten
+        this.dragDropSystem = new DragDropSystem(this.gameCanvas, this.componentsContainer);
         window.dragDropSystem = this.dragDropSystem; // Globale Referenz für andere Systeme
         
         // Verkabelungssystem
-        this.wiringSystem = new WiringSystem(this.gameCanvas, this.gameArea);
+        this.wiringSystem = new WiringSystem(this.gameCanvas, this.componentsContainer);
         
         // Schaltkreis-Simulation
         this.circuitSystem = new CircuitSystem();
@@ -227,8 +252,16 @@ class ElectronicsGame {
         if (!this.gameCanvas || !this.gameArea) return;
         
         const rect = this.gameArea.getBoundingClientRect();
+        
+        // Canvas-Größe setzen (wichtig für korrekte Koordinaten)
         this.gameCanvas.width = rect.width;
         this.gameCanvas.height = rect.height;
+        
+        // Canvas-Style für korrekte Darstellung
+        this.gameCanvas.style.width = rect.width + 'px';
+        this.gameCanvas.style.height = rect.height + 'px';
+        
+        console.log(`Canvas resized to: ${rect.width}x${rect.height}`);
         
         // Kabel neu zeichnen
         if (this.wiringSystem) {
