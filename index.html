@@ -7,8 +7,8 @@
     <title>Elektronik Lernspiel</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* Einheitliche Spiel-Container */
-        .game-section {
+        /* Spezielle Styles für die zweispaltige Level-Auswahl */
+        .section-container {
             margin-bottom: 40px;
             background: white;
             border-radius: 15px;
@@ -18,173 +18,164 @@
         
         .section-header {
             padding: 25px;
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            color: white;
             text-align: center;
+            color: white;
+        }
+        
+        .grundlagen-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
         }
         
         .werbetechnik-header {
             background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
         }
         
-        .section-content {
-            padding: 0;
+        .section-description {
+            font-size: 1.1em;
+            margin: 10px 0;
+            opacity: 0.95;
         }
         
-        .level-selector {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
+        .section-levels {
+            padding: 30px;
         }
         
-        .level-tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            background: #f8f9fa;
-            border: none;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 500;
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
         
-        .level-tab:hover {
-            background: #e9ecef;
-        }
-        
-        .level-tab.active {
+        .level-card {
             background: white;
-            border-bottom: 3px solid #007bff;
-        }
-        
-        .werbetechnik .level-tab.active {
-            border-bottom-color: #FF6B35;
-        }
-        
-        .game-interface {
-            display: none;
-            min-height: 600px;
-        }
-        
-        .game-interface.active {
-            display: flex;
-        }
-        
-        .components-panel {
-            width: 280px;
-            background: #f8f9fa;
-            border-right: 1px solid #e9ecef;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
             padding: 20px;
-            overflow-y: auto;
-            max-height: 600px;
-        }
-        
-        .game-area {
-            flex: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
             position: relative;
-            background: white;
             overflow: hidden;
         }
         
-        .game-canvas {
-            width: 100%;
-            height: 600px;
-            border: none;
-            display: block;
+        .level-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
         
-        .components-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .component-item {
-            background: white;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            cursor: grab;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-        
-        .component-item:hover {
+        .grundlagen-section .level-card:hover {
             border-color: #007bff;
-            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
-            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.2);
         }
         
-        .werbetechnik .component-item:hover {
+        .werbetechnik-section .level-card:hover {
             border-color: #FF6B35;
-            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.2);
         }
         
-        .component-item img {
-            width: 50px;
-            height: 30px;
-            object-fit: contain;
-            margin-bottom: 5px;
+        .level-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         
-        .component-name {
-            font-size: 11px;
-            font-weight: 500;
-            color: #333;
+        .level-card.locked:hover {
+            transform: none;
+            box-shadow: none;
         }
         
-        .component-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #28a745;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
+        .level-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .level-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+            width: 60px;
+            text-align: center;
+        }
+        
+        .level-title {
+            flex: 1;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .level-difficulty {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .difficulty-easy {
+            background: #28a745;
+        }
+        
+        .difficulty-medium {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .difficulty-hard {
+            background: #dc3545;
+        }
+        
+        .level-description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .level-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 0.9em;
+        }
+        
+        .level-components {
+            color: #666;
+        }
+        
+        .level-status {
             font-weight: bold;
         }
         
-        .game-controls {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 100;
+        .status-completed {
+            color: #28a745;
         }
         
-        .control-btn {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin-left: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s ease;
+        .status-available {
+            color: #007bff;
         }
         
-        .control-btn:hover {
-            background: #f8f9fa;
-            border-color: #007bff;
+        .status-locked {
+            color: #6c757d;
         }
         
-        .status-display {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            z-index: 100;
+        .werbetechnik-section .status-available {
+            color: #FF6B35;
+        }
+        
+        .tech-info {
+            background: rgba(0, 123, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+            font-size: 0.85em;
+            border-left: 4px solid #007bff;
+        }
+        
+        .werbetechnik-section .tech-info {
+            background: rgba(255, 107, 53, 0.1);
+            border-left-color: #FF6B35;
         }
         
         .voltage-warning {
@@ -192,31 +183,39 @@
             border: 2px solid #dc3545;
             border-radius: 10px;
             padding: 15px;
-            margin: 15px 20px;
+            margin: 20px 30px;
             color: #721c24;
-            font-size: 13px;
+            font-size: 0.9em;
         }
         
         .voltage-warning h4 {
             color: #dc3545;
-            margin: 0 0 8px 0;
-            font-size: 14px;
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+        
+        .voltage-warning ul {
+            margin: 10px 0;
+            padding-left: 20px;
         }
         
         @media (max-width: 768px) {
-            .game-interface {
+            .levels-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-levels {
+                padding: 20px;
+            }
+            
+            .level-header {
                 flex-direction: column;
+                text-align: center;
             }
             
-            .components-panel {
-                width: 100%;
-                max-height: 200px;
-                border-right: none;
-                border-bottom: 1px solid #e9ecef;
-            }
-            
-            .game-canvas {
-                height: 400px;
+            .level-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
             }
         }
     </style>
@@ -229,84 +228,40 @@
         </header>
 
         <!-- GRUNDLAGEN SEKTION -->
-        <section class="game-section" id="grundlagenSection">
-            <div class="section-header">
+        <section class="section-container grundlagen-section">
+            <div class="section-header grundlagen-header">
                 <h2>🔋 Grundlagen</h2>
-                <p>Einfache 12V Elektronik-Schaltungen</p>
+                <p class="section-description">Einfache 12V Elektronik-Schaltungen für Einsteiger</p>
             </div>
             
-            <div class="section-content">
-                <div class="level-selector">
-                    <button class="level-tab active" data-level="1">Level 1: LED Schaltung</button>
-                    <button class="level-tab" data-level="2">Level 2: Mit Schalter</button>
-                    <button class="level-tab" data-level="3">Level 3: Parallel LEDs</button>
-                    <button class="level-tab" data-level="4">Level 4: Komplexe Schaltung</button>
-                </div>
-                
-                <div class="game-interface active" id="grundlagenGame">
-                    <div class="components-panel">
-                        <h3>Bauteile</h3>
-                        <div class="components-grid" id="grundlagenComponents">
-                            <!-- Komponenten werden hier geladen -->
-                        </div>
-                    </div>
-                    
-                    <div class="game-area" id="grundlagenGameArea">
-                        <canvas class="game-canvas" id="grundlagenCanvas"></canvas>
-                        
-                        <div class="game-controls">
-                            <button class="control-btn" onclick="resetGrundlagenLevel()">🔄 Reset</button>
-                            <button class="control-btn" onclick="checkGrundlagenCircuit()">✓ Prüfen</button>
-                        </div>
-                        
-                        <div class="status-display" id="grundlagenStatus">
-                            Ziehe Bauteile und verbinde sie
-                        </div>
-                    </div>
+            <div class="section-levels">
+                <div class="levels-grid" id="grundlagenLevels">
+                    <!-- Grundlagen-Level werden hier geladen -->
                 </div>
             </div>
         </section>
 
         <!-- WERBEANLAGEN SEKTION -->
-        <section class="game-section werbetechnik" id="werbeanlagenSection">
+        <section class="section-container werbetechnik-section">
             <div class="section-header werbetechnik-header">
                 <h2>🏗️ Werbeanlagen</h2>
-                <p>Professionelle 230V AC/DC Installationen</p>
+                <p class="section-description">Professionelle 230V AC/DC Installationen</p>
             </div>
             
             <div class="voltage-warning">
                 <h4>⚠️ Sicherheitshinweis</h4>
-                <p><strong>230V Installationen!</strong> Alle Schaltungen mit LS- und FI-Schutzschaltern. In der Praxis nur durch Elektrofachkräfte!</p>
+                <p><strong>230V Installationen!</strong> Alle gezeigten Schaltungen entsprechen realen Werbetechnik-Installationen.</p>
+                <ul>
+                    <li>✅ Immer LS- und FI-Schutzschalter verwenden</li>
+                    <li>✅ Trafo-Leistungen beachten (Überlast = Defekt)</li>
+                    <li>✅ Korrekte Spannungen für LED-Module</li>
+                    <li>⚠️ 12V LEDs an 24V = Blinken/Defekt</li>
+                </ul>
             </div>
             
-            <div class="section-content">
-                <div class="level-selector">
-                    <button class="level-tab active" data-level="1">Level 1: 230V Basis</button>
-                    <button class="level-tab" data-level="2">Level 2: 12V/24V Mix</button>
-                    <button class="level-tab" data-level="3">Level 3: Dämmerung</button>
-                    <button class="level-tab" data-level="4">Level 4: Zeitschaltung</button>
-                </div>
-                
-                <div class="game-interface active" id="werbeanlagenGame">
-                    <div class="components-panel">
-                        <h3>230V Komponenten</h3>
-                        <div class="components-grid" id="werbeanlagenComponents">
-                            <!-- Werbetechnik-Komponenten werden hier geladen -->
-                        </div>
-                    </div>
-                    
-                    <div class="game-area" id="werbeanlagenGameArea">
-                        <canvas class="game-canvas" id="werbeanlagenCanvas"></canvas>
-                        
-                        <div class="game-controls">
-                            <button class="control-btn" onclick="resetWerbeanlagenLevel()">🔄 Reset</button>
-                            <button class="control-btn" onclick="checkWerbeanlagenCircuit()">✓ Prüfen</button>
-                        </div>
-                        
-                        <div class="status-display" id="werbeanlagenStatus">
-                            230V Komponenten sicher verkabeln
-                        </div>
-                    </div>
+            <div class="section-levels">
+                <div class="levels-grid" id="werbetechnikLevels">
+                    <!-- Werbetechnik-Level werden hier geladen -->
                 </div>
             </div>
         </section>
@@ -322,194 +277,172 @@
     <!-- Scripts -->
     <script src="js/levels.js"></script>
     <script src="js/werbetechnik-levels.js"></script>
-    <script src="js/dragdrop.js"></script>
-    <script src="js/wiresystem.js"></script>
-    <script src="js/circuitsimulation.js"></script>
-    <script src="js/werbetechnik-circuit.js"></script>
-    <script src="js/game.js"></script>
     
     <script>
-        // Haupt-Controller für beide Spielbereiche
-        class GameController {
+        // Level-Auswahl Controller
+        class LevelSelectionController {
             constructor() {
-                this.currentSection = 'grundlagen';
-                this.currentLevels = {
-                    grundlagen: 1,
-                    werbeanlagen: 1
+                this.completedGrundlagenLevels = this.getCompletedLevels('grundlagen');
+                this.completedWerbetechnikLevels = this.getCompletedLevels('werbetechnik');
+                
+                this.initializeLevelCards();
+            }
+            
+            initializeLevelCards() {
+                this.loadGrundlagenLevels();
+                this.loadWerbetechnikLevels();
+            }
+            
+            loadGrundlagenLevels() {
+                const container = document.getElementById('grundlagenLevels');
+                if (!container || typeof GameLevels === 'undefined') return;
+                
+                const levels = GameLevels.getAllLevels();
+                
+                levels.forEach(level => {
+                    const card = this.createGrundlagenLevelCard(level);
+                    container.appendChild(card);
+                });
+            }
+            
+            loadWerbetechnikLevels() {
+                const container = document.getElementById('werbetechnikLevels');
+                if (!container || typeof WerbetechnikLevels === 'undefined') return;
+                
+                const levels = WerbetechnikLevels.getAllLevels();
+                
+                levels.forEach(level => {
+                    const card = this.createWerbetechnikLevelCard(level);
+                    container.appendChild(card);
+                });
+            }
+            
+            createGrundlagenLevelCard(level) {
+                const isCompleted = this.completedGrundlagenLevels.includes(level.id);
+                const isUnlocked = this.isGrundlagenLevelUnlocked(level.id);
+                
+                const card = document.createElement('div');
+                card.className = `level-card ${!isUnlocked ? 'locked' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="level-header">
+                        <div class="level-icon">${isCompleted ? '✅' : (isUnlocked ? level.icon : '🔒')}</div>
+                        <div class="level-title">${level.title}</div>
+                        <div class="level-difficulty difficulty-${level.difficulty}">${this.getDifficultyText(level.difficulty)}</div>
+                    </div>
+                    
+                    <div class="level-description">${level.description}</div>
+                    
+                    <div class="tech-info">
+                        <strong>Komponenten:</strong> ${this.getGrundlagenTechInfo(level)}
+                    </div>
+                    
+                    <div class="level-stats">
+                        <div class="level-components">${level.components.length} Bauteile</div>
+                        <div class="level-status ${isCompleted ? 'status-completed' : (isUnlocked ? 'status-available' : 'status-locked')}">
+                            ${isCompleted ? 'Abgeschlossen' : (isUnlocked ? 'Verfügbar' : 'Gesperrt')}
+                        </div>
+                    </div>
+                `;
+                
+                if (isUnlocked) {
+                    card.addEventListener('click', () => this.startGrundlagenLevel(level.id));
+                }
+                
+                return card;
+            }
+            
+            createWerbetechnikLevelCard(level) {
+                const isCompleted = this.completedWerbetechnikLevels.includes(level.id);
+                const isUnlocked = this.isWerbetechnikLevelUnlocked(level.id);
+                
+                const card = document.createElement('div');
+                card.className = `level-card ${!isUnlocked ? 'locked' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="level-header">
+                        <div class="level-icon">${isCompleted ? '✅' : (isUnlocked ? level.icon : '🔒')}</div>
+                        <div class="level-title">${level.title}</div>
+                        <div class="level-difficulty difficulty-${level.difficulty}">${this.getDifficultyText(level.difficulty)}</div>
+                    </div>
+                    
+                    <div class="level-description">${level.description}</div>
+                    
+                    <div class="tech-info">
+                        <strong>Komponenten:</strong> ${this.getWerbetechnikTechInfo(level)}
+                    </div>
+                    
+                    <div class="level-stats">
+                        <div class="level-components">${level.components.length} Bauteile</div>
+                        <div class="level-status ${isCompleted ? 'status-completed' : (isUnlocked ? 'status-available' : 'status-locked')}">
+                            ${isCompleted ? 'Abgeschlossen' : (isUnlocked ? 'Verfügbar' : 'Gesperrt')}
+                        </div>
+                    </div>
+                `;
+                
+                if (isUnlocked) {
+                    card.addEventListener('click', () => this.startWerbetechnikLevel(level.id));
+                }
+                
+                return card;
+            }
+            
+            getGrundlagenTechInfo(level) {
+                const components = level.components;
+                const types = components.map(c => c.name).slice(0, 3);
+                return types.join(', ') + (components.length > 3 ? '...' : '');
+            }
+            
+            getWerbetechnikTechInfo(level) {
+                const components = level.components;
+                const has230V = components.some(c => c.type === 'power230v');
+                const hasTrafos = components.filter(c => c.type.includes('trafo_'));
+                const hasLEDs = components.filter(c => c.type.includes('led_'));
+                
+                let details = [];
+                if (has230V) details.push('230V AC');
+                if (hasTrafos.length > 0) details.push(`${hasTrafos.length} Trafo(s)`);
+                if (hasLEDs.length > 0) details.push(`${hasLEDs.length} LED-Module`);
+                
+                return details.join(' • ');
+            }
+            
+            getDifficultyText(difficulty) {
+                const texts = {
+                    easy: 'Einsteiger',
+                    medium: 'Fortgeschritten', 
+                    hard: 'Experte'
                 };
-                this.gameInstances = {};
-                
-                this.initializeSections();
-                this.setupEventListeners();
+                return texts[difficulty] || difficulty;
             }
             
-            initializeSections() {
-                // Grundlagen initialisieren
-                this.loadGrundlagenLevel(1);
-                
-                // Werbeanlagen initialisieren  
-                this.loadWerbeanlagenLevel(1);
+            isGrundlagenLevelUnlocked(levelId) {
+                if (levelId === 1) return true;
+                return this.completedGrundlagenLevels.includes(levelId - 1);
             }
             
-            setupEventListeners() {
-                // Level-Tab Clicks für beide Sektionen
-                document.querySelectorAll('.level-tab').forEach(tab => {
-                    tab.addEventListener('click', (e) => {
-                        const level = parseInt(e.target.dataset.level);
-                        const section = e.target.closest('.game-section');
-                        
-                        if (section.id === 'grundlagenSection') {
-                            this.switchGrundlagenLevel(level);
-                        } else {
-                            this.switchWerbeanlagenLevel(level);
-                        }
-                    });
-                });
+            isWerbetechnikLevelUnlocked(levelId) {
+                if (levelId === 1) return true;
+                return this.completedWerbetechnikLevels.includes(levelId - 1);
             }
             
-            switchGrundlagenLevel(level) {
-                // Tab-Status aktualisieren
-                const section = document.getElementById('grundlagenSection');
-                section.querySelectorAll('.level-tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                section.querySelector(`[data-level="${level}"]`).classList.add('active');
-                
-                this.currentLevels.grundlagen = level;
-                this.loadGrundlagenLevel(level);
+            getCompletedLevels(section) {
+                const stored = localStorage.getItem(`completed_${section}_levels`);
+                return stored ? JSON.parse(stored) : [];
             }
             
-            switchWerbeanlagenLevel(level) {
-                // Tab-Status aktualisieren
-                const section = document.getElementById('werbeanlagenSection');
-                section.querySelectorAll('.level-tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-                section.querySelector(`[data-level="${level}"]`).classList.add('active');
-                
-                this.currentLevels.werbeanlagen = level;
-                this.loadWerbeanlagenLevel(level);
+            startGrundlagenLevel(levelId) {
+                window.location.href = `game.html?level=${levelId}`;
             }
             
-            loadGrundlagenLevel(levelNumber) {
-                console.log(`🔋 Lade Grundlagen Level ${levelNumber}`);
-                
-                const levelData = GameLevels.getLevel(levelNumber);
-                if (!levelData) {
-                    console.error('Grundlagen Level nicht gefunden:', levelNumber);
-                    return;
-                }
-                
-                // Komponenten-Panel füllen
-                this.populateComponentsPanel('grundlagenComponents', levelData.components);
-                
-                // Status aktualisieren
-                const status = document.getElementById('grundlagenStatus');
-                status.textContent = `Level ${levelNumber}: ${levelData.title}`;
-                
-                // Canvas resetten
-                const canvas = document.getElementById('grundlagenCanvas');
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Game-Instanz erstellen falls noch nicht vorhanden
-                if (!this.gameInstances.grundlagen) {
-                    this.initializeGrundlagenGame();
-                }
+            startWerbetechnikLevel(levelId) {
+                window.location.href = `werbetechnik-game.html?level=${levelId}`;
             }
-            
-            loadWerbeanlagenLevel(levelNumber) {
-                console.log(`🏗️ Lade Werbeanlagen Level ${levelNumber}`);
-                
-                const levelData = WerbetechnikLevels.getLevel(levelNumber);
-                if (!levelData) {
-                    console.error('Werbeanlagen Level nicht gefunden:', levelNumber);
-                    return;
-                }
-                
-                // Komponenten-Panel füllen
-                this.populateComponentsPanel('werbeanlagenComponents', levelData.components);
-                
-                // Status aktualisieren
-                const status = document.getElementById('werbeanlagenStatus');
-                status.textContent = `Level ${levelNumber}: ${levelData.title}`;
-                
-                // Canvas resetten
-                const canvas = document.getElementById('werbeanlagenCanvas');
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Game-Instanz erstellen falls noch nicht vorhanden
-                if (!this.gameInstances.werbeanlagen) {
-                    this.initializeWerbeanlagenGame();
-                }
-            }
-            
-            populateComponentsPanel(panelId, components) {
-                const panel = document.getElementById(panelId);
-                if (!panel) return;
-                
-                panel.innerHTML = '';
-                
-                components.forEach(component => {
-                    const item = document.createElement('div');
-                    item.className = 'component-item';
-                    item.dataset.componentType = component.type;
-                    item.draggable = true;
-                    
-                    item.innerHTML = `
-                        <img src="${component.image}" alt="${component.name}" loading="lazy">
-                        <div class="component-name">${component.name}</div>
-                        <div class="component-count">${component.count}</div>
-                    `;
-                    
-                    panel.appendChild(item);
-                });
-            }
-            
-            initializeGrundlagenGame() {
-                console.log('🎮 Initialisiere Grundlagen Spiel');
-                // Hier würde die Game-Engine initialisiert werden
-                // Da wir momentan den Drag&Drop Fehler haben, erstmal placeholder
-            }
-            
-            initializeWerbeanlagenGame() {
-                console.log('🎮 Initialisiere Werbeanlagen Spiel');
-                // Hier würde die Werbetechnik Game-Engine initialisiert werden
-            }
-        }
-        
-        // Global Functions für Button-Callbacks
-        function resetGrundlagenLevel() {
-            if (window.gameController) {
-                const level = window.gameController.currentLevels.grundlagen;
-                window.gameController.loadGrundlagenLevel(level);
-            }
-        }
-        
-        function checkGrundlagenCircuit() {
-            console.log('🔍 Prüfe Grundlagen Schaltung');
-            // Implementierung folgt
-        }
-        
-        function resetWerbeanlagenLevel() {
-            if (window.gameController) {
-                const level = window.gameController.currentLevels.werbeanlagen;
-                window.gameController.loadWerbeanlagenLevel(level);
-            }
-        }
-        
-        function checkWerbeanlagenCircuit() {
-            console.log('🔍 Prüfe Werbeanlagen Schaltung');
-            // Implementierung folgt
         }
         
         // Initialisierung
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Starte einheitliche Elektronik-Spielseite');
-            
-            // Canvas-Elemente korrekt dimensionieren
-            initializeCanvases();
+            console.log('🚀 Starte Level-Auswahl');
             
             // Prüfe ob alle Scripts geladen sind
             const requiredClasses = ['GameLevels', 'WerbetechnikLevels'];
@@ -517,36 +450,25 @@
             
             if (missingClasses.length > 0) {
                 console.error('❌ Fehlende Klassen:', missingClasses);
+                
+                // Zeige Fallback wenn Scripts nicht laden
+                setTimeout(() => {
+                    if (missingClasses.includes('GameLevels')) {
+                        document.getElementById('grundlagenLevels').innerHTML = 
+                            '<div style="text-align: center; padding: 40px; color: #666;">Grundlagen-Level werden geladen...</div>';
+                    }
+                    if (missingClasses.includes('WerbetechnikLevels')) {
+                        document.getElementById('werbetechnikLevels').innerHTML = 
+                            '<div style="text-align: center; padding: 40px; color: #666;">Werbetechnik-Level werden geladen...</div>';
+                    }
+                }, 1000);
                 return;
             }
             
-            // Game Controller starten
-            window.gameController = new GameController();
-            console.log('✅ Game Controller gestartet');
+            // Level-Controller starten
+            window.levelController = new LevelSelectionController();
+            console.log('✅ Level-Auswahl gestartet');
         });
-        
-        // Canvas-Initialisierung
-        function initializeCanvases() {
-            const canvases = ['grundlagenCanvas', 'werbeanlagenCanvas'];
-            
-            canvases.forEach(canvasId => {
-                const canvas = document.getElementById(canvasId);
-                if (canvas) {
-                    const container = canvas.parentElement;
-                    const rect = container.getBoundingClientRect();
-                    
-                    // Canvas-Dimensionen setzen
-                    canvas.width = container.offsetWidth || 800;
-                    canvas.height = 600;
-                    
-                    // Canvas-Stil anpassen
-                    canvas.style.width = '100%';
-                    canvas.style.height = '600px';
-                    
-                    console.log(`✅ Canvas ${canvasId} initialisiert: ${canvas.width}x${canvas.height}`);
-                }
-            });
-        }
         
         // Error Handling
         window.addEventListener('error', function(event) {
