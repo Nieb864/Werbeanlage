@@ -98,6 +98,18 @@ class WerbetechnikCircuitSystem {
         return { ok: true };
     }
 
+    buildWerbetechnikNetwork() {
+        // Einfache Netzwerk-Struktur für Werbetechnik
+        return {
+            components: this.components,
+            wires: this.wires,
+            powerSources: this.powerSources,
+            protectionDevices: this.protectionDevices,
+            trafos: this.trafos,
+            loads: this.loads
+        };
+    }
+
     isProtectionCorrectlyWired(lsSwitch, fiSwitch) {
         // LS-Schalter muss vor FI-Schalter sein
         const powerSource = this.powerSources[0];
@@ -166,12 +178,12 @@ class WerbetechnikCircuitSystem {
 
         if (!connectedWire) return null;
 
-        const otherComponent = wire.to.componentId === component.id ? 
-            this.components.find(c => c.id === wire.from.componentId) :
-            this.components.find(c => c.id === wire.to.componentId);
+        const otherComponent = connectedWire.to.componentId === component.id ? 
+            this.components.find(c => c.id === connectedWire.from.componentId) :
+            this.components.find(c => c.id === connectedWire.to.componentId);
 
-        const otherConnection = wire.to.componentId === component.id ? 
-            wire.from.pointName : wire.to.pointName;
+        const otherConnection = connectedWire.to.componentId === component.id ? 
+            connectedWire.from.pointName : connectedWire.to.pointName;
 
         return distribution.get(`${otherComponent.id}_${otherConnection}`);
     }
@@ -510,16 +522,23 @@ class WerbetechnikCircuitSystem {
             errors.push(protectionCheck.error);
         }
 
-        // Leistungsberechnung prüfen
-        const simulation = this.simulate();
-        if (simulation.success) {
-            simulation.faultAnalysis.overloadedTrafos.forEach(fault => {
+        // Leistungsberechnung prüfen (vereinfacht, um Rekursion zu vermeiden)
+        try {
+            const network = this.buildWerbetechnikNetwork();
+            const acDistribution = this.simulateACDistribution(network);
+            const dcCircuits = this.simulateTransformers(network, acDistribution);
+            const loadAnalysis = this.calculateLoads(dcCircuits);
+            const faultAnalysis = this.analyzeFaults(loadAnalysis);
+            
+            faultAnalysis.overloadedTrafos.forEach(fault => {
                 errors.push(`Trafo überlastet: ${fault.power.toFixed(1)}W > ${fault.maxPower}W`);
             });
 
-            simulation.faultAnalysis.wrongVoltages.forEach(fault => {
+            faultAnalysis.wrongVoltages.forEach(fault => {
                 errors.push(`Falsche LED-Spannung: ${fault.actualVoltage}V statt ${fault.expectedVoltage}V`);
             });
+        } catch (e) {
+            // Ignoriere Simulationsfehler bei der Validierung
         }
 
         return {
