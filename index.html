@@ -1003,9 +1003,1651 @@
     </div>
 
     <script>
-        console.log('🚀 LED-Lernspiel wird geladen...');
-        // Vollständige JavaScript-Implementierung wird jetzt hinzugefügt
-        alert('Die neue LED-Werkbank Version ist fast fertig!\n\nDer komplette JavaScript-Code wird jetzt geladen.');
+        let systemPower = false;
+        let connections = [];
+        let components = [];
+        let circuit = null;
+        
+        const ComponentTypes = {
+            POWER_SOURCE: 'power-source',
+            TRANSFORMER_12V: 'trafo-12v-40w',
+            TRANSFORMER_24V: 'trafo-24v-60w',
+            LED_12V_1_2W: 'led-12v-1.2w',
+            LED_12V: 'led-12v-3.5w',
+            LED_24V: 'led-24v-5w',
+            FI_SWITCH: 'fi-schalter',
+            LS_SWITCH: 'ls-schalter'
+        };
+        
+        const ComponentSpecs = {
+            [ComponentTypes.POWER_SOURCE]: {
+                voltage: 230,
+                maxCurrent: 16,
+                type: 'source'
+            },
+            [ComponentTypes.TRANSFORMER_12V]: {
+                inputVoltage: 230,
+                outputVoltage: 12,
+                maxPower: 40,
+                type: 'transformer'
+            },
+            [ComponentTypes.TRANSFORMER_24V]: {
+                inputVoltage: 230,
+                outputVoltage: 24,
+                maxPower: 60,
+                type: 'transformer'
+            },
+            [ComponentTypes.LED_12V_1_2W]: {
+                ratedVoltage: 12,
+                power: 1.2,
+                tolerance: 0.2,
+                type: 'load'
+            },
+            [ComponentTypes.LED_12V]: {
+                ratedVoltage: 12,
+                power: 3.5,
+                tolerance: 0.2,
+                type: 'load'
+            },
+            [ComponentTypes.LED_24V]: {
+                ratedVoltage: 24,
+                power: 5,
+                tolerance: 0.2,
+                type: 'load'
+            }
+        };
+        
+        const ComponentStates = {
+            OFF: 'off',
+            ON: 'on',
+            BLINKING: 'blinking',
+            BROKEN: 'broken',
+            OVERLOADED: 'overloaded'
+        };
+        
+        class ComponentStateMachine {
+            constructor(componentType, elementId) {
+                this.type = componentType;
+                this.elementId = elementId;
+                this.state = ComponentStates.OFF;
+                this.specs = ComponentSpecs[componentType];
+                this.currentVoltage = 0;
+                this.currentPower = 0;
+            }
+            
+            updateState(voltage, current) {
+                this.currentVoltage = voltage;
+                this.currentPower = voltage * current;
+                
+                const previousState = this.state;
+                
+                if (this.specs.type === 'load') {
+                    this.state = this.calculateLEDState(voltage);
+                } else if (this.specs.type === 'transformer') {
+                    this.state = this.calculateTransformerState();
+                }
+                
+                if (previousState !== this.state) {
+                    this.animateStateChange();
+                }
+            }
+            
+            calculateLEDState(voltage) {
+                if (voltage === 0) return ComponentStates.OFF;
+                
+                const ratedVoltage = this.specs.ratedVoltage;
+                const tolerance = this.specs.tolerance;
+                
+                if (voltage > ratedVoltage * (1 + tolerance * 3)) {
+                    return ComponentStates.BROKEN;
+                }
+                
+                if (voltage > ratedVoltage * (1 + tolerance)) {
+                    return ComponentStates.BLINKING;
+                }
+                
+                if (voltage >= ratedVoltage * (1 - tolerance)) {
+                    return ComponentStates.ON;
+                }
+                
+                return ComponentStates.OFF;
+            }
+            
+            calculateTransformerState() {
+                if (this.currentPower > this.specs.maxPower * 1.2) {
+                    return ComponentStates.BROKEN;
+                }
+                if (this.currentPower > this.specs.maxPower) {
+                    return ComponentStates.OVERLOADED;
+                }
+                return this.currentVoltage > 0 ? ComponentStates.ON : ComponentStates.OFF;
+            }
+            
+            animateStateChange() {
+                const element = document.getElementById(this.elementId);
+                if (!element) return;
+                
+                element.classList.remove('state-off', 'state-on', 'state-blinking', 'state-broken', 'state-overloaded');
+                element.classList.add(`state-${this.state}`);
+                
+                console.log(`${this.type} (${this.elementId}): ${this.state} (${this.currentVoltage}V, ${this.currentPower.toFixed(2)}W)`);
+            }
+        }
+        
+        class CircuitGraph {
+            constructor() {
+                this.nodes = new Map();
+                this.edges = new Map();
+                this.stateMachines = new Map();
+            }
+            
+            addComponent(id, type, position) {
+                this.nodes.set(id, {
+                    id: id,
+                    type: type,
+                    position: position,
+                    connections: new Set()
+                });
+                
+                this.stateMachines.set(id, new ComponentStateMachine(type, id));
+                
+                console.log(`Bauteil hinzugefügt: ${type} (${id})`);
+            }
+            
+            addConnection(id, fromComponent, toComponent) {
+                this.edges.set(id, {
+                    from: fromComponent,
+                    to: toComponent
+                });
+                
+                if (this.nodes.has(fromComponent)) {
+                    this.nodes.get(fromComponent).connections.add(toComponent);
+                }
+                if (this.nodes.has(toComponent)) {
+                    this.nodes.get(toComponent).connections.add(fromComponent);
+                }
+                
+                console.log(`Verbindung erstellt: ${fromComponent} → ${toComponent}`);
+            }
+            
+            findPath(startNode, endNode, visited = new Set()) {
+                if (startNode === endNode) return [startNode];
+                if (visited.has(startNode)) return null;
+                
+                visited.add(startNode);
+                
+                const component = this.nodes.get(startNode);
+                if (!component) return null;
+                
+                for (const neighbor of component.connections) {
+                    const path = this.findPath(neighbor, endNode, new Set(visited));
+                    if (path) {
+                        return [startNode, ...path];
+                    }
+                }
+                
+                return null;
+            }
+            
+            getConnectedComponents(startNode) {
+                const visited = new Set();
+                const connected = [];
+                
+                const dfs = (nodeId) => {
+                    if (visited.has(nodeId)) return;
+                    visited.add(nodeId);
+                    connected.push(nodeId);
+                    
+                    const component = this.nodes.get(nodeId);
+                    if (component) {
+                        for (const neighbor of component.connections) {
+                            dfs(neighbor);
+                        }
+                    }
+                };
+                
+                dfs(startNode);
+                return connected;
+            }
+        }
+        
+        class PhysicsEngine {
+            constructor(graph) {
+                this.graph = graph;
+            }
+            
+            calculateCircuit() {
+                if (!systemPower) {
+                    this.powerOffAllComponents();
+                    return;
+                }
+                
+                const powerSource = this.findPowerSource();
+                if (!powerSource) {
+                    console.log('Keine Stromquelle gefunden');
+                    return;
+                }
+                
+                const connectedComponents = this.graph.getConnectedComponents(powerSource);
+                console.log('Verbundene Komponenten:', connectedComponents);
+                
+                this.calculateVoltagesAndCurrents(connectedComponents);
+            }
+            
+            findPowerSource() {
+                for (const [id, component] of this.graph.nodes) {
+                    if (component.type === ComponentTypes.POWER_SOURCE) {
+                        return id;
+                    }
+                }
+                return null;
+            }
+            
+            calculateVoltagesAndCurrents(components) {
+                for (const componentId of components) {
+                    const component = this.graph.nodes.get(componentId);
+                    const stateMachine = this.graph.stateMachines.get(componentId);
+                    
+                    if (!component || !stateMachine) continue;
+                    
+                    let voltage = 0;
+                    let current = 0;
+                    
+                    if (component.type === ComponentTypes.POWER_SOURCE) {
+                        voltage = ComponentSpecs[component.type].voltage;
+                        current = this.calculateSourceCurrent(componentId);
+                    } else {
+                        const result = this.calculateComponentPower(componentId);
+                        voltage = result.voltage;
+                        current = result.current;
+                    }
+                    
+                    stateMachine.updateState(voltage, current);
+                }
+            }
+            
+            calculateComponentPower(componentId) {
+                const component = this.graph.nodes.get(componentId);
+                
+                for (const connectedId of component.connections) {
+                    const connectedComponent = this.graph.nodes.get(connectedId);
+                    if (connectedComponent && ComponentSpecs[connectedComponent.type].type === 'transformer') {
+                        const specs = ComponentSpecs[connectedComponent.type];
+                        return {
+                            voltage: specs.outputVoltage,
+                            current: ComponentSpecs[component.type].power / specs.outputVoltage
+                        };
+                    }
+                }
+                
+                for (const connectedId of component.connections) {
+                    const connectedComponent = this.graph.nodes.get(connectedId);
+                    if (connectedComponent && connectedComponent.type === ComponentTypes.POWER_SOURCE) {
+                        return {
+                            voltage: ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage,
+                            current: ComponentSpecs[component.type].power / ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage
+                        };
+                    }
+                }
+                
+                return { voltage: 0, current: 0 };
+            }
+            
+            calculateSourceCurrent(sourceId) {
+                let totalCurrent = 0;
+                const connectedComponents = this.graph.getConnectedComponents(sourceId);
+                
+                for (const componentId of connectedComponents) {
+                    const component = this.graph.nodes.get(componentId);
+                    if (component && ComponentSpecs[component.type].type === 'load') {
+                        const specs = ComponentSpecs[component.type];
+                        totalCurrent += specs.power / ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage;
+                    }
+                }
+                
+                return totalCurrent;
+            }
+            
+            powerOffAllComponents() {
+                for (const [id, stateMachine] of this.graph.stateMachines) {
+                    stateMachine.updateState(0, 0);
+                }
+            }
+        }
+        
+        class RealtimeSimulation {
+            constructor() {
+                this.graph = new CircuitGraph();
+                this.physics = new PhysicsEngine(this.graph);
+                this.isRunning = false;
+            }
+            
+            start() {
+                this.isRunning = true;
+                console.log('🔄 Echtzeit-Simulation gestartet');
+            }
+            
+            stop() {
+                this.isRunning = false;
+                console.log('⏸️ Echtzeit-Simulation gestoppt');
+            }
+            
+            update() {
+                if (!this.isRunning) return;
+                this.physics.calculateCircuit();
+            }
+            
+            addComponent(id, type, position) {
+                this.graph.addComponent(id, type, position);
+                this.update();
+            }
+            
+            addConnection(id, fromComponent, toComponent) {
+                this.graph.addConnection(id, fromComponent, toComponent);
+                this.update();
+            }
+            
+            powerStateChanged() {
+                console.log(`⚡ Hauptschalter: ${systemPower ? 'EIN' : 'AUS'}`);
+                this.update();
+            }
+        }
+        
+        // Event-Delegierung System
+        class WorkspaceManager {
+            constructor() {
+                this.setupEventDelegation();
+                this.selectedComponents = new Set();
+                this.isDraggingComponents = false;
+                this.dragStartPos = null;
+                this.componentStartPositions = new Map();
+                this.componentRotations = new Map();
+                this.isDrawingSelection = false;
+                this.selectionStart = null;
+                this.selectionRectangle = null;
+                this.justFinishedRectangleSelection = false;
+                
+                // Connection System
+                this.activeConnection = null;
+                this.tempConnectionLine = null;
+                this.connections = new Map();
+                
+                console.log('🎯 WorkspaceManager initialisiert');
+            }
+            
+            setupEventDelegation() {
+                const workspace = document.getElementById('workspace');
+                
+                workspace.addEventListener('mousedown', this.handleMouseDown.bind(this));
+                workspace.addEventListener('mousemove', this.handleMouseMove.bind(this));
+                workspace.addEventListener('mouseup', this.handleMouseUp.bind(this));
+                workspace.addEventListener('click', this.handleClick.bind(this));
+                workspace.addEventListener('dblclick', this.handleDblClick.bind(this));
+                
+                this.setupKeyboardEvents();
+                
+                console.log('✅ Event-Delegierung eingerichtet');
+            }
+            
+            setupKeyboardEvents() {
+                document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+                document.addEventListener('keydown', this.handleKeyDown.bind(this));
+                
+                const workspace = document.getElementById('workspace');
+                workspace.setAttribute('tabindex', '0');
+                workspace.style.outline = 'none';
+                
+                workspace.addEventListener('mousedown', () => {
+                    workspace.focus();
+                });
+                
+                console.log('⌨️ Keyboard Events eingerichtet');
+            }
+            
+            isComponent(element) {
+                const component = element.classList.contains('component') || 
+                                element.closest('.component');
+                
+                if (component && component.id === 'power-source-svg') {
+                    return false;
+                }
+                
+                return !!component;
+            }
+            
+            getComponent(element) {
+                const component = element.classList.contains('component') ? 
+                                element : element.closest('.component');
+                
+                if (component && component.id === 'power-source-svg') {
+                    return null;
+                }
+                
+                return component;
+            }
+            
+            handleMouseDown(e) {
+                if (this.isConnectionPoint(e.target)) {
+                    this.handleConnectionMouseDown(e);
+                    return;
+                }
+                
+                const component = this.getComponent(e.target);
+                
+                if (component) {
+                    console.log('🖱️ MouseDown auf Bauteil:', component.dataset.componentType);
+                    
+                    if (!this.selectedComponents.has(component)) {
+                        if (!e.ctrlKey) {
+                            this.selectSingle(component);
+                        } else {
+                            this.toggleSelection(component);
+                        }
+                    }
+                    
+                    this.startDragging(e);
+                    e.preventDefault();
+                } else {
+                    console.log('🖱️ MouseDown auf leere Fläche');
+                    this.startRectangleSelection(e);
+                }
+            }
+            
+            handleMouseMove(e) {
+                if (this.activeConnection) {
+                    this.updateConnectionLine(e);
+                    return;
+                }
+                
+                if (this.isDraggingComponents) {
+                    this.updateDragging(e);
+                } else if (this.isDrawingSelection) {
+                    this.updateRectangleSelection(e);
+                }
+            }
+            
+            handleMouseUp(e) {
+                if (this.activeConnection) {
+                    this.handleConnectionMouseUp(e);
+                    return;
+                }
+                
+                if (this.isDraggingComponents) {
+                    this.endDragging(e);
+                } else if (this.isDrawingSelection) {
+                    this.endRectangleSelection(e);
+                }
+            }
+            
+            handleClick(e) {
+                if (this.justFinishedRectangleSelection) {
+                    this.justFinishedRectangleSelection = false;
+                    console.log('🚫 Click nach Rectangle Selection ignoriert');
+                    return;
+                }
+                
+                if (this.isDraggingComponents) return;
+                
+                const component = this.getComponent(e.target);
+                
+                if (component) {
+                    if (e.ctrlKey) {
+                        console.log('🎯 Strg+Klick - Multi-Select auf:', component.dataset.componentType);
+                        this.toggleSelection(component);
+                    } else {
+                        console.log('🎯 Klick - Single-Select auf:', component.dataset.componentType);
+                        this.selectSingle(component);
+                    }
+                } else {
+                    console.log('🎯 Klick auf leere Fläche - Auswahl löschen');
+                    this.clearSelection();
+                }
+            }
+            
+            handleDblClick(e) {
+                const component = this.getComponent(e.target);
+                if (component) {
+                    console.log('🔄 Doppelklick - Drehe Bauteil:', component.dataset.componentType);
+                    this.rotateComponent(component);
+                    e.preventDefault();
+                }
+            }
+            
+            handleKeyDown(e) {
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    console.log('🗑️ Delete/Backspace-Taste - Lösche ausgewählte Bauteile');
+                    this.deleteSelectedComponents();
+                    e.preventDefault();
+                } else if (e.key === 'Escape') {
+                    console.log('🚫 Escape - Alle Auswahlen aufheben');
+                    this.clearSelection();
+                }
+            }
+            
+            // Drag & Drop System
+            startDragging(e) {
+                this.isDraggingComponents = true;
+                this.dragStartPos = { x: e.clientX, y: e.clientY };
+                
+                this.componentStartPositions.clear();
+                const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+                
+                this.selectedComponents.forEach(component => {
+                    const currentLeft = parseFloat(component.style.left) || 0;
+                    const currentTop = parseFloat(component.style.top) || 0;
+                    
+                    const mouseX = e.clientX - workspaceRect.left;
+                    const mouseY = e.clientY - workspaceRect.top;
+                    const mouseOffsetX = mouseX - currentLeft;
+                    const mouseOffsetY = mouseY - currentTop;
+                    
+                    this.componentStartPositions.set(component, {
+                        x: currentLeft,
+                        y: currentTop,
+                        mouseOffsetX: mouseOffsetX,
+                        mouseOffsetY: mouseOffsetY
+                    });
+                    
+                    component.classList.add('dragging');
+                });
+                
+                console.log('🚀 Drag gestartet für', this.selectedComponents.size, 'Bauteile');
+            }
+            
+            updateDragging(e) {
+                if (!this.isDraggingComponents) return;
+                
+                const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+                const mouseX = e.clientX - workspaceRect.left;
+                const mouseY = e.clientY - workspaceRect.top;
+                
+                this.selectedComponents.forEach((component) => {
+                    const startData = this.componentStartPositions.get(component);
+                    if (startData) {
+                        const newLeft = mouseX - startData.mouseOffsetX;
+                        const newTop = mouseY - startData.mouseOffsetY;
+                        
+                        component.style.left = newLeft + 'px';
+                        component.style.top = newTop + 'px';
+                        
+                        try {
+                            this.updateConnectionsForComponent(component);
+                        } catch (error) {
+                            console.log('⚠️ Fehler beim Connection-Update:', error.message);
+                        }
+                    }
+                });
+            }
+            
+            endDragging(e) {
+                this.isDraggingComponents = false;
+                this.dragStartPos = null;
+                this.componentStartPositions.clear();
+                
+                this.selectedComponents.forEach(component => {
+                    component.classList.remove('dragging');
+                });
+                
+                console.log('🎯 Drag beendet');
+            }
+            
+            // Selection System
+            selectSingle(component) {
+                this.clearSelection();
+                this.selectedComponents.add(component);
+                component.classList.add('selected');
+                console.log('✅ Ausgewählt:', component.id);
+            }
+            
+            toggleSelection(component) {
+                if (this.selectedComponents.has(component)) {
+                    this.selectedComponents.delete(component);
+                    component.classList.remove('selected');
+                    console.log('➖ Abgewählt:', component.id);
+                } else {
+                    this.selectedComponents.add(component);
+                    component.classList.add('selected');
+                    console.log('➕ Hinzugefügt:', component.id);
+                }
+            }
+            
+            clearSelection() {
+                this.selectedComponents.forEach(component => {
+                    component.classList.remove('selected');
+                });
+                this.selectedComponents.clear();
+                console.log('🧹 Auswahl geleert');
+            }
+            
+            // Rotation System
+            rotateComponent(component) {
+                let currentRotation = this.componentRotations.get(component) || 0;
+                currentRotation = (currentRotation + 90) % 360;
+                this.componentRotations.set(component, currentRotation);
+                component.style.transform = `rotate(${currentRotation}deg)`;
+                
+                // Verbindungen sofort nach Rotation aktualisieren
+                this.updateConnectionsForComponent(component);
+                
+                console.log(`🔄 Bauteil ${component.id} gedreht auf ${currentRotation}°`);
+            }
+            
+            // Deletion System
+            deleteSelectedComponents() {
+                if (this.selectedComponents.size === 0) {
+                    console.log('⚠️ Keine Bauteile zum Löschen ausgewählt');
+                    return;
+                }
+                
+                const deletedComponents = [];
+                
+                this.selectedComponents.forEach(component => {
+                    const componentId = component.id;
+                    const componentType = component.dataset.componentType;
+                    
+                    component.remove();
+                    this.componentRotations.delete(component);
+                    
+                    if (circuit && circuit.graph && circuit.graph.nodes.has(componentId)) {
+                        circuit.graph.nodes.delete(componentId);
+                        circuit.graph.stateMachines.delete(componentId);
+                    }
+                    
+                    deletedComponents.push(`${componentType} (${componentId})`);
+                });
+                
+                this.selectedComponents.clear();
+                console.log(`🗑️ ${deletedComponents.length} Bauteile gelöscht:`, deletedComponents);
+            }
+            
+            // Rectangle Selection System
+            startRectangleSelection(e) {
+                const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+                
+                this.isDrawingSelection = true;
+                this.selectionStart = {
+                    x: e.clientX - workspaceRect.left,
+                    y: e.clientY - workspaceRect.top
+                };
+                
+                if (!e.ctrlKey) {
+                    this.clearSelection();
+                }
+                
+                this.createSelectionRectangle();
+                console.log('📐 Rectangle Selection gestartet');
+                e.preventDefault();
+            }
+            
+            createSelectionRectangle() {
+                this.selectionRectangle = document.createElement('div');
+                this.selectionRectangle.className = 'selection-rectangle';
+                this.selectionRectangle.style.position = 'absolute';
+                this.selectionRectangle.style.border = '2px dashed #4CAF50';
+                this.selectionRectangle.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+                this.selectionRectangle.style.pointerEvents = 'none';
+                this.selectionRectangle.style.zIndex = '999';
+                
+                document.getElementById('workspace').appendChild(this.selectionRectangle);
+            }
+            
+            updateRectangleSelection(e) {
+                if (!this.isDrawingSelection || !this.selectionRectangle) return;
+                
+                const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+                const currentX = e.clientX - workspaceRect.left;
+                const currentY = e.clientY - workspaceRect.top;
+                
+                const left = Math.min(this.selectionStart.x, currentX);
+                const top = Math.min(this.selectionStart.y, currentY);
+                const width = Math.abs(currentX - this.selectionStart.x);
+                const height = Math.abs(currentY - this.selectionStart.y);
+                
+                this.selectionRectangle.style.left = left + 'px';
+                this.selectionRectangle.style.top = top + 'px';
+                this.selectionRectangle.style.width = width + 'px';
+                this.selectionRectangle.style.height = height + 'px';
+            }
+            
+            endRectangleSelection(e) {
+                if (!this.isDrawingSelection) return;
+                
+                const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+                const currentX = e.clientX - workspaceRect.left;
+                const currentY = e.clientY - workspaceRect.top;
+                
+                const selectionRect = {
+                    left: Math.min(this.selectionStart.x, currentX),
+                    top: Math.min(this.selectionStart.y, currentY),
+                    right: Math.max(this.selectionStart.x, currentX),
+                    bottom: Math.max(this.selectionStart.y, currentY)
+                };
+                
+                const components = document.querySelectorAll('.component:not(#power-source-svg)');
+                let selectedCount = 0;
+                
+                components.forEach(component => {
+                    const left = parseInt(component.style.left) || 0;
+                    const top = parseInt(component.style.top) || 0;
+                    const width = component.offsetWidth;
+                    const height = component.offsetHeight;
+                    
+                    const componentRect = {
+                        left: left,
+                        top: top,
+                        right: left + width,
+                        bottom: top + height
+                    };
+                    
+                    if (selectionRect.left < componentRect.right &&
+                        selectionRect.right > componentRect.left &&
+                        selectionRect.top < componentRect.bottom &&
+                        selectionRect.bottom > componentRect.top) {
+                        
+                        this.selectedComponents.add(component);
+                        component.classList.add('selected');
+                        selectedCount++;
+                    }
+                });
+                
+                this.isDrawingSelection = false;
+                this.selectionStart = null;
+                this.justFinishedRectangleSelection = true;
+                
+                if (this.selectionRectangle) {
+                    this.selectionRectangle.remove();
+                    this.selectionRectangle = null;
+                }
+                
+                console.log(`📐 Rectangle Selection beendet: ${selectedCount} Bauteile ausgewählt`);
+            }
+            
+            // Connection System
+            isConnectionPoint(element) {
+                return element.classList.contains('connection-line') || 
+                       element.classList.contains('connection-socket') ||
+                       element.classList.contains('connection-area');
+            }
+            
+            handleConnectionMouseDown(e) {
+                if (e.target.classList.contains('connection-line') && 
+                    e.target.dataset.connectionType === 'output-line') {
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    this.startConnection(e.target, e);
+                }
+            }
+            
+            startConnection(outputLine, event) {
+                const componentElement = outputLine.closest('.component');
+                const componentId = componentElement ? componentElement.id : 'power-source-svg';
+                
+                this.activeConnection = {
+                    outputLine: outputLine,
+                    componentId: componentId,
+                    outputData: this.getConnectionData(outputLine),
+                    startPos: this.getConnectionPosition(outputLine, componentElement)
+                };
+                
+                this.createTempConnectionLine(event);
+                
+                console.log('🚀 Verbindung gestartet:', this.activeConnection.outputData);
+            }
+            
+            createTempConnectionLine(event) {
+                const svg = document.getElementById('connectionSvg');
+                this.tempConnectionLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                
+                this.tempConnectionLine.setAttribute('class', 'temp-connection');
+                this.tempConnectionLine.setAttribute('stroke', this.getWireColor(this.activeConnection.outputData.wireType));
+                this.tempConnectionLine.setAttribute('stroke-width', '3');
+                this.tempConnectionLine.setAttribute('stroke-dasharray', '5,5');
+                this.tempConnectionLine.setAttribute('opacity', '0.8');
+                
+                const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+                const mouseX = event.clientX - workspaceRect.left;
+                const mouseY = event.clientY - workspaceRect.top;
+                
+                this.tempConnectionLine.setAttribute('x1', this.activeConnection.startPos.x);
+                this.tempConnectionLine.setAttribute('y1', this.activeConnection.startPos.y);
+                this.tempConnectionLine.setAttribute('x2', mouseX);
+                this.tempConnectionLine.setAttribute('y2', mouseY);
+                
+                svg.appendChild(this.tempConnectionLine);
+            }
+            
+            updateConnectionLine(e) {
+                if (!this.tempConnectionLine) return;
+                
+                const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+                const mouseX = e.clientX - workspaceRect.left;
+                const mouseY = e.clientY - workspaceRect.top;
+                
+                this.tempConnectionLine.setAttribute('x2', mouseX);
+                this.tempConnectionLine.setAttribute('y2', mouseY);
+            }
+            
+            handleConnectionMouseUp(e) {
+                if (e.target.classList.contains('connection-socket') && 
+                    e.target.dataset.connectionType === 'input-socket') {
+                    
+                    this.completeConnection(e.target);
+                } else {
+                    this.cancelConnection();
+                }
+            }
+            
+            completeConnection(inputSocket) {
+                const targetComponent = inputSocket.closest('.component');
+                const targetComponentId = targetComponent ? targetComponent.id : 'unknown';
+                const inputData = this.getConnectionData(inputSocket);
+                
+                console.log('✅ Verbindung erfolgreich:', 
+                    `${this.activeConnection.componentId}.${this.activeConnection.outputData.id}`, 
+                    '→', 
+                    `${targetComponentId}.${inputData.id}`);
+                
+                this.createBezierConnection(this.activeConnection.outputLine, inputSocket, targetComponent);
+                this.cancelConnection();
+            }
+            
+            createBezierConnection(outputLine, inputSocket, targetComponent) {
+                const svg = document.getElementById('connectionSvg');
+                const connectionId = `conn-${Date.now()}`;
+                
+                const startPos = this.getConnectionPosition(outputLine, outputLine.closest('.component'));
+                const endPos = this.getConnectionPosition(inputSocket, targetComponent);
+                
+                // Dynamische Bezier-Berechnung mit Rotation (wie in redrawConnection)
+                const { cp1X, cp1Y, cp2X, cp2Y } = this.calculateRotatedBezierPoints(
+                    startPos, endPos, outputLine, inputSocket, 
+                    outputLine.closest('.component') || document.getElementById('power-source-svg'), 
+                    targetComponent
+                );
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const pathData = `M ${startPos.x},${startPos.y} C ${cp1X},${cp1Y} ${cp2X},${cp2Y} ${endPos.x},${endPos.y}`;
+                
+                path.setAttribute('d', pathData);
+                path.setAttribute('class', 'bezier-connection');
+                path.setAttribute('stroke', this.getWireColor(this.activeConnection.outputData.wireType));
+                path.setAttribute('stroke-width', '4');
+                path.setAttribute('fill', 'none');
+                path.setAttribute('id', connectionId);
+                path.setAttribute('data-from-component', this.activeConnection.componentId);
+                path.setAttribute('data-to-component', targetComponent ? targetComponent.id : 'unknown');
+                path.setAttribute('data-from-connection', this.activeConnection.outputData.id);
+                path.setAttribute('data-to-connection', this.getConnectionData(inputSocket).id);
+                
+                path.addEventListener('click', (e) => {
+                    console.log('🔗 Click auf Verbindung:', connectionId);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.deleteConnection(path);
+                });
+                
+                svg.appendChild(path);
+                
+                // Verbindung in der Physik-Engine registrieren
+                if (circuit) {
+                    circuit.addConnection(connectionId, 
+                        this.activeConnection.componentId, 
+                        targetComponent ? targetComponent.id : 'unknown'
+                    );
+                }
+                
+                this.connections.set(connectionId, {
+                    path: path,
+                    from: outputLine,
+                    to: inputSocket,
+                    fromComponent: this.activeConnection.componentId,
+                    toComponent: targetComponent ? targetComponent.id : 'unknown'
+                });
+                
+                console.log('🔗 Bezier-Verbindung erstellt:', connectionId);
+            }
+            
+            parseBezierDirection(directionString) {
+                if (!directionString) return { dx1: 200, dy1: 0, dx2: 0, dy2: 0 };
+                
+                const parts = directionString.split(',').map(Number);
+                return {
+                    dx1: parts[0] || 200,
+                    dy1: parts[1] || 0,
+                    dx2: parts[2] || 0,
+                    dy2: parts[3] || 0
+                };
+            }
+            
+            deleteConnection(path) {
+                const connectionId = path.id;
+                path.remove();
+                this.connections.delete(connectionId);
+                console.log('🗑️ Verbindung gelöscht:', connectionId);
+            }
+            
+            cancelConnection() {
+                if (this.tempConnectionLine) {
+                    this.tempConnectionLine.remove();
+                    this.tempConnectionLine = null;
+                }
+                
+                if (this.activeConnection) {
+                    console.log('❌ Verbindung abgebrochen');
+                    this.activeConnection = null;
+                }
+            }
+            
+            getConnectionData(element) {
+                return {
+                    id: element.dataset.connectionId,
+                    type: element.dataset.connectionType,
+                    wireType: element.dataset.wireType,
+                    voltage: parseFloat(element.dataset.voltage)
+                };
+            }
+            
+            getConnectionPosition(element, component) {
+                // Basis-Position aus data-Attributen lesen
+                let x = parseFloat(element.dataset.bezierStartX) || parseFloat(element.dataset.bezierEndX) || 0;
+                let y = parseFloat(element.dataset.bezierStartY) || parseFloat(element.dataset.bezierEndY) || 0;
+                
+                // Rotation anwenden falls Bauteil rotiert ist
+                if (component && component.id !== 'power-source-svg') {
+                    const rotation = this.componentRotations.get(component) || 0;
+                    if (rotation !== 0) {
+                        // SVG-Dimensionen dynamisch auslesen
+                        const svg = component.querySelector('svg');
+                        if (svg) {
+                            const viewBox = svg.getAttribute('viewBox');
+                            if (viewBox) {
+                                const viewBoxValues = viewBox.split(' ');
+                                const svgWidth = parseFloat(viewBoxValues[2]);
+                                const svgHeight = parseFloat(viewBoxValues[3]);
+                                
+                                // Dynamisches Zentrum berechnen
+                                const centerX = svgWidth / 2;
+                                const centerY = svgHeight / 2;
+                                
+                                // Koordinaten relativ zum Zentrum machen
+                                const relativeX = x - centerX;
+                                const relativeY = y - centerY;
+                                
+                                // Rotieren um das Zentrum
+                                const rad = (rotation * Math.PI) / 180;
+                                const rotatedX = relativeX * Math.cos(rad) - relativeY * Math.sin(rad);
+                                const rotatedY = relativeX * Math.sin(rad) + relativeY * Math.cos(rad);
+                                
+                                // Zurück zu absoluten Koordinaten
+                                x = rotatedX + centerX;
+                                y = rotatedY + centerY;
+                            }
+                        }
+                    }
+                }
+                
+                // Position relativ zur Component berechnen - KONSISTENTES KOORDINATENSYSTEM
+                if (component) {
+                    // Verwende style.left/top statt getBoundingClientRect() für Konsistenz mit Rotation
+                    const left = parseFloat(component.style.left) || 0;
+                    const top = parseFloat(component.style.top) || 0;
+                    
+                    return {
+                        x: left + x,
+                        y: top + y
+                    };
+                }
+                
+                return { x: x, y: y };
+            }
+            
+            getWireColor(wireType) {
+                const colors = {
+                    'plus': '#e30613',
+                    'minus': '#1d1d1b', 
+                    'phase': '#683c11',
+                    'neutral': '#1d71b8',
+                    'earth': '#ffed00'
+                };
+                return colors[wireType] || '#666';
+            }
+            
+            updateConnectionsForComponent(component) {
+                const componentId = component.id;
+                console.log('🔄 updateConnectionsForComponent aufgerufen für:', componentId);
+                
+                let foundConnections = 0;
+                
+                this.connections.forEach((connectionData, connectionId) => {
+                    if (connectionData.fromComponent === componentId || 
+                        connectionData.toComponent === componentId) {
+                        
+                        foundConnections++;
+                        this.redrawConnection(connectionId, connectionData);
+                    }
+                });
+                
+                console.log(`📊 ${foundConnections} Verbindungen für ${componentId} aktualisiert`);
+            }
+            
+            redrawConnection(connectionId, connectionData) {
+                const path = connectionData.path;
+                if (!path) return;
+                
+                const fromComponent = document.getElementById(connectionData.fromComponent);
+                const toComponent = document.getElementById(connectionData.toComponent);
+                
+                if (!fromComponent || !toComponent) return;
+                
+                const startPos = this.getConnectionPosition(connectionData.from, fromComponent);
+                const endPos = this.getConnectionPosition(connectionData.to, toComponent);
+                
+                // Dynamische Bezier-Berechnung mit Rotation
+                const { cp1X, cp1Y, cp2X, cp2Y } = this.calculateRotatedBezierPoints(
+                    startPos, endPos, connectionData.from, connectionData.to, fromComponent, toComponent
+                );
+                
+                const pathData = `M ${startPos.x},${startPos.y} C ${cp1X},${cp1Y} ${cp2X},${cp2Y} ${endPos.x},${endPos.y}`;
+                path.setAttribute('d', pathData);
+                
+                console.log('🔄 Verbindung aktualisiert:', connectionId);
+            }
+            
+            calculateRotatedBezierPoints(startPos, endPos, fromElement, toElement, fromComponent, toComponent) {
+                // Basis-Offset für Kontrollpunkte
+                const baseOffset = 60;
+                
+                // Start-Kontrollpunkt (von Stromquelle oder anderem Bauteil)
+                let cp1X, cp1Y;
+                const fromRotation = this.componentRotations.get(fromComponent) || 0;
+                
+                if (fromComponent.id === 'power-source-svg') {
+                    // Stromquelle: statische Richtung nach unten
+                    cp1X = startPos.x;
+                    cp1Y = startPos.y + baseOffset;
+                } else {
+                    // Rotiertes Bauteil: Berechne Richtung basierend auf Rotation
+                    const fromRad = (fromRotation * Math.PI) / 180;
+                    const outputSide = fromElement.dataset.connectionId?.includes('out-') ? 'right' : 'left';
+                    
+                    if (outputSide === 'right') {
+                        cp1X = startPos.x + baseOffset * Math.cos(fromRad);
+                        cp1Y = startPos.y + baseOffset * Math.sin(fromRad);
+                    } else {
+                        const leftDirection = fromRad + Math.PI;
+                        cp1X = startPos.x + baseOffset * Math.cos(leftDirection);
+                        cp1Y = startPos.y + baseOffset * Math.sin(leftDirection);
+                    }
+                }
+                
+                // End-Kontrollpunkt (zum Ziel-Bauteil)
+                let cp2X, cp2Y;
+                const toRotation = this.componentRotations.get(toComponent) || 0;
+                
+                if (toComponent.id === 'power-source-svg') {
+                    // Stromquelle: statische Richtung nach oben
+                    cp2X = endPos.x;
+                    cp2Y = endPos.y - baseOffset;
+                } else {
+                    // Rotiertes Bauteil: Berechne Richtung basierend auf Rotation
+                    const toRad = (toRotation * Math.PI) / 180;
+                    const inputSide = toElement.dataset.connectionId?.includes('in-') ? 'left' : 'right';
+                    
+                    if (inputSide === 'left') {
+                        const leftDirection = toRad + Math.PI;
+                        cp2X = endPos.x + (baseOffset * 0.5) * Math.cos(leftDirection);
+                        cp2Y = endPos.y + (baseOffset * 0.5) * Math.sin(leftDirection);
+                    } else {
+                        cp2X = endPos.x + (baseOffset * 0.5) * Math.cos(toRad);
+                        cp2Y = endPos.y + (baseOffset * 0.5) * Math.sin(toRad);
+                    }
+                }
+                
+                return { cp1X, cp1Y, cp2X, cp2Y };
+            }
+        }
+        
+        // WorkspaceManager initialisieren
+        const workspaceManager = new WorkspaceManager();
+        
+        // Connection Point Hover Effects
+        function setupConnectionHoverEffects() {
+            document.addEventListener('mouseover', function(e) {
+                if (e.target.classList.contains('connection-line') || 
+                    e.target.classList.contains('connection-socket')) {
+                    
+                    const connectionData = {
+                        type: e.target.dataset.connectionType,
+                        id: e.target.dataset.connectionId,
+                        wireType: e.target.dataset.wireType,
+                        voltage: e.target.dataset.voltage
+                    };
+                    
+                    console.log('🔌 Hover über Anschlusspunkt:', connectionData);
+                }
+            });
+        }
+        
+        setupConnectionHoverEffects();
+        
+        // Simulation initialisieren
+        circuit = new RealtimeSimulation();
+        circuit.addComponent('power-source-svg', ComponentTypes.POWER_SOURCE, {x: 20, y: 20});
+        circuit.start();
+        
+        function openTaskMenu() {
+            alert('Hier wird später das Aufgaben-Menü geöffnet.\n\nFunktionen:\n• Aufgaben-Übersicht\n• Schwierigkeitsgrade\n• Fortschritt anzeigen\n• Neue Aufgaben laden');
+        }
+        
+        function toggleDatasheet() {
+            const section = document.getElementById('datasheet-section');
+            const toggle = document.getElementById('datasheet-toggle');
+            
+            section.classList.toggle('collapsed');
+            
+            if (section.classList.contains('collapsed')) {
+                toggle.textContent = '▼';
+                toggle.title = 'Datenblatt ausklappen';
+            } else {
+                toggle.textContent = '▲';
+                toggle.title = 'Datenblatt einklappen';
+            }
+        }
+        
+        function togglePower() {
+            systemPower = !systemPower;
+            const powerBtn = document.getElementById('powerBtn');
+            
+            if (systemPower) {
+                powerBtn.innerHTML = `
+                    <span class="power-icon">
+                        <svg id="power-icon" viewBox="0 0 21.74 22.48" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="powerGradientOn" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:var(--color-border);stop-opacity:1" />
+                                    <stop offset="3%" style="stop-color:#c1c1c1;stop-opacity:1" />
+                                    <stop offset="44%" style="stop-color:#888887;stop-opacity:1" />
+                                    <stop offset="75%" style="stop-color:#646463;stop-opacity:1" />
+                                    <stop offset="92%" style="stop-color:#575756;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <rect fill="url(#powerGradientOn)" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                  x="2.13" y=".91" width="17.49" height="20.74" transform="translate(22.15 .41) rotate(90)"/>
+                            <g>
+                                <g>
+                                    <polygon fill="var(--color-border)" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                             points="5.22 8.66 5.22 17.05 16.38 17.05 16.38 8.66 18.52 8.66 18.52 .5 3.22 .5 3.22 8.66 5.22 8.66"/>
+                                    <line fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                          x1="16.63" y1="2.78" x2="5.5" y2="2.78"/>
+                                    <line fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                          x1="16.63" y1="4.46" x2="5.5" y2="4.46"/>
+                                </g>
+                                <rect fill="var(--color-error)" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                      x="5.21" y="9.83" width="11.18" height="4.98" transform="translate(21.59 24.63) rotate(180)"/>
+                                <text fill="var(--color-white)" font-family="Arial, sans-serif" font-size="4.15px" 
+                                      transform="translate(7.47 13.58)">
+                                    <tspan x="0" y="0">I</tspan>
+                                    <tspan x=".99" y="0">-</tspan>
+                                    <tspan x="2.34" y="0">on</tspan>
+                                </text>
+                            </g>
+                        </svg>
+                    </span>
+                    <span class="btn-text">
+                        <span>Haupt-</span>
+                        <span>schalter</span>
+                    </span>`;
+            } else {
+                powerBtn.innerHTML = `
+                    <span class="power-icon">
+                        <svg id="power-icon" viewBox="0 0 21.74 22.48" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="powerGradientOff" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:var(--color-border);stop-opacity:1" />
+                                    <stop offset="3%" style="stop-color:#c1c1c1;stop-opacity:1" />
+                                    <stop offset="44%" style="stop-color:#888887;stop-opacity:1" />
+                                    <stop offset="75%" style="stop-color:#646463;stop-opacity:1" />
+                                    <stop offset="92%" style="stop-color:#575756;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <rect fill="url(#powerGradientOff)" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                  x="2.13" y=".34" width="17.49" height="20.74" transform="translate(21.58 -.16) rotate(90)"/>
+                            <g>
+                                <g>
+                                    <polygon fill="var(--color-border)" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                             points="16.53 13.82 16.53 5.43 5.36 5.43 5.36 13.82 3.22 13.82 3.22 21.98 18.52 21.98 18.52 13.82 16.53 13.82"/>
+                                    <line fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                          x1="5.12" y1="19.7" x2="16.25" y2="19.7"/>
+                                    <line fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                          x1="5.12" y1="18.02" x2="16.25" y2="18.02"/>
+                                </g>
+                                <rect fill="var(--color-success)" stroke="var(--color-primary)" stroke-width="2" stroke-miterlimit="10"
+                                      x="5.36" y="7.68" width="11.18" height="4.98"/>
+                                <text fill="var(--color-white)" font-family="Arial, sans-serif" font-size="4.15px" 
+                                      transform="translate(6.36 11.7)">
+                                    <tspan x="0" y="0">O</tspan>
+                                    <tspan x="2.92" y="0">-</tspan>
+                                    <tspan x="4.27" y="0">off</tspan>
+                                </text>
+                            </g>
+                        </svg>
+                    </span>
+                    <span class="btn-text">
+                        <span>Haupt-</span>
+                        <span>schalter</span>
+                    </span>`;
+            }
+            
+            circuit.powerStateChanged();
+        }
+        
+        let isDragging = false;
+        let dragElement = null;
+        let dragOffset = { x: 0, y: 0 };
+        
+        function initializeDragAndDrop() {
+            const componentItems = document.querySelectorAll('.component-item');
+            
+            componentItems.forEach(item => {
+                item.addEventListener('mousedown', startDrag);
+            });
+            
+            document.addEventListener('mousemove', handleDrag);
+            document.addEventListener('mouseup', endDrag);
+        }
+        
+        function startDrag(e) {
+            e.preventDefault();
+            
+            const componentType = e.currentTarget.getAttribute('data-component-type');
+            console.log('🎯 Drag gestartet für Typ:', componentType);
+            
+            const svg = createComponentSVG(componentType);
+            
+            if (!svg) {
+                console.log('❌ Kein SVG für Typ erstellt:', componentType);
+                return;
+            }
+            
+            isDragging = true;
+            
+            dragElement = document.createElement('div');
+            dragElement.className = 'dragging-component';
+            dragElement.appendChild(svg);
+            
+            const rect = e.currentTarget.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+            
+            updateDragPosition(e);
+            document.body.appendChild(dragElement);
+            
+            console.log('✅ Drag-Element erstellt und hinzugefügt');
+        }
+        
+        function handleDrag(e) {
+            if (!isDragging || !dragElement) return;
+            
+            updateDragPosition(e);
+        }
+        
+        function updateDragPosition(e) {
+            if (!dragElement) return;
+            
+            dragElement.style.left = (e.clientX - dragOffset.x) + 'px';
+            dragElement.style.top = (e.clientY - dragOffset.y) + 'px';
+        }
+        
+        function endDrag(e) {
+            if (!isDragging || !dragElement) return;
+            
+            const workspace = document.getElementById('workspace');
+            const workspaceRect = workspace.getBoundingClientRect();
+            
+            if (e.clientX >= workspaceRect.left && 
+                e.clientX <= workspaceRect.right && 
+                e.clientY >= workspaceRect.top && 
+                e.clientY <= workspaceRect.bottom) {
+                
+                const relativeX = e.clientX - workspaceRect.left;
+                const relativeY = e.clientY - workspaceRect.top;
+                
+                placeComponent(relativeX, relativeY, dragElement.firstChild.getAttribute('data-component-type'));
+                
+                console.log('✅ Bauteil platziert bei:', relativeX, relativeY);
+            }
+            
+            if (dragElement && dragElement.parentNode) {
+                dragElement.parentNode.removeChild(dragElement);
+            }
+            
+            isDragging = false;
+            dragElement = null;
+        }
+        
+        function createComponentSVG(componentType) {
+            switch(componentType) {
+                case 'led-12v-1.2w':
+                    return createLEDModuleSVG();
+                default:
+                    console.log('⚠️ Unbekannter Komponententyp:', componentType);
+                    return null;
+            }
+        }
+        
+        function createLEDModuleSVG() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 133.29 27.54');
+            svg.setAttribute('class', 'led-module-svg');
+            svg.setAttribute('data-component-type', 'led-12v-1.2w');
+            
+            svg.setAttribute('data-internal-routing', JSON.stringify([
+                {"from":"in-plus", "to":"out-plus", "resistance":0.1},
+                {"from":"in-minus", "to":"out-minus", "resistance":0.1}
+            ]));
+            
+            svg.setAttribute('data-component-load', JSON.stringify({
+                "between": ["in-plus", "in-minus"],
+                "power": 1.2,
+                "voltage": 12,
+                "type": "led"
+            }));
+            
+            svg.innerHTML = `
+                <defs>
+                    <style>
+                        .cls-1 { fill: #9e9e9e; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
+                        .cls-2 { fill: #e8e8e8; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
+                        .cls-3 { fill: none; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
+                        .cls-4 { fill: none; stroke: #e30613; stroke-width: 1.5; stroke-miterlimit: 10; }
+                        .cls-5 { fill: #fff; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
+                        .cls-6 { letter-spacing: -.04em; }
+                        .cls-7 { fill: #1d1d1b; font-family: Arial, sans-serif; font-size: 7.77px; }
+                        .cls-8 { letter-spacing: .02em; }
+                        .connection-socket { 
+                            fill: #888; 
+                            stroke: #666; 
+                            stroke-width: 1; 
+                            cursor: crosshair; 
+                            transition: all 0.3s; 
+                            opacity: 0.7; 
+                        }
+                        .connection-socket:hover { 
+                            opacity: 1; 
+                            transform: scale(1.3); 
+                            fill: #4CAF50;
+                        }
+                        .connection-line {
+                            stroke-width: 3;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                            opacity: 0.8;
+                        }
+                        .connection-line:hover {
+                            opacity: 1;
+                            stroke-width: 4;
+                            filter: drop-shadow(0 0 3px currentColor);
+                        }
+                        .connection-area {
+                            cursor: crosshair;
+                            transition: all 0.3s;
+                            opacity: 0;
+                        }
+                        .connection-area:hover {
+                            opacity: 0.2;
+                            fill: #4CAF50;
+                        }
+                        .connection-area:hover + .connection-visual {
+                            opacity: 1;
+                            transform: scale(1.3);
+                            filter: drop-shadow(0 0 5px #4CAF50);
+                        }
+                        .connection-visual {
+                            transition: all 0.3s;
+                            opacity: 0.8;
+                        }
+                    </style>
+                </defs>
+                <g>
+                    <!-- Anschlusskabel Links - 4px dick -->
+                    <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
+                    <line stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
+            
+                    <g>
+                        <rect class="cls-2" x="16.605" y=".75" width="100.14" height="26.04" rx="8.475" ry="8.475"/>
+                        <g>
+                            <circle class="cls-1" cx="90.18" cy="13.77" r="8.25"/>
+                            <circle class="cls-5" cx="90.18" cy="13.77" r="4.125"/>
+                        </g>
+                        <g>
+                            <circle class="cls-1" cx="44.73" cy="13.77" r="8.25"/>
+                            <circle class="cls-5" cx="44.73" cy="13.77" r="4.125"/>
+                        </g>
+                        <g>
+                            <circle class="cls-1" cx="67.455" cy="13.77" r="8.25"/>
+                            <circle class="cls-5" cx="67.455" cy="13.77" r="4.125"/>
+                        </g>
+                        <text class="cls-7" transform="translate(101.34 5.01) rotate(90)">
+                            <tspan x="0" y="0">1,2</tspan><tspan class="cls-6" x="9.57" y="0"> </tspan><tspan x="10.935" y="0">W</tspan>
+                        </text>
+                        <text class="cls-7" transform="translate(24.84 20.61) rotate(-90)">
+                            <tspan x="0" y="0">12</tspan><tspan class="cls-6" x="7.965" y="0"> </tspan><tspan x="9.33" y="0">V</tspan>
+                            <tspan class="cls-8" x=".195" y="9.315">W</tspan><tspan x="6.9" y="9.315">W</tspan>
+                        </text>
+                        <text class="cls-7" transform="translate(113.82 17.01) rotate(-180)">+</text>
+                        <text class="cls-7" transform="translate(112.68 5.685) rotate(-180)">-</text>
+                    </g>
+                </g>
+                
+                <!-- Connection Points Links (Typ 2: Eingangsbuchsen) -->
+                <!-- Minus/Negativ Eingang (Schwarz) -->
+                <circle class="connection-socket" 
+                        cx="8" cy="9.225" r="4" 
+                        data-connection-type="input-socket"
+                        data-connection-id="in-minus"
+                        data-wire-type="minus"
+                        data-voltage="12"
+                        data-bezier-end-x="8" data-bezier-end-y="9.225"
+                        data-bezier-direction="-20,0,0,0"/>
+                        
+                <!-- Plus/Positiv Eingang (Rot) -->
+                <circle class="connection-socket" 
+                        cx="8" cy="18.315" r="4" 
+                        data-connection-type="input-socket"
+                        data-connection-id="in-plus"
+                        data-wire-type="plus"
+                        data-voltage="12"
+                        data-bezier-end-x="8" data-bezier-end-y="18.315"
+                        data-bezier-direction="-20,0,0,0"/>
+                
+                <!-- Connection Points Rechts (Typ 1: Ausgehende Linien) -->
+                <!-- Minus/Negativ Ausgang (Schwarz) -->
+                <line class="connection-line" 
+                      x1="113" y1="9.225" x2="123.29" y2="9.225" 
+                      stroke="#1d1d1b" 
+                      data-connection-type="output-line"
+                      data-connection-id="out-minus"
+                      data-wire-type="minus"
+                      data-voltage="12"
+                      data-bezier-start-x="123" data-bezier-start-y="9.225"
+                      data-bezier-direction="20,0,0,0"/>
+                      
+                <!-- Plus/Positiv Ausgang (Rot) -->
+                <line class="connection-line" 
+                      x1="113" y1="18.315" x2="123.29" y2="18.315" 
+                      stroke="#e30613" 
+                      data-connection-type="output-line"
+                      data-connection-id="out-plus"
+                      data-wire-type="plus"
+                      data-voltage="12"
+                      data-bezier-start-x="123" data-bezier-start-y="18.315"
+                      data-bezier-direction="20,0,0,0"/>
+            `;
+            
+            return svg;
+        }
+        
+        function placeComponent(x, y, componentType) {
+            const workspace = document.getElementById('workspace');
+            const svg = createComponentSVG(componentType);
+            
+            if (!svg) return;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'component placed-component';
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = x + 'px';
+            wrapper.style.top = y + 'px';
+            wrapper.setAttribute('data-component-type', componentType);
+            wrapper.setAttribute('id', 'component-' + Date.now());
+            
+            wrapper.appendChild(svg);
+            workspace.appendChild(wrapper);
+            
+            if (circuit) {
+                circuit.addComponent(wrapper.id, componentType, {x: x, y: y});
+            }
+        }
+        
+        function clearWorkspace() {
+            const workspace = document.getElementById('workspace');
+            const powerSource = workspace.querySelector('.power-source');
+            const svg = workspace.querySelector('#connectionSvg');
+            const infoBtn = workspace.querySelector('.workspace-info-btn');
+            const infoTooltip = workspace.querySelector('.info-tooltip');
+            
+            Array.from(workspace.children).forEach(child => {
+                if (child !== powerSource && child !== svg && child !== infoBtn && child !== infoTooltip) {
+                    child.remove();
+                }
+            });
+            
+            connections = [];
+            components = [];
+        }
+        
+        function resetConnections() {
+            const svg = document.getElementById('connectionSvg');
+            svg.innerHTML = '';
+            connections = [];
+        }
+        
+        document.addEventListener('mouseover', function(e) {
+            if (e.target.closest('.component-item')) {
+                const componentItem = e.target.closest('.component-item');
+                const type = componentItem.getAttribute('data-component-type');
+                showDatasheet(type);
+            }
+        });
+        
+        function showDatasheet(componentType) {
+            const content = document.getElementById('datasheet-content');
+            const typeNames = {
+                'fi-schalter': 'FI-Schutzschalter',
+                'ls-schalter': 'LS-Schalter',
+                'zeitschaltuhr': 'Zeitschaltuhr',
+                'daemmerungsschalter': 'Dämmerungsschalter',
+                'trafo-12v-40w': 'Trafo 12V',
+                'trafo-24v-60w': 'Trafo 24V',
+                'led-12v-1.2w': 'LED-Modul 12V-1,2W-WW',
+                'led-12v-3.5w': 'LED-Modul 12V',
+                'led-24v-5w': 'LED-Modul 24V'
+            };
+            
+            const datasheetInfo = {
+                'fi-schalter': {
+                    specs: 'Nennstrom: 16A<br>Auslösestrom: 30mA<br>Schutzart: IP20<br>Einbauart: Hutschiene',
+                    description: 'Schutz vor Fehlerstrom durch defekte Geräte oder Berührung spannungsführender Teile.'
+                },
+                'ls-schalter': {
+                    specs: 'Nennstrom: 16A<br>Charakteristik: B<br>Auslösezeit: < 0,1s<br>Schutzart: IP20',
+                    description: 'Schutz vor Überlast und Kurzschluss in elektrischen Anlagen.'
+                },
+                'trafo-12v-40w': {
+                    specs: 'Eingang: 230V AC<br>Ausgang: 12V DC<br>Leistung: 40W<br>Wirkungsgrad: >85%',
+                    description: 'Elektronischer Transformator für LED-Beleuchtung mit 12V Ausgangsspannung.'
+                },
+                'trafo-24v-60w': {
+                    specs: 'Eingang: 230V AC<br>Ausgang: 24V DC<br>Leistung: 60W<br>Wirkungsgrad: >85%',
+                    description: 'Elektronischer Transformator für LED-Beleuchtung mit 24V Ausgangsspannung.'
+                },
+                'led-12v-1.2w': {
+                    specs: 'Spannung: 12V DC<br>Leistung: 1,2W<br>Lichtstrom: 120lm<br>Farbtemperatur: 3000K',
+                    description: 'Kompaktes LED-Modul mit drei LEDs für Niedervolt-Beleuchtungsanlagen.'
+                },
+                'led-12v-3.5w': {
+                    specs: 'Spannung: 12V DC<br>Leistung: 3,5W<br>Lichtstrom: 350lm<br>Farbtemperatur: 3000K',
+                    description: 'Warmweißes LED-Modul für Niedervolt-Beleuchtungsanlagen.'
+                },
+                'led-24v-5w': {
+                    specs: 'Spannung: 24V DC<br>Leistung: 5W<br>Lichtstrom: 500lm<br>Farbtemperatur: 3000K',
+                    description: 'Warmweißes LED-Modul für Niedervolt-Beleuchtungsanlagen.'
+                },
+                'zeitschaltuhr': {
+                    specs: 'Spannung: 230V AC<br>Schaltleistung: 16A<br>Programme: 20<br>Gangreserve: 100h',
+                    description: 'Digitale Zeitschaltuhr für automatische Schaltung von Beleuchtung.'
+                },
+                'daemmerungsschalter': {
+                    specs: 'Spannung: 230V AC<br>Schaltleistung: 10A<br>Einstellbereich: 2-200 Lux<br>Verzögerung: 30s',
+                    description: 'Automatischer Schalter basierend auf Umgebungshelligkeit.'
+                }
+            };
+            
+            const info = datasheetInfo[componentType] || {
+                specs: 'Technische Daten werden geladen...',
+                description: 'Beschreibung wird geladen...'
+            };
+            
+            content.innerHTML = `
+                <h4 class="text-h2">${typeNames[componentType] || componentType}</h4>
+                <p class="text-small">${info.description}</p>
+                <div class="info-box">
+                    <h4>Technische Daten</h4>
+                    <p class="text-small">${info.specs}</p>
+                </div>
+                <div class="info-box">
+                    <h4>Schaltskizze</h4>
+                    <p class="text-small"><em>Schaltskizze wird hier als SVG dargestellt</em></p>
+                </div>
+            `;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('datasheet-toggle');
+            if (toggle) {
+                toggle.title = 'Datenblatt einklappen';
+            }
+            
+            if (circuit) {
+                circuit.powerStateChanged();
+            }
+            
+            initializeDragAndDrop();
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === '1') {
+                e.preventDefault();
+                console.log('💡 Test-Funktion: Normale Schaltung (nicht implementiert)');
+            }
+            if (e.ctrlKey && e.key === '2') {
+                e.preventDefault();
+                console.log('⚠️ Test-Funktion: Überlastung (nicht implementiert)');
+            }
+            if (e.ctrlKey && e.key === '3') {
+                e.preventDefault();
+                console.log('💥 Test-Funktion: Direktanschluss (nicht implementiert)');
+            }
+        });
+        
+        console.log('🚀 LED-Lernspiel vollständig initialisiert');
+        console.log('💡 Funktionen verfügbar:');
+        console.log('   • Drag & Drop von Bauteilen');
+        console.log('   • Schaltungsverbindungen');
+        console.log('   • Physik-Simulation');
+        console.log('   • Technische Datenblätter');
     </script>
 </body>
 </html>
