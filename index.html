@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED & EVG Drag-and-Drop Werkbank</title>
+    <style>
+        :root {
+            /* Standard-Elektrofarben */
+            --wire-brown: #683c11;           /* Phase L1 */
+            --wire-blue: #1d71b8;            /* Neutral N */
+            --wire-yellow-green: #ffed00;    /* Schutzleiter PE */
+            --wire-black: #1d1d1b;           /* Allgemein/Minus */
+            --wire-red: #e30613;             /* Plus/Phase */
+            
+            /* Standard-Materialien */
+            --metal-dark: #3c3c3b;           /* Dunkles Metall */
+            --metal-light: #878787;          /* Helles Metall */
+            --plastic-light: #e8e8e8;        /* Heller Kunststoff */
+            --plastic-dark: #9e9e9e;         /* Dunkler Kunststoff */
+            --housing-white: #ffffff;        /* Weißes Gehäuse */
+            
+            /* Interface-Farben */
+            --font-family: Arial, sans-serif;
+            --font-size-h1: 18px;
+            --font-size-h2: 14px;
+            --font-size-text: 16px;
+            --font-size-small: 12px;
+            --font-weight-h1: bold;
+            --font-weight-h2: bold;
+            --font-weight-text: normal;
+            --font-weight-small: normal;
+            --color-primary: #333;
+            --color-secondary: #666;
+            --color-light: #f8f9fa;
+            --color-border: #dee2e6;
+            --color-hover: #e8f5e8;
+            --color-hover-border: #4CAF50;
+            --color-background: #f0f0f0;
+            --color-white: white;
+            --color-success: #008800;
+            --color-error: #cc0000;
+            --color-warning: #856404;
+            --color-success-bg: #e6ffe6;
+            --color-error-bg: #ffe6e6;
+            --color-warning-bg: #fff3cd;
+            --spacing-xs: 5px;
+            --spacing-sm: 8px;
+            --spacing-md: 10px;
+            --spacing-lg: 15px;
+            --spacing-xl: 20px;
+            --border-radius: 8px;
+            --border-width: 2px;
+            --border-color: #333;
+            --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --box-shadow-hover: 0 4px 12px rgba(76, 175, 80, 0.2);
+            --svg-stroke-width: 2px;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            background: var(--color-background);
+            display: flex;
+            height: 100vh;
+        }
+        
+        .text-h1 {
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-h1);
+            color: var(--color-primary);
+            margin: 0;
+            padding-bottom: var(--spacing-md);
+            border-bottom: var(--border-width) solid #eee;
+        }
+        
+        .text-h2 {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            color: var(--color-primary);
+            margin: 0;
+        }
+        
+        .text-body {
+            font-size: var(--font-size-text);
+            font-weight: var(--font-weight-text);
+            color: var(--color-secondary);
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        .text-small {
+            font-size: var(--font-size-small);
+            font-weight: var(--font-weight-small);
+            color: var(--color-secondary);
+            line-height: 1.4;
+        }
+        
+        .layout-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+        
+        .sidebar-left {
+            width: 260px;
+            background: var(--color-white);
+            border-right: var(--border-width) solid var(--border-color);
+            padding: var(--spacing-lg);
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-xl);
+            min-width: 0;
+        }
+        
+        .task-area {
+            background: var(--color-white);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .task-menu-btn {
+            background: var(--color-light);
+            color: var(--color-primary);
+            border: var(--border-width) solid var(--color-border);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            font-family: var(--font-family);
+            min-width: 120px;
+        }
+        
+        .task-menu-btn:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+            transform: translateY(-1px);
+        }
+        
+        .workspace {
+            flex: 1;
+            background: var(--color-white);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            min-height: 400px;
+        }
+        
+        .workspace-info-btn {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            width: 30px;
+            height: 30px;
+            background: var(--color-light);
+            border: var(--border-width) solid var(--color-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-h2);
+            font-weight: bold;
+            color: var(--color-primary);
+            z-index: 100;
+        }
+        
+        .workspace-info-btn:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+            transform: scale(1.1);
+        }
+        
+        .info-tooltip {
+            position: absolute;
+            top: 45px;
+            right: -10px;
+            width: 320px;
+            max-height: 500px;
+            background: var(--color-white);
+            border: var(--border-width) solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            box-shadow: var(--box-shadow);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            color: var(--color-primary);
+            font-size: var(--font-size-small);
+            overflow-y: auto;
+        }
+        
+        .workspace-info-btn:hover + .info-tooltip,
+        .info-tooltip:hover {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .info-category {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .info-category:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-category-title {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-sm);
+            border-bottom: 1px solid #eee;
+            padding-bottom: var(--spacing-xs);
+        }
+        
+        .info-rule {
+            font-size: var(--font-size-small);
+            color: var(--color-secondary);
+            margin-bottom: var(--spacing-xs);
+            line-height: 1.4;
+        }
+        
+        .info-rule:last-child {
+            margin-bottom: 0;
+        }
+        
+        .components-section {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .components-header {
+            flex-shrink: 0;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .components-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: var(--spacing-xs);
+        }
+        
+        .datasheet-section {
+            flex-shrink: 0;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            border-bottom: var(--border-width) solid #eee;
+            padding-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .datasheet-header {
+            flex-shrink: 0;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .datasheet-toggle {
+            background: var(--color-light);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-small);
+            color: var(--color-secondary);
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .datasheet-toggle:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+        }
+        
+        .datasheet-section.collapsed {
+            height: auto;
+        }
+        
+        .datasheet-section.collapsed .datasheet-content {
+            display: none;
+        }
+        
+        .component-item {
+            background: var(--color-light);
+            border: var(--border-width) solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-md) 0;
+            cursor: grab;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .component-item:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--box-shadow-hover);
+        }
+        
+        .component-item:active {
+            cursor: grabbing;
+            transform: translateY(0);
+        }
+        
+        .component-name {
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .component-category {
+            border-bottom: var(--border-width) solid #eee;
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .category-title {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .btn {
+            background: var(--color-light);
+            color: var(--color-primary);
+            border: var(--border-width) solid var(--color-border);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 4px;
+            cursor: pointer;
+            margin: var(--spacing-xs);
+            transition: all 0.3s ease;
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            font-family: var(--font-family);
+            min-width: 120px;
+        }
+        
+        .btn:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+            transform: translateY(-1px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            border-color: #ccc;
+            transform: none;
+        }
+        
+        .function-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-lg);
+            border-top: var(--border-width) solid #eee;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        
+        .function-controls .btn {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex: 1;
+            justify-content: center;
+            min-width: 0;
+        }
+        
+        .power-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+        
+        .power-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .btn-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        
+        .toggle-btn {
+            position: absolute;
+            top: var(--spacing-xl);
+            z-index: 1000;
+            background: var(--color-light);
+            border: var(--border-width) solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            color: var(--color-primary);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .toggle-btn:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+            transform: translateY(-1px);
+        }
+        
+        .toggle-left {
+            left: var(--spacing-md);
+        }
+        
+        .component {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            transition: border 0.3s ease;
+            border: var(--border-width) solid transparent;
+        }
+        
+        .component:hover {
+            border: var(--border-width) solid var(--color-hover-border);
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+        }
+        
+        .component.dragging {
+            z-index: 1000;
+            border: var(--border-width) solid #FF9800;
+            box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
+        }
+        
+        .power-source {
+            position: absolute;
+            top: var(--spacing-xl);
+            left: var(--spacing-xl);
+            background: transparent;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0;
+            color: var(--color-warning);
+            box-shadow: none;
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+        }
+        
+        .power-source svg {
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        .connection-point {
+            cursor: crosshair;
+            transition: all 0.3s ease;
+        }
+        
+        .connection-point:hover {
+            transform: scale(1.5);
+            opacity: 1 !important;
+        }
+        
+        .connection-point.dragging-connection {
+            opacity: 1 !important;
+            transform: scale(1.8);
+        }
+        
+        .bezier-connection {
+            fill: none;
+            stroke-width: 3;
+            opacity: 1;
+        }
+        
+        .bezier-connection.red-wire {
+            stroke: #ff0000;
+        }
+        
+        .bezier-connection.black-wire {
+            stroke: #000000;
+        }
+        
+        .led-cable {
+            fill: none;
+            stroke-width: 3;
+            pointer-events: none;
+        }
+        
+        .led-cable.plus {
+            stroke: #ff0000;
+        }
+        
+        .led-cable.minus {
+            stroke: #000000;
+        }
+        
+        .temp-line {
+            stroke: #888;
+            stroke-width: 2;
+            stroke-dasharray: 5,5;
+            opacity: 0.7;
+        }
+        
+        .dragging-component {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.8;
+        }
+        
+        .led-module-svg {
+            width: auto;
+            height: 30px;
+        }
+        
+        .technical-datasheet {
+            flex-shrink: 0;
+        }
+        
+        .datasheet-content {
+            height: 200px;
+            overflow-y: auto;
+            padding: var(--spacing-md) 0;
+            border: var(--border-width) solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            background: var(--color-light);
+        }
+        
+        .info-box {
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background: var(--color-light);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--color-border);
+        }
+        
+        .info-box h4 {
+            margin-top: 0;
+            color: var(--color-primary);
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+        }
+        
+        .info-box p {
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .component.selected {
+            border: 2px solid #4CAF50 !important;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5) !important;
+        }
+        
+        .component.dragging {
+            z-index: 1000 !important;
+            opacity: 0.8 !important;
+            cursor: grabbing !important;
+            border: 2px solid #FF9800 !important;
+            box-shadow: 0 0 12px rgba(255, 152, 0, 0.5) !important;
+        }
+        
+        .component {
+            transition: transform 0.3s ease !important;
+            transform-origin: center center !important;
+        }
+        
+        .bezier-connection {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+            pointer-events: all;
+            stroke-width: 4;
+        }
+        
+        .bezier-connection:hover {
+            opacity: 1;
+            stroke-width: 6;
+            filter: drop-shadow(0 0 5px currentColor);
+        }
+        
+        .connection-socket { 
+            fill: #888; 
+            stroke: #666; 
+            stroke-width: 1; 
+            cursor: crosshair; 
+            transition: all 0.3s; 
+            opacity: 0.7; 
+        }
+        .connection-socket:hover { 
+            opacity: 1; 
+            transform: scale(1.3); 
+            fill: #4CAF50;
+        }
+        .connection-line {
+            stroke-width: 3;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.8;
+        }
+        .connection-line:hover {
+            opacity: 1;
+            stroke-width: 4;
+            filter: drop-shadow(0 0 3px currentColor);
+        }
+        .connection-area {
+            cursor: crosshair;
+            transition: all 0.3s;
+            opacity: 0;
+        }
+        .connection-area:hover {
+            opacity: 0.2;
+            fill: #4CAF50;
+        }
+        .connection-area:hover + .connection-visual {
+            opacity: 1;
+            transform: scale(1.3);
+            filter: drop-shadow(0 0 5px #4CAF50);
+        }
+        .connection-visual {
+            transition: all 0.3s;
+            opacity: 0.8;
+        }
+        
+        /* === LED FOUNDATION SVG STANDARDS v1.0 === */
+        
+        /* Standard Elektro-Farben */
+        .std-wire-plus { stroke: var(--std-wire-plus); fill: none; stroke-width: var(--std-cable); }
+        .std-wire-minus { stroke: var(--std-wire-minus); fill: none; stroke-width: var(--std-cable); }
+        .std-wire-phase { stroke: var(--std-wire-phase); fill: none; stroke-width: var(--std-cable); }
+        .std-wire-neutral { stroke: var(--std-wire-neutral); fill: none; stroke-width: var(--std-cable); }
+        .std-wire-earth { stroke: var(--std-wire-earth); fill: none; stroke-width: var(--std-cable); }
+        
+        /* Standard Material-Farben */
+        .std-housing-light { fill: var(--std-housing-light); stroke: var(--std-text-color); stroke-width: var(--std-thin); }
+        .std-housing-dark { fill: var(--std-housing-dark); stroke: var(--std-text-color); stroke-width: var(--std-thin); }
+        .std-metal-light { fill: var(--std-metal-light); stroke: var(--std-text-color); stroke-width: var(--std-thin); }
+        .std-metal-dark { fill: var(--std-metal-dark); stroke: var(--std-text-color); stroke-width: var(--std-thin); }
+        .std-led-off { fill: var(--std-led-off); stroke: var(--std-text-color); stroke-width: var(--std-thin); }
+        
+        /* Standard Strichstärken */
+        .std-hairline { stroke-width: var(--std-hairline); }
+        .std-thin { stroke-width: var(--std-thin); }
+        .std-cable { stroke-width: var(--std-cable); }
+        .std-connection { stroke-width: var(--std-connection); }
+        .std-thick { stroke-width: var(--std-thick); }
+        
+        /* Standard Text */
+        .std-text { fill: var(--std-text-color); font-family: Arial, sans-serif; stroke: none; }
+        .std-text-small { font-size: 6px; }
+        .std-text-medium { font-size: 8px; }
+        .std-text-large { font-size: 10px; }
+        
+        /* Standard Connection Points */
+        .std-connection-socket { 
+            fill: #888; 
+            stroke: #666; 
+            stroke-width: var(--std-hairline); 
+            cursor: crosshair; 
+            transition: all 0.3s; 
+            opacity: 0.7; 
+        }
+        .std-connection-socket:hover { 
+            opacity: 1; 
+            transform: scale(1.3); 
+            fill: #4CAF50;
+        }
+        .std-connection-line {
+            stroke-width: var(--std-connection);
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.8;
+            fill: none;
+        }
+        .std-connection-line:hover {
+            opacity: 1;
+            stroke-width: var(--std-thick);
+            filter: drop-shadow(0 0 3px currentColor);
+        }
+        
+        /* Connection Lines mit spezifischen Farben */
+        .std-connection-line.std-wire-plus { stroke: var(--std-wire-plus); }
+        .std-connection-line.std-wire-minus { stroke: var(--std-wire-minus); }
+        .std-connection-line.std-wire-phase { stroke: var(--std-wire-phase); }
+        .std-connection-line.std-wire-neutral { stroke: var(--std-wire-neutral); }
+        .std-connection-line.std-wire-earth { stroke: var(--std-wire-earth); }
+        
+        /* Standard Gradients für Schalter */
+        .std-gradient-off {
+            stop-color: var(--color-border);
+        }
+        .std-gradient-on {
+            stop-color: var(--color-success);
+        }
+        
+        /* Connection Points verstecken wenn verbunden */
+        .connection-socket.connected,
+        .connection-line.connected,
+        .std-connection-socket.connected,
+        .std-connection-line.connected {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout-container">
+        <div class="sidebar-left">
+            <div class="datasheet-section" id="datasheet-section">
+                <div class="datasheet-header">
+                    <h3 class="text-h1">Technisches Datenblatt</h3>
+                    <button class="datasheet-toggle" onclick="toggleDatasheet()" id="datasheet-toggle">
+                        ▲
+                    </button>
+                </div>
+                
+                <div class="technical-datasheet">
+                    <div class="datasheet-content" id="datasheet-content-wrapper">
+                        <div id="datasheet-content" class="text-small">
+                            <p><em>Bewege den Cursor über ein Bauteil, um technische Informationen und Schaltskizzen anzuzeigen.</em></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="components-section">
+                <div class="components-header">
+                    <h2 class="text-h1">Bauteile</h2>
+                </div>
+                
+                <div class="components-list">
+                    <div class="component-category">
+                        <div class="category-title text-h2">Schutzschalter</div>
+                        <div class="component-item" data-component-type="fi-schalter">
+                            <div class="component-name text-h2">FI-Schutzschalter</div>
+                            <div class="component-specs text-small">
+                                30mA, 16A<br>
+                                Fehlerstromschutz
+                            </div>
+                        </div>
+                        <div class="component-item" data-component-type="ls-schalter">
+                            <div class="component-name text-h2">LS-Schalter</div>
+                            <div class="component-specs text-small">
+                                16A, Überlastschutz<br>
+                                Charakteristik B
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-category">
+                        <div class="category-title text-h2">Steuerungen</div>
+                        <div class="component-item" data-component-type="zeitschaltuhr">
+                            <div class="component-name text-h2">Zeitschaltuhr</div>
+                            <div class="component-specs text-small">
+                                Digital, 16A<br>
+                                Tages-/Wochenprogramm
+                            </div>
+                        </div>
+                        <div class="component-item" data-component-type="daemmerungsschalter">
+                            <div class="component-name text-h2">Dämmerungsschalter</div>
+                            <div class="component-specs text-small">
+                                10A, einstellbar<br>
+                                2-200 Lux
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-category">
+                        <div class="category-title text-h2">Transformatoren</div>
+                        <div class="component-item" data-component-type="trafo-12v-40w">
+                            <div class="component-name text-h2">Trafo 12V</div>
+                            <div class="component-specs text-small">
+                                Eingang: 230V AC<br>
+                                Ausgang: 12V DC, 40W
+                            </div>
+                        </div>
+                        <div class="component-item" data-component-type="trafo-24v-60w">
+                            <div class="component-name text-h2">Trafo 24V</div>
+                            <div class="component-specs text-small">
+                                Eingang: 230V AC<br>
+                                Ausgang: 24V DC, 60W
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-category">
+                        <div class="category-title text-h2">LED-Module</div>
+                        <div class="component-item" data-component-type="led-12v-1.2w">
+                            <div class="component-name text-h2">LED-Modul 12V-1,2W-WW</div>
+                            <div class="component-specs text-small">
+                                1,2W, Warmweiß<br>
+                                12V DC, 3x LED
+                            </div>
+                        </div>
+                        <div class="component-item" data-component-type="led-24v-5w">
+                            <div class="component-name text-h2">LED-Modul 24V</div>
+                            <div class="component-specs text-small">
+                                5W, Warmweiß<br>
+                                24V DC
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-area">
+            <div class="task-area">
+                <div class="task-header">
+                    <h3 class="text-h1">Aufgabenstellung</h3>
+                    <button class="task-menu-btn" onclick="openTaskMenu()">
+                        Zum Aufgaben-Menü
+                    </button>
+                </div>
+                
+                <p class="text-body">
+                    Baue eine Schaltung mit einem 12V Transformator und verbinde die LED-Module korrekt. 
+                    Achte auf die richtige Polarität und die maximale Leistung des Transformators.
+                </p>
+                
+                <div class="function-controls">
+                    <button id="powerBtn" class="btn" onclick="togglePower()">
+                        <span class="power-icon">
+                            <svg id="power-icon" viewBox="0 0 21.74 22.48" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="powerGradientOff" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:var(--color-border);stop-opacity:1" />
+                                        <stop offset="3%" style="stop-color:#c1c1c1;stop-opacity:1" />
+                                        <stop offset="44%" style="stop-color:#888887;stop-opacity:1" />
+                                        <stop offset="75%" style="stop-color:#646463;stop-opacity:1" />
+                                        <stop offset="92%" style="stop-color:#575756;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <rect fill="url(#powerGradientOff)" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                      x="2.13" y=".34" width="17.49" height="20.74" transform="translate(21.58 -.16) rotate(90)"/>
+                                <g>
+                                    <g>
+                                        <polygon fill="var(--color-border)" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                                 points="16.53 13.82 16.53 5.43 5.36 5.43 5.36 13.82 3.22 13.82 3.22 21.98 18.52 21.98 18.52 13.82 16.53 13.82"/>
+                                        <line fill="none" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                              x1="5.12" y1="19.7" x2="16.25" y2="19.7"/>
+                                        <line fill="none" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                              x1="5.12" y1="18.02" x2="16.25" y2="18.02"/>
+                                    </g>
+                                    <rect fill="var(--color-success)" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                          x="5.36" y="7.68" width="11.18" height="4.98"/>
+                                    <text fill="var(--color-white)" font-family="Arial, sans-serif" font-size="4.15px" 
+                                          transform="translate(6.36 11.7)">
+                                        <tspan x="0" y="0">O</tspan>
+                                        <tspan x="2.92" y="0">-</tspan>
+                                        <tspan x="4.27" y="0">off</tspan>
+                                    </text>
+                                </g>
+                            </svg>
+                        </span>
+                        <span class="btn-text">
+                            <span>Haupt-</span>
+                            <span>schalter</span>
+                        </span>
+                    </button>
+                    
+                    <button class="btn" onclick="clearWorkspace()">
+                        Arbeitsfläche leeren
+                    </button>
+                    
+                    <button class="btn" onclick="resetConnections()">
+                        Verbindungen zurücksetzen
+                    </button>
+                </div>
+            </div>
+            
+            <div class="workspace" id="workspace">
+                <div class="workspace-info-btn" id="info-btn">
+                    i
+                </div>
+                <div class="info-tooltip" id="info-tooltip">
+                    <div class="info-category">
+                        <div class="info-category-title">Bauteile</div>
+                        <div class="info-rule">• Aus Sidebar ziehen zum Platzieren</div>
+                        <div class="info-rule">• Klick: Einzelnes Bauteil auswählen</div>
+                        <div class="info-rule">• Strg + Klick: Mehrere Bauteile auswählen</div>
+                        <div class="info-rule">• Rechteck aufziehen: Gruppenauswahl</div>
+                        <div class="info-rule">• Doppelklick: 90° Drehung</div>
+                        <div class="info-rule">• Ziehen: Ausgewählte Bauteile verschieben</div>
+                        <div class="info-rule">• Entf-Taste: Ausgewählte Bauteile löschen</div>
+                    </div>
+                    
+                    <div class="info-category">
+                        <div class="info-category-title">Verbindungen</div>
+                        <div class="info-rule">• Anschlusspunkte verbinden durch Klicken und Ziehen</div>
+                        <div class="info-rule">• Klick auf Verbindung: Auswählen</div>
+                        <div class="info-rule">• Entf-Taste: Ausgewählte Verbindung löschen</div>
+                    </div>
+                    
+                    <div class="info-category">
+                        <div class="info-category-title">Allgemein</div>
+                        <div class="info-rule">• Klick ins Leere: Auswahl aufheben</div>
+                        <div class="info-rule">• Esc-Taste: Alle Auswahlen aufheben</div>
+                        <div class="info-rule">• Strg + Z: Rückgängig (geplant)</div>
+                    </div>
+                </div>
+                
+                <div class="power-source" id="power-source-svg">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31.43 71.94" width="50.29" height="115.10">
+                        <defs>
+                            <style>
+                                /* Legacy Power Source Klassen - DEPRECATED */
+                                .power-cls-4 {
+                                    fill: #3c3c3b;
+                                    stroke: #1d1d1b;
+                                    stroke-width: 1px;
+                                }
+                                .power-cls-5 {
+                                    fill: #878787;
+                                }
+                            </style>
+                        </defs>
+                        <g data-name="Ebene_1">
+                            <!-- Anschlusskabel - NEUE STANDARDS -->
+                            <line class="std-wire-earth" x1="15.68" y1="71.94" x2="15.73" y2="36.06"/>
+                            <line class="std-wire-phase" x1="11.77" y1="39.64" x2="11.77" y2="71.94"/>
+                            <line class="std-wire-neutral" x1="19.65" y1="39.46" x2="19.65" y2="71.94"/>
+                            
+                            <!-- Gehäuse -->
+                            <circle class="std-metal-dark" cx="15.71" cy="15.71" r="15.21"/>
+                            <path class="std-metal-light" d="M8.87,16.86c0-4.43,3.09-8.08,6.84-8.08s6.84,3.65,6.84,8.08v37.32l-13.67-.17c0-12.38,0-24.76-.01-37.14Z"/>
+                        </g>
+                        
+                        <!-- Connection Points - REPARIERT -->
+                        <!-- Phase (Braun) -->
+                        <line class="std-connection-line" 
+                              x1="11.77" y1="71.94" x2="11.77" y2="81.94" 
+                              stroke="#683c11"
+                              data-connection-type="output-line"
+                              data-connection-id="out-phase"
+                              data-wire-type="phase"
+                              data-voltage="230"
+                              data-bezier-start-x="11.77" data-bezier-start-y="76.94"
+                              data-bezier-direction="0,10,0,0"/>
+                              
+                        <!-- Neutral (Blau) -->
+                        <line class="std-connection-line" 
+                              x1="15.73" y1="71.94" x2="15.73" y2="81.94" 
+                              stroke="#1d71b8"
+                              data-connection-type="output-line"
+                              data-connection-id="out-neutral"
+                              data-wire-type="neutral"
+                              data-voltage="230"
+                              data-bezier-start-x="15.73" data-bezier-start-y="76.94"
+                              data-bezier-direction="0,10,0,0"/>
+                              
+                        <!-- Earth (Gelb-Grün) -->
+                        <line class="std-connection-line" 
+                              x1="19.65" y1="71.94" x2="19.65" y2="81.94" 
+                              stroke="#ffed00"
+                              data-connection-type="output-line"
+                              data-connection-id="out-earth"
+                              data-wire-type="earth"
+                              data-voltage="230"
+                              data-bezier-start-x="19.65" data-bezier-start-y="76.94"
+                              data-bezier-direction="0,10,0,0"/>
+                    </svg>
+                </div>
+                
+                <svg id="connectionSvg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 LED-Lernspiel wird geladen...');
+        // Vollständige JavaScript-Implementierung wird jetzt hinzugefügt
+        alert('Die neue LED-Werkbank Version ist fast fertig!\n\nDer komplette JavaScript-Code wird jetzt geladen.');
+    </script>
+</body>
+</html>
