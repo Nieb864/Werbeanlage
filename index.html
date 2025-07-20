@@ -1273,12 +1273,16 @@
                 
                 const powerSource = this.findPowerSource();
                 if (!powerSource) {
-                    console.log('Keine Stromquelle gefunden');
+                    console.log('❌ Keine Stromquelle gefunden');
                     return;
                 }
                 
+                console.log('⚡ Power Source gefunden:', powerSource);
+                console.log('🔌 Alle Verbindungen:', Array.from(this.graph.edges.entries()));
+                console.log('📦 Alle Komponenten:', Array.from(this.graph.nodes.entries()));
+                
                 const connectedComponents = this.graph.getConnectedComponents(powerSource);
-                console.log('Verbundene Komponenten:', connectedComponents);
+                console.log('🔗 Verbundene Komponenten:', connectedComponents);
                 
                 this.calculateVoltagesAndCurrents(connectedComponents);
             }
@@ -1297,7 +1301,10 @@
                     const component = this.graph.nodes.get(componentId);
                     const stateMachine = this.graph.stateMachines.get(componentId);
                     
-                    if (!component || !stateMachine) continue;
+                    if (!component || !stateMachine) {
+                        console.log('❌ Komponente oder StateMachine fehlt für:', componentId);
+                        continue;
+                    }
                     
                     let voltage = 0;
                     let current = 0;
@@ -1305,10 +1312,12 @@
                     if (component.type === ComponentTypes.POWER_SOURCE) {
                         voltage = ComponentSpecs[component.type].voltage;
                         current = this.calculateSourceCurrent(componentId);
+                        console.log(`🔌 Power Source ${componentId}: ${voltage}V, ${current}A`);
                     } else {
                         const result = this.calculateComponentPower(componentId);
                         voltage = result.voltage;
                         current = result.current;
+                        console.log(`⚡ Komponente ${componentId} (${component.type}): ${voltage}V, ${current}A`);
                     }
                     
                     stateMachine.updateState(voltage, current);
