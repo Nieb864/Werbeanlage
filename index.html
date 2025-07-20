@@ -948,7 +948,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.20</div>
+                <div class="version-display">v0.00.21</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2663,6 +2663,20 @@
             svg.setAttribute('class', 'transformer-svg');
             svg.setAttribute('data-component-type', 'trafo-12v-40w');
             
+            svg.setAttribute('data-internal-routing', JSON.stringify([
+                {"from":"in-phase", "to":"out-plus", "resistance":0.02, "efficiency":0.87},
+                {"from":"in-neutral", "to":"out-minus", "resistance":0.02, "efficiency":0.87}
+            ]));
+            
+            svg.setAttribute('data-component-load', JSON.stringify({
+                "between": ["in-phase", "in-neutral"],
+                "power": 40,
+                "voltage": 230,
+                "type": "transformer",
+                "output_voltage": 12,
+                "output_power": 40
+            }));
+            
             svg.innerHTML = `
                 <!-- Gehäuse -->
                 <rect class="trafo-housing" x="20" y="10" width="80" height="60" rx="5"/>
@@ -2688,7 +2702,8 @@
                         data-connection-id="in-phase"
                         data-wire-type="phase"
                         data-voltage="230"
-                        data-bezier-end-x="5" data-bezier-end-y="25"/>
+                        data-bezier-end-x="5" data-bezier-end-y="25"
+                        data-bezier-direction="-20,0,0,0"/>
                         
                 <circle class="connection-socket" 
                         cx="5" cy="35" r="4" 
@@ -2696,7 +2711,8 @@
                         data-connection-id="in-neutral"
                         data-wire-type="neutral"
                         data-voltage="230"
-                        data-bezier-end-x="5" data-bezier-end-y="35"/>
+                        data-bezier-end-x="5" data-bezier-end-y="35"
+                        data-bezier-direction="-20,0,0,0"/>
                         
                 <circle class="connection-socket" 
                         cx="5" cy="45" r="4" 
@@ -2704,7 +2720,8 @@
                         data-connection-id="in-earth"
                         data-wire-type="earth"
                         data-voltage="230"
-                        data-bezier-end-x="5" data-bezier-end-y="45"/>
+                        data-bezier-end-x="5" data-bezier-end-y="45"
+                        data-bezier-direction="-20,0,0,0"/>
                 
                 <!-- Ausgangs-Connection Points -->
                 <line class="connection-line" 
@@ -2714,7 +2731,8 @@
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="12"
-                      data-bezier-start-x="117" data-bezier-start-y="30"/>
+                      data-bezier-start-x="117" data-bezier-start-y="30"
+                      data-bezier-direction="20,0,0,0"/>
                       
                 <line class="connection-line" 
                       x1="115" y1="50" x2="120" y2="50" 
@@ -2723,7 +2741,8 @@
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="12"
-                      data-bezier-start-x="117" data-bezier-start-y="50"/>
+                      data-bezier-start-x="117" data-bezier-start-y="50"
+                      data-bezier-direction="20,0,0,0"/>
             `;
             
             return svg;
@@ -2735,6 +2754,20 @@
             svg.setAttribute('viewBox', '0 0 120 80');
             svg.setAttribute('class', 'transformer-svg');
             svg.setAttribute('data-component-type', 'trafo-24v-60w');
+            
+            svg.setAttribute('data-internal-routing', JSON.stringify([
+                {"from":"in-phase", "to":"out-plus", "resistance":0.02, "efficiency":0.90},
+                {"from":"in-neutral", "to":"out-minus", "resistance":0.02, "efficiency":0.90}
+            ]));
+            
+            svg.setAttribute('data-component-load', JSON.stringify({
+                "between": ["in-phase", "in-neutral"],
+                "power": 60,
+                "voltage": 230,
+                "type": "transformer",
+                "output_voltage": 24,
+                "output_power": 60
+            }));
             
             svg.innerHTML = `
                 <!-- Gehäuse -->
@@ -2757,20 +2790,25 @@
                 <!-- Connection Points analog zu 12V Trafo -->
                 <circle class="connection-socket" cx="5" cy="25" r="4" 
                         data-connection-type="input-socket" data-connection-id="in-phase"
-                        data-wire-type="phase" data-voltage="230" data-bezier-end-x="5" data-bezier-end-y="25"/>
+                        data-wire-type="phase" data-voltage="230" data-bezier-end-x="5" data-bezier-end-y="25"
+                        data-bezier-direction="-20,0,0,0"/>
                 <circle class="connection-socket" cx="5" cy="35" r="4" 
                         data-connection-type="input-socket" data-connection-id="in-neutral"
-                        data-wire-type="neutral" data-voltage="230" data-bezier-end-x="5" data-bezier-end-y="35"/>
+                        data-wire-type="neutral" data-voltage="230" data-bezier-end-x="5" data-bezier-end-y="35"
+                        data-bezier-direction="-20,0,0,0"/>
                 <circle class="connection-socket" cx="5" cy="45" r="4" 
                         data-connection-type="input-socket" data-connection-id="in-earth"
-                        data-wire-type="earth" data-voltage="230" data-bezier-end-x="5" data-bezier-end-y="45"/>
+                        data-wire-type="earth" data-voltage="230" data-bezier-end-x="5" data-bezier-end-y="45"
+                        data-bezier-direction="-20,0,0,0"/>
                 
                 <line class="connection-line" x1="115" y1="30" x2="120" y2="30" stroke="#e30613" 
                       data-connection-type="output-line" data-connection-id="out-plus"
-                      data-wire-type="plus" data-voltage="24" data-bezier-start-x="117" data-bezier-start-y="30"/>
+                      data-wire-type="plus" data-voltage="24" data-bezier-start-x="117" data-bezier-start-y="30"
+                      data-bezier-direction="20,0,0,0"/>
                 <line class="connection-line" x1="115" y1="50" x2="120" y2="50" stroke="#1d1d1b" 
                       data-connection-type="output-line" data-connection-id="out-minus"
-                      data-wire-type="minus" data-voltage="24" data-bezier-start-x="117" data-bezier-start-y="50"/>
+                      data-wire-type="minus" data-voltage="24" data-bezier-start-x="117" data-bezier-start-y="50"
+                      data-bezier-direction="20,0,0,0"/>
             `;
             
             return svg;
@@ -2973,7 +3011,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.20 - Trafo CSS Fix: Feste Größen statt Skalierung...');
+            console.log('🚀 LED Foundation v0.00.21 - Trafo Physik: Bereit für Engine-Tests...');
             
             // 1. Circuit Simulation initialisieren
             try {
