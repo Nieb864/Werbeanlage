@@ -1039,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.39</div>
+                <div class="version-display">v0.00.40</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2976,37 +2976,20 @@
                     </filter>
                 </defs>
                 
-                <!-- RAUCH-ELEMENTE (versteckt per CSS) -->
+                <!-- TEST-RAUCH (versteckt per CSS) -->
                 <g class="smoke-container" style="display: none;">
-                    <!-- Rauch über LED 1 (44.73, 13.77) -->
-                    <g transform="translate(44.73, 13.77)">
-                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
-                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
-                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
-                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
-                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
-                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
-                    </g>
+                    <!-- GROSSE SCHWARZE RECHTECKE - SOLLTEN SICHTBAR SEIN -->
+                    <rect x="40" y="-30" width="15" height="25" fill="#000" opacity="1.0"/>
+                    <rect x="60" y="-35" width="15" height="25" fill="#000" opacity="1.0"/>
+                    <rect x="80" y="-30" width="15" height="25" fill="#000" opacity="1.0"/>
                     
-                    <!-- Rauch über LED 2 (67.455, 13.77) -->
-                    <g transform="translate(67.455, 13.77)">
-                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
-                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
-                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
-                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
-                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
-                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
-                    </g>
+                    <!-- DEBUG: Rote Kreise zur LED-Positionsprüfung -->
+                    <circle cx="44.73" cy="13.77" r="4" fill="red" opacity="1.0"/>
+                    <circle cx="67.455" cy="13.77" r="4" fill="red" opacity="1.0"/>
+                    <circle cx="90.18" cy="13.77" r="4" fill="red" opacity="1.0"/>
                     
-                    <!-- Rauch über LED 3 (90.18, 13.77) -->
-                    <g transform="translate(90.18, 13.77)">
-                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
-                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
-                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
-                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
-                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
-                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
-                    </g>
+                    <!-- TEST: Großer grüner Balken über allem -->
+                    <rect x="30" y="-50" width="80" height="10" fill="green" opacity="1.0"/>
                 </g>
                 
                 <g>
@@ -3497,7 +3480,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.39 - SVG-Rauch: Elegante Integration direkt im LED-Modul...');
+            console.log('🚀 LED Foundation v0.00.40 - SVG-Debug: Große Test-Elemente für Sichtbarkeit...');
             
             // 1. Circuit Simulation initialisieren
             try {
