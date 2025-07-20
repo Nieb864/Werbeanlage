@@ -666,6 +666,46 @@
             font-size: 6px; 
         }
 
+        /* Component States */
+        .state-off .cls-5, 
+        .state-off .led24-center {
+            fill: #ddd !important;
+        }
+
+        .state-on .cls-5, 
+        .state-on .led24-center {
+            fill: #ffeb3b !important;
+            filter: drop-shadow(0 0 5px #ffeb3b);
+        }
+
+        .state-blinking .cls-5, 
+        .state-blinking .led24-center {
+            fill: #ff9800 !important;
+            animation: blink 0.5s infinite alternate;
+        }
+
+        .state-broken .cls-5, 
+        .state-broken .led24-center {
+            fill: #f44336 !important;
+            filter: drop-shadow(0 0 3px #f44336);
+        }
+
+        .state-overloaded .cls-5, 
+        .state-overloaded .led24-center {
+            fill: #e91e63 !important;
+            animation: flicker 0.2s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes flicker {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+
         /* Info Box */
         .info-box {
             margin-top: var(--spacing-lg);
@@ -948,7 +988,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.22</div>
+                <div class="version-display">v0.00.23</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1120,6 +1160,9 @@
                 this.specs = ComponentSpecs[componentType];
                 this.currentVoltage = 0;
                 this.currentPower = 0;
+                
+                // Initial state CSS setzen
+                this.applyStateCSS();
             }
             
             updateState(voltage, current) {
@@ -1171,13 +1214,16 @@
             }
             
             animateStateChange() {
+                this.applyStateCSS();
+                console.log(`${this.type} (${this.elementId}): ${this.state} (${this.currentVoltage}V, ${this.currentPower.toFixed(2)}W)`);
+            }
+            
+            applyStateCSS() {
                 const element = document.getElementById(this.elementId);
                 if (!element) return;
                 
                 element.classList.remove('state-off', 'state-on', 'state-blinking', 'state-broken', 'state-overloaded');
                 element.classList.add(`state-${this.state}`);
-                
-                console.log(`${this.type} (${this.elementId}): ${this.state} (${this.currentVoltage}V, ${this.currentPower.toFixed(2)}W)`);
             }
         }
 
@@ -3033,7 +3079,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.22 - Physik-Engine Fix: Trafo NaN repariert...');
+            console.log('🚀 LED Foundation v0.00.23 - LED Visual Feedback: CSS States funktional...');
             
             // 1. Circuit Simulation initialisieren
             try {
