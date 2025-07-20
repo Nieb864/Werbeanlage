@@ -933,7 +933,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.10</div>
+                <div class="version-display">v0.00.11</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -965,13 +965,13 @@
                 </div>
                 
                 <div class="power-source" id="power-source-svg">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31.43 71.94" width="50.29" height="115.10">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50.29 115.10" width="50.29" height="115.10">
                         <defs>
                             <style>
                                 .power-cls-4 {
                                     fill: #3c3c3b;
                                     stroke: #1d1d1b;
-                                    stroke-width: 1px;
+                                    stroke-width: 1.6px;
                                 }
                                 .power-cls-5 {
                                     fill: #878787;
@@ -979,88 +979,88 @@
                             </style>
                         </defs>
                         <g data-name="Ebene_1">
-                            <!-- Anschlusskabel -->
-                            <line class="std-wire-earth" x1="15.68" y1="71.94" x2="15.73" y2="36.06"/>
-                            <line class="std-wire-phase" x1="11.77" y1="39.64" x2="11.77" y2="71.94"/>
-                            <line class="std-wire-neutral" x1="19.65" y1="39.46" x2="19.65" y2="71.94"/>
+                            <!-- Anschlusskabel (×1.6 skaliert) -->
+                            <line class="std-wire-earth" x1="25.09" y1="115.10" x2="25.17" y2="57.70"/>
+                            <line class="std-wire-phase" x1="18.83" y1="63.42" x2="18.83" y2="115.10"/>
+                            <line class="std-wire-neutral" x1="31.44" y1="63.14" x2="31.44" y2="115.10"/>
                             
-                            <!-- Gehäuse -->
-                            <circle class="std-metal-dark" cx="15.71" cy="15.71" r="15.21"/>
-                            <path class="std-metal-light" d="M8.87,16.86c0-4.43,3.09-8.08,6.84-8.08s6.84,3.65,6.84,8.08v37.32l-13.67-.17c0-12.38,0-24.76-.01-37.14Z"/>
+                            <!-- Gehäuse (×1.6 skaliert) -->
+                            <circle class="std-metal-dark" cx="25.14" cy="25.14" r="24.34"/>
+                            <path class="std-metal-light" d="M14.19,26.98c0-7.09,4.94-12.93,10.94-12.93s10.94,5.84,10.94,12.93v59.71l-21.87-.27c0-19.81,0-39.62-.01-59.43Z"/>
                         </g>
                         
                         <!-- Connection Points -->
                         <g data-name="connections">
-                            <!-- DEBUG: Hover-Areas am Gehäuse-Ausgang -->
+                            <!-- DEBUG: Hover-Areas (Workspace-Koordinaten) -->
                             <rect class="wire-hover-area std-wire-phase" 
-                                  x="10.77" y="54" width="2" height="10" 
+                                  x="17.23" y="86.4" width="3.2" height="16" 
                                   fill="red"
                                   stroke="black"
-                                  stroke-width="0.5"
+                                  stroke-width="0.8"
                                   opacity="0.5"
                                   data-connection-type="output-line"
                                   data-connection-id="out-phase"
                                   data-wire-type="phase"
                                   data-voltage="230"
-                                  data-bezier-start-x="11.77" data-bezier-start-y="59"
-                                  data-bezier-direction="0,10,0,0"/>
+                                  data-bezier-start-x="18.83" data-bezier-start-y="86.4"
+                                  data-bezier-direction="0,16,0,0"/>
                                   
                             <rect class="wire-hover-area std-wire-neutral" 
-                                  x="18.65" y="54" width="2" height="10" 
+                                  x="29.84" y="86.4" width="3.2" height="16" 
                                   fill="blue"
                                   stroke="black"
-                                  stroke-width="0.5"
+                                  stroke-width="0.8"
                                   opacity="0.5"
                                   data-connection-type="output-line"
                                   data-connection-id="out-neutral"
                                   data-wire-type="neutral"
                                   data-voltage="230"
-                                  data-bezier-start-x="19.65" data-bezier-start-y="59"
-                                  data-bezier-direction="0,10,0,0"/>
+                                  data-bezier-start-x="31.44" data-bezier-start-y="86.4"
+                                  data-bezier-direction="0,16,0,0"/>
                                   
                             <rect class="wire-hover-area std-wire-earth" 
-                                  x="14.68" y="54" width="2" height="10" 
+                                  x="23.49" y="86.4" width="3.2" height="16" 
                                   fill="yellow"
                                   stroke="black"
-                                  stroke-width="0.5"
+                                  stroke-width="0.8"
                                   opacity="0.5"
                                   data-connection-type="output-line"
                                   data-connection-id="out-earth"
                                   data-wire-type="earth"
                                   data-voltage="230"
-                                  data-bezier-start-x="15.68" data-bezier-start-y="59"
-                                  data-bezier-direction="0,10,0,0"/>
+                                  data-bezier-start-x="25.09" data-bezier-start-y="86.4"
+                                  data-bezier-direction="0,16,0,0"/>
                             
-                            <!-- Connection Lines (für Bézier-Kurven) -->
+                            <!-- Connection Lines (Workspace-Koordinaten) -->
                             <line class="connection-line" 
-                                  x1="11.77" y1="54" x2="11.77" y2="64" 
+                                  x1="18.83" y1="86.4" x2="18.83" y2="102.4" 
                                   stroke="#683c11"
                                   data-connection-type="output-line"
                                   data-connection-id="out-phase"
                                   data-wire-type="phase"
                                   data-voltage="230"
-                                  data-bezier-start-x="11.77" data-bezier-start-y="59"
-                                  data-bezier-direction="0,10,0,0"/>
+                                  data-bezier-start-x="18.83" data-bezier-start-y="86.4"
+                                  data-bezier-direction="0,16,0,0"/>
                                   
                             <line class="connection-line" 
-                                  x1="19.65" y1="54" x2="19.65" y2="64" 
+                                  x1="31.44" y1="86.4" x2="31.44" y2="102.4" 
                                   stroke="#1d71b8"
                                   data-connection-type="output-line"
                                   data-connection-id="out-neutral"
                                   data-wire-type="neutral"
                                   data-voltage="230"
-                                  data-bezier-start-x="19.65" data-bezier-start-y="59"
-                                  data-bezier-direction="0,10,0,0"/>
+                                  data-bezier-start-x="31.44" data-bezier-start-y="86.4"
+                                  data-bezier-direction="0,16,0,0"/>
                                   
                             <line class="connection-line" 
-                                  x1="15.68" y1="54" x2="15.68" y2="64" 
+                                  x1="25.09" y1="86.4" x2="25.09" y2="102.4" 
                                   stroke="#ffed00"
                                   data-connection-type="output-line"
                                   data-connection-id="out-earth"
                                   data-wire-type="earth"
                                   data-voltage="230"
-                                  data-bezier-start-x="15.68" data-bezier-start-y="59"
-                                  data-bezier-direction="0,10,0,0"/>
+                                  data-bezier-start-x="25.09" data-bezier-start-y="86.4"
+                                  data-bezier-direction="0,16,0,0"/>
                         </g>
                     </svg>
                 </div>
@@ -2971,7 +2971,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.10 - DEBUG: Position korrigiert...');
+            console.log('🚀 LED Foundation v0.00.11 - SVG Reskaliert: Einheitliche Koordinaten...');
             
             // 1. Circuit Simulation initialisieren
             try {
