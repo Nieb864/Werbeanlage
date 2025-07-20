@@ -1039,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.37</div>
+                <div class="version-display">v0.00.39</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1216,9 +1216,7 @@
                 this.blinkInterval = null;
                 this.blinkState = true;
                 
-                // Rauch-Animation State
-                this.smokeElements = [];
-                this.smokeOverlay = null;
+                // Rauch-Animation: Nur noch CSS-basiert (im SVG)
                 
                 // Initial state CSS setzen
                 this.applyStateCSS();
@@ -1414,12 +1412,21 @@
             
             updateSmokeAnimation() {
                 console.log(`🔧 updateSmokeAnimation: State=${this.state}, BROKEN=${ComponentStates.BROKEN}`);
+                const element = document.getElementById(this.elementId);
+                if (!element) return;
+                
+                const smokeContainer = element.querySelector('.smoke-container');
+                if (!smokeContainer) {
+                    console.log(`⚠️ Kein Rauch-Container im SVG gefunden`);
+                    return;
+                }
+                
                 if (this.state === ComponentStates.BROKEN) {
-                    console.log(`💨 State ist BROKEN - Erstelle Rauch-Overlay`);
-                    this.createSmokeOverlay();
+                    console.log(`💨 State ist BROKEN - Zeige Rauch`);
+                    smokeContainer.style.display = 'block';
                 } else {
-                    console.log(`🧹 State ist nicht BROKEN - Entferne Rauch-Overlay`);
-                    this.removeSmokeOverlay();
+                    console.log(`🧹 State ist nicht BROKEN - Verstecke Rauch`);
+                    smokeContainer.style.display = 'none';
                 }
             }
             
@@ -2085,8 +2092,7 @@
                 // Verbindungen sofort nach Rotation aktualisieren
                 this.updateConnectionsForComponent(component);
                 
-                // Rauch-Position bei Rotation aktualisieren
-                this.updateSmokeForComponent(component);
+                // Rauch rotiert automatisch mit SVG - keine Updates nötig
                 
                 console.log(`🔄 Bauteil ${component.id} gedreht auf ${currentRotation}°`);
             }
@@ -2636,11 +2642,7 @@
             dragElement.style.left = (e.clientX - dragOffset.x) + 'px';
             dragElement.style.top = (e.clientY - dragOffset.y) + 'px';
             
-            // Rauch-Position bei Drag aktualisieren
-            if (workspaceManager && dragElement) {
-                console.log(`🎮 Drag-Update für ${dragElement.id}`);
-                workspaceManager.updateSmokeForComponent(dragElement);
-            }
+            // Rauch bewegt sich automatisch mit SVG - keine Drag-Updates nötig
         }
 
         function endDrag(e) {
@@ -2973,6 +2975,40 @@
                         </feMerge>
                     </filter>
                 </defs>
+                
+                <!-- RAUCH-ELEMENTE (versteckt per CSS) -->
+                <g class="smoke-container" style="display: none;">
+                    <!-- Rauch über LED 1 (44.73, 13.77) -->
+                    <g transform="translate(44.73, 13.77)">
+                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
+                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
+                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
+                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
+                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
+                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
+                    </g>
+                    
+                    <!-- Rauch über LED 2 (67.455, 13.77) -->
+                    <g transform="translate(67.455, 13.77)">
+                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
+                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
+                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
+                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
+                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
+                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
+                    </g>
+                    
+                    <!-- Rauch über LED 3 (90.18, 13.77) -->
+                    <g transform="translate(90.18, 13.77)">
+                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
+                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
+                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
+                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
+                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
+                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
+                    </g>
+                </g>
+                
                 <g>
                     <!-- Anschlusskabel Links -->
                     <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
@@ -3258,6 +3294,40 @@
                         </feMerge>
                     </filter>
                 </defs>
+                
+                <!-- RAUCH-ELEMENTE (versteckt per CSS) -->
+                <g class="smoke-container" style="display: none;">
+                    <!-- Rauch über LED 1 (44.73, 13.77) -->
+                    <g transform="translate(44.73, 13.77)">
+                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
+                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
+                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
+                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
+                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
+                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
+                    </g>
+                    
+                    <!-- Rauch über LED 2 (67.455, 13.77) -->
+                    <g transform="translate(67.455, 13.77)">
+                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
+                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
+                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
+                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
+                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
+                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
+                    </g>
+                    
+                    <!-- Rauch über LED 3 (90.18, 13.77) -->
+                    <g transform="translate(90.18, 13.77)">
+                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
+                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
+                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
+                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
+                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
+                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
+                    </g>
+                </g>
+                
                 <g>
                     <!-- Anschlusskabel Links -->
                     <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
@@ -3427,7 +3497,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.37 - Sync-Fix: Global WorkspaceManager + Debug-Logs...');
+            console.log('🚀 LED Foundation v0.00.39 - SVG-Rauch: Elegante Integration direkt im LED-Modul...');
             
             // 1. Circuit Simulation initialisieren
             try {
