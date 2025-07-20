@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.62</div>
+                <div class="version-display">v0.00.63</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1324,7 +1324,19 @@
                 
                 const previousState = this.state;
                 
-                if (this.specs.type === 'load') {
+                // 🔧 BROKEN STATE: Nur bei eingeschaltetem Hauptschalter sichtbar
+                const componentState = window.circuit?.graph?.getComponentState?.(this.elementId);
+                const isSystemPowered = window.systemPower || false;
+                
+                if (componentState === 'broken' && !isSystemPowered) {
+                    // Wenn Hauptschalter AUS ist, zeige kaputte LEDs als normale AUS LEDs
+                    this.state = ComponentStates.OFF;
+                    console.log(`🔧 LED ${this.elementId}: Ist kaputt, aber Hauptschalter AUS → zeige als OFF`);
+                } else if (componentState === 'broken' && isSystemPowered) {
+                    // Nur bei eingeschaltetem Hauptschalter zeige als kaputt
+                    this.state = ComponentStates.BROKEN;
+                    console.log(`💀 LED ${this.elementId}: Ist kaputt und Hauptschalter EIN → zeige als BROKEN`);
+                } else if (this.specs.type === 'load') {
                     this.state = this.calculateLEDState(voltage);
                 } else if (this.specs.type === 'transformer') {
                     this.state = this.calculateTransformerState();
@@ -2051,10 +2063,22 @@
                             continue;
                         }
                         
-                        // Prüfe ob die andere LED eine gültige Spannungsquelle hat
+                        // 🔧 WICHTIG: Prüfe ob die andere LED kaputt ist
+                        const otherLEDState = this.graph.getComponentState(connectedId);
+                        if (otherLEDState === 'broken') {
+                            console.log(`💀 LED ${connectedId} ist kaputt - aber Kontakte sind noch verbunden, suche alternative Stromquelle`);
+                            // Kaputte LEDs blockieren nicht die Parallelschaltung - Kontakte sind ja noch da!
+                            // Suche rekursiv weiter nach anderen Stromquellen über diese kaputte LED
+                        }
+                        
+                        // Prüfe ob die andere LED eine gültige Spannungsquelle hat (auch wenn sie kaputt ist - Durchleitung!)
                         const otherLEDPower = this.findPowerSourceForLED(connectedId, visited);
                         if (otherLEDPower) {
-                            console.log(`✅ LED ${ledId}: Bekommt Spannung über Parallelschaltung von LED ${connectedId}`);
+                            if (otherLEDState === 'broken') {
+                                console.log(`⚡ LED ${ledId}: Bekommt Spannung über KAPUTTE LED ${connectedId} (Kontakte leiten weiter)`);
+                            } else {
+                                console.log(`✅ LED ${ledId}: Bekommt Spannung über Parallelschaltung von LED ${connectedId}`);
+                            }
                             return otherLEDPower;
                         }
                     }
@@ -4455,7 +4479,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.62 - NEUBERECHNUNG GEFIXT: LED-Kreise und Ein/Aus-Schaltung funktioniert...');
+            console.log('🚀 LED Foundation v0.00.63 - PARALLELSCHALTUNG REALISTISCH: Kaputte LEDs blockieren andere nicht...');
             
             // 1. Circuit Simulation initialisieren
             try {
