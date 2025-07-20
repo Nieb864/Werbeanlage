@@ -3727,24 +3727,26 @@
                         data-bezier-end-x="5" data-bezier-end-y="45"
                         data-bezier-direction="-20,0,0,0"/>
                 
-                <!-- Ausgangs-Connection Points -->
-                <circle class="connection-socket" 
-                        cx="115" cy="30" r="4" 
-                        data-connection-type="output-socket"
-                        data-connection-id="out-plus"
-                        data-wire-type="plus"
-                        data-voltage="12"
-                        data-bezier-start-x="115" data-bezier-start-y="30"
-                        data-bezier-direction="20,0,0,0"/>
-                
-                <circle class="connection-socket" 
-                        cx="115" cy="50" r="4" 
-                        data-connection-type="output-socket"
-                        data-connection-id="out-minus"
-                        data-wire-type="minus"
-                        data-voltage="12"
-                        data-bezier-start-x="115" data-bezier-start-y="50"
-                        data-bezier-direction="20,0,0,0"/>
+                <!-- Ausgangs-Connection Lines -->
+                <line class="connection-line" 
+                      x1="115" y1="30" x2="120" y2="30" 
+                      stroke="#e30613" 
+                      data-connection-type="output-line"
+                      data-connection-id="out-plus"
+                      data-wire-type="plus"
+                      data-voltage="12"
+                      data-bezier-start-x="117" data-bezier-start-y="30"
+                      data-bezier-direction="20,0,0,0"/>
+                      
+                <line class="connection-line" 
+                      x1="115" y1="50" x2="120" y2="50" 
+                      stroke="#1d1d1b" 
+                      data-connection-type="output-line"
+                      data-connection-id="out-minus"
+                      data-wire-type="minus"
+                      data-voltage="12"
+                      data-bezier-start-x="117" data-bezier-start-y="50"
+                      data-bezier-direction="20,0,0,0"/>
             `;
             
             return svg;
