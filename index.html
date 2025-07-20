@@ -918,6 +918,13 @@
                                 Ausgang: 24V DC, 60W
                             </div>
                         </div>
+                        <div class="component-item" data-component-type="trafo-12v-3w">
+                            <div class="component-name text-h2" style="color: #ff6b6b;">Trafo 12V Mini</div>
+                            <div class="component-specs text-small">
+                                Eingang: 230V AC<br>
+                                Ausgang: 12V DC, <strong style="color: #ff6b6b;">3W</strong>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="component-category">
@@ -1007,7 +1014,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.51</div>
+                <div class="version-display">v0.00.52</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1115,6 +1122,7 @@
             POWER_SOURCE: 'power-source',
             TRANSFORMER_12V: 'trafo-12v-40w',
             TRANSFORMER_24V: 'trafo-24v-60w',
+            TRANSFORMER_12V_3W: 'trafo-12v-3w',
             LED_12V_1_2W: 'led-12v-1.2w',
             LED_12V: 'led-12v-3.5w',
             LED_24V: 'led-24v-5w',
@@ -1139,6 +1147,12 @@
                 inputVoltage: 230,
                 outputVoltage: 24,
                 maxPower: 60,
+                type: 'transformer'
+            },
+            [ComponentTypes.TRANSFORMER_12V_3W]: {
+                inputVoltage: 230,
+                outputVoltage: 12,
+                power: 3,
                 type: 'transformer'
             },
             [ComponentTypes.LED_12V_1_2W]: {
@@ -2788,7 +2802,7 @@
                 console.log(`🚨 DEBUG isCircuitComplete: ${componentId}, componentType="${componentType}"`);
                 
                 // TRAFO: Braucht mindestens phase+neutral Eingang UND mindestens 1 Ausgang
-                if (componentType === 'trafo-12v-40w' || componentType === 'trafo-24v-60w') {
+                if (componentType === 'trafo-12v-40w' || componentType === 'trafo-24v-60w' || componentType === 'trafo-12v-3w') {
                     console.log(`🔍 isCircuitComplete: Prüfe TRAFO ${componentId}...`);
                     return this.hasRequiredTransformerConnections(componentId);
                 }
@@ -3406,6 +3420,8 @@
                     return createTransformer12VSVG();
                 case 'trafo-24v-60w':
                     return createTransformer24VSVG();
+                case 'trafo-12v-3w':
+                    return createTransformer12V3WSVG();
                 case 'fi-schalter':
                     return createFISwitchSVG();
                 case 'ls-schalter':
@@ -3633,6 +3649,96 @@
                 <line class="connection-line" 
                       x1="115" y1="50" x2="120" y2="50" 
                       stroke="#1d1d1b" 
+                      data-connection-type="output-line"
+                      data-connection-id="out-minus"
+                      data-wire-type="minus"
+                      data-voltage="12"
+                      data-bezier-start-x="117" data-bezier-start-y="50"
+                      data-bezier-direction="20,0,0,0"/>
+            `;
+            
+            return svg;
+        }
+
+        // ===== TRANSFORMATOR 12V 3W (MINI) =====
+        function createTransformer12V3WSVG() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 120 80');
+            svg.setAttribute('class', 'transformer-svg');
+            svg.setAttribute('data-component-type', 'trafo-12v-3w');
+            
+            svg.setAttribute('data-internal-routing', JSON.stringify([
+                {"from":"in-phase", "to":"out-plus", "resistance":0.02, "efficiency":0.87},
+                {"from":"in-neutral", "to":"out-minus", "resistance":0.02, "efficiency":0.87}
+            ]));
+            
+            svg.setAttribute('data-component-load', JSON.stringify({
+                "between": ["in-phase", "in-neutral"],
+                "power": 3,
+                "voltage": 230,
+                "type": "transformer",
+                "output_voltage": 12,
+                "output_power": 3
+            }));
+            
+            svg.innerHTML = `
+                <!-- Gehäuse (rot für Mini-Trafo) -->
+                <rect class="trafo-housing" x="20" y="10" width="80" height="60" rx="5" fill="#ff6b6b" stroke="#cc5555"/>
+                
+                <!-- Beschriftung -->
+                <text class="trafo-text" x="60" y="30" text-anchor="middle" fill="white">MINI</text>
+                <text class="trafo-text" x="60" y="45" text-anchor="middle" fill="white">12V DC</text>
+                <text class="trafo-label" x="60" y="55" text-anchor="middle" fill="white" font-weight="bold">3W</text>
+                
+                <!-- Eingangskabel (230V) -->
+                <line stroke="#683c11" stroke-width="4" x1="5" y1="25" x2="20" y2="25"/>
+                <line stroke="#1d71b8" stroke-width="4" x1="5" y1="35" x2="20" y2="35"/>
+                <line stroke="#ffed00" stroke-width="4" x1="5" y1="45" x2="20" y2="45"/>
+                
+                <!-- Ausgangskabel (12V) -->
+                <line stroke="#e30613" stroke-width="4" x1="100" y1="30" x2="115" y2="30"/>
+                <line stroke="#1d1d1b" stroke-width="4" x1="100" y1="50" x2="115" y2="50"/>
+                
+                <!-- Eingangs-Connection Points -->
+                <circle class="connection-socket" 
+                        cx="5" cy="25" r="4" 
+                        data-connection-type="input-socket"
+                        data-connection-id="in-phase"
+                        data-wire-type="phase"
+                        data-voltage="230"
+                        data-bezier-end-x="5" data-bezier-end-y="25"
+                        data-bezier-direction="-20,0,0,0"/>
+                        
+                <circle class="connection-socket" 
+                        cx="5" cy="35" r="4" 
+                        data-connection-type="input-socket"
+                        data-connection-id="in-neutral"
+                        data-wire-type="neutral"
+                        data-voltage="230"
+                        data-bezier-end-x="5" data-bezier-end-y="35"
+                        data-bezier-direction="-20,0,0,0"/>
+                        
+                <circle class="connection-socket" 
+                        cx="5" cy="45" r="4" 
+                        data-connection-type="input-socket"
+                        data-connection-id="in-earth"
+                        data-wire-type="earth"
+                        data-voltage="230"
+                        data-bezier-end-x="5" data-bezier-end-y="45"
+                        data-bezier-direction="-20,0,0,0"/>
+                
+                <!-- Ausgangs-Connection Lines -->
+                <line class="connection-line" 
+                      x1="115" y1="30" x2="120" y2="30"
+                      data-connection-type="output-line"
+                      data-connection-id="out-plus"
+                      data-wire-type="plus"
+                      data-voltage="12"
+                      data-bezier-start-x="117" data-bezier-start-y="30"
+                      data-bezier-direction="20,0,0,0"/>
+                
+                <line class="connection-line" 
+                      x1="115" y1="50" x2="120" y2="50"
                       data-connection-type="output-line"
                       data-connection-id="out-minus"
                       data-wire-type="minus"
@@ -4030,7 +4136,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.51 - BUGFIX: Isolierte Gefährdungslogik + Tooltip Debug...');
+            console.log('🚀 LED Foundation v0.00.52 - FEATURE: Mini-Trafo 12V 3W für Überlastungstests...');
             
             // 1. Circuit Simulation initialisieren
             try {
