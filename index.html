@@ -1039,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.41</div>
+                <div class="version-display">v0.00.42</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2992,18 +2992,18 @@
                 
                 <!-- TEST-RAUCH (versteckt per CSS) -->
                 <g class="smoke-container" style="display: none;">
-                    <!-- GROSSE SCHWARZE RECHTECKE - SOLLTEN SICHTBAR SEIN -->
-                    <rect x="40" y="-30" width="15" height="25" fill="#000" opacity="1.0"/>
-                    <rect x="60" y="-35" width="15" height="25" fill="#000" opacity="1.0"/>
-                    <rect x="80" y="-30" width="15" height="25" fill="#000" opacity="1.0"/>
+                    <!-- SICHTBARE ELEMENTE INNERHALB DER VIEWBOX -->
+                    <rect x="40" y="5" width="15" height="8" fill="#000" opacity="1.0"/>
+                    <rect x="60" y="5" width="15" height="8" fill="#000" opacity="1.0"/>
+                    <rect x="80" y="5" width="15" height="8" fill="#000" opacity="1.0"/>
                     
-                    <!-- DEBUG: Rote Kreise zur LED-Positionsprüfung -->
-                    <circle cx="44.73" cy="13.77" r="4" fill="red" opacity="1.0"/>
-                    <circle cx="67.455" cy="13.77" r="4" fill="red" opacity="1.0"/>
-                    <circle cx="90.18" cy="13.77" r="4" fill="red" opacity="1.0"/>
+                    <!-- DEBUG: Rote Kreise ÜBER den LEDs (innerhalb ViewBox) -->
+                    <circle cx="44.73" cy="5" r="3" fill="red" opacity="1.0"/>
+                    <circle cx="67.455" cy="5" r="3" fill="red" opacity="1.0"/>
+                    <circle cx="90.18" cy="5" r="3" fill="red" opacity="1.0"/>
                     
-                    <!-- TEST: Großer grüner Balken über allem -->
-                    <rect x="30" y="-50" width="80" height="10" fill="green" opacity="1.0"/>
+                    <!-- TEST: Großer grüner Balken INNERHALB der ViewBox -->
+                    <rect x="20" y="1" width="90" height="3" fill="lime" opacity="1.0"/>
                 </g>
                 
                 <g>
@@ -3494,7 +3494,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.41 - Debug-Diagnostik: Detaillierte Rauch-Container-Analyse...');
+            console.log('🚀 LED Foundation v0.00.42 - ViewBox-Fix: Elemente innerhalb sichtbarem Bereich...');
             
             // 1. Circuit Simulation initialisieren
             try {
