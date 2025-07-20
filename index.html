@@ -1039,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.31</div>
+                <div class="version-display">v0.00.32</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1412,27 +1412,40 @@
             }
             
             updateSmokeAnimation() {
+                console.log(`🔧 updateSmokeAnimation: State=${this.state}, BROKEN=${ComponentStates.BROKEN}`);
                 if (this.state === ComponentStates.BROKEN) {
+                    console.log(`💨 State ist BROKEN - Erstelle Rauch-Effekte`);
                     this.createSmokeEffects();
                 } else {
+                    console.log(`🧹 State ist nicht BROKEN - Entferne Rauch-Effekte`);
                     this.removeSmokeEffects();
                 }
             }
             
             createSmokeEffects() {
                 const element = document.getElementById(this.elementId);
-                if (!element || this.specs.type !== 'load') return;
+                console.log(`🔍 createSmokeEffects: Element=${!!element}, Type=${this.specs.type}`);
+                if (!element || this.specs.type !== 'load') {
+                    console.log(`❌ Rauch-Erstellung abgebrochen: Element=${!!element}, Type=${this.specs.type}`);
+                    return;
+                }
                 
                 const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
+                console.log(`🔍 LED-Centers gefunden: ${ledCenters.length}`);
                 
                 ledCenters.forEach((led, index) => {
-                    if (this.smokeElements[index]) return; // Rauch bereits vorhanden
+                    if (this.smokeElements[index]) {
+                        console.log(`⚠️ Rauch bereits vorhanden für LED ${index}`);
+                        return; // Rauch bereits vorhanden
+                    }
                     
                     const ledRect = led.getBoundingClientRect();
                     const elementRect = element.getBoundingClientRect();
                     
                     const relativeX = ledRect.left - elementRect.left + ledRect.width / 2;
                     const relativeY = ledRect.top - elementRect.top + ledRect.height / 2;
+                    
+                    console.log(`📍 LED ${index} Position: (${relativeX}, ${relativeY})`);
                     
                     const smokeContainer = this.createSmokeElement(relativeX, relativeY);
                     element.appendChild(smokeContainer);
@@ -1454,38 +1467,38 @@
                         <!-- Erste Rauchserie -->
                         <g class="smoke-group">
                             <svg x="0" y="-18" width="5.34" height="13.79" viewBox="0 0 5.34 13.79" class="smoke smoke-1" style="transform: translateX(-2.67px)">
-                                <path fill="#999" opacity="0.7" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                                                                 <path fill="#333" opacity="0.8" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
                             </svg>
                         </g>
                         
                         <g class="smoke-group">
                             <svg x="0" y="-16" width="4.5" height="12" viewBox="0 0 5.34 13.79" class="smoke smoke-2" style="transform: translateX(-2.2px)">
-                                <path fill="#aaa" opacity="0.5" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                                                                 <path fill="#444" opacity="0.6" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
                             </svg>
                         </g>
                         
                         <g class="smoke-group">
                             <svg x="0" y="-14" width="3.6" height="10" viewBox="0 0 5.34 13.79" class="smoke smoke-3" style="transform: translateX(-1.8px)">
-                                <path fill="#bbb" opacity="0.4" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                                                                 <path fill="#555" opacity="0.4" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
                             </svg>
                         </g>
 
                         <!-- Zweite Rauchserie - gespiegelt -->
                         <g class="smoke-group-alt">
                             <svg x="0" y="-18" width="5.34" height="13.79" viewBox="0 0 5.34 13.79" class="smoke smoke-alt-1" style="transform: translateX(-2.67px) scaleX(-1)">
-                                <path fill="#888" opacity="0.6" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                                                                 <path fill="#222" opacity="0.7" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
                             </svg>
                         </g>
                         
                         <g class="smoke-group-alt">
                             <svg x="0" y="-16" width="4.8" height="12.5" viewBox="0 0 5.34 13.79" class="smoke smoke-alt-2" style="transform: translateX(-2.4px) scaleX(-1)">
-                                <path fill="#999" opacity="0.4" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                                                                 <path fill="#333" opacity="0.5" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
                             </svg>
                         </g>
                         
                         <g class="smoke-group-alt">
                             <svg x="0" y="-15" width="4.0" height="11" viewBox="0 0 5.34 13.79" class="smoke smoke-alt-3" style="transform: translateX(-2.0px) scaleX(-1)">
-                                <path fill="#aaa" opacity="0.3" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                                                                 <path fill="#444" opacity="0.3" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
                             </svg>
                         </g>
                     </g>
@@ -3404,7 +3417,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.31 - Rauch-Animation: Epische Broken-LEDs...');
+            console.log('🚀 LED Foundation v0.00.32 - Rauch-Fix: Dunkle Farben + Debug-Logs...');
             
             // 1. Circuit Simulation initialisieren
             try {
