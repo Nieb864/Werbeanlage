@@ -721,6 +721,34 @@
 
 
 
+        /* Live Power Tooltip */
+        .power-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1000;
+            white-space: nowrap;
+            border: 2px solid #ffa500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transform: translate(-50%, -120%);
+        }
+        
+        .power-tooltip.overloaded {
+            border-color: #ff0000;
+            background: rgba(255, 0, 0, 0.9);
+            animation: pulse-warning 1s infinite;
+        }
+        
+        @keyframes pulse-warning {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1.0; }
+        }
+
         /* Connection States */
         .connection-socket.connected,
         .connection-line.connected {
@@ -979,7 +1007,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.49</div>
+                <div class="version-display">v0.00.50</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1746,40 +1774,75 @@
             calculateComponentPower(componentId) {
                 const component = this.graph.nodes.get(componentId);
                 
-                // Prüfe Verbindungen zu Transformatoren
-                for (const connectedId of component.connections) {
-                    const connectedComponent = this.graph.nodes.get(connectedId);
-                    if (connectedComponent && ComponentSpecs[connectedComponent.type].type === 'transformer') {
-                        
-                        // 🔍 WICHTIG: Prüfe ob der Trafo selbst funktionsfähig ist!
-                        if (!this.hasValidTransformerConnections(connectedId)) {
-                            console.log(`⚠️ LED ${componentId}: Verbundener Trafo ${connectedId} ist nicht funktionsfähig`);
-                            return { voltage: 0, current: 0 };
-                        }
-                        
-                        const specs = ComponentSpecs[connectedComponent.type];
-                        console.log(`✅ LED ${componentId}: Bekommt ${specs.outputVoltage}V vom funktionsfähigen Trafo ${connectedId}`);
-                        return {
-                            voltage: specs.outputVoltage,
-                            current: ComponentSpecs[component.type].power / specs.outputVoltage
-                        };
-                    }
-                }
-                
-                // Prüfe direkte Verbindungen zur Stromquelle
-                for (const connectedId of component.connections) {
-                    const connectedComponent = this.graph.nodes.get(connectedId);
-                    if (connectedComponent && connectedComponent.type === ComponentTypes.POWER_SOURCE) {
-                        console.log(`⚠️ LED ${componentId}: Direkt mit 230V Stromquelle verbunden - GEFÄHRLICH!`);
-                        return {
-                            voltage: ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage,
-                            current: ComponentSpecs[component.type].power / ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage
-                        };
-                    }
+                // 🔍 NEUE PARALLELSCHALTUNG: Prüfe LED-zu-LED Verbindungen
+                const powerSource = this.findPowerSourceForLED(componentId);
+                if (powerSource) {
+                    console.log(`✅ LED ${componentId}: Bekommt ${powerSource.voltage}V über Parallelschaltung von ${powerSource.sourceType} ${powerSource.sourceId}`);
+                    return {
+                        voltage: powerSource.voltage,
+                        current: ComponentSpecs[component.type].power / powerSource.voltage
+                    };
                 }
                 
                 console.log(`⚠️ LED ${componentId}: Keine gültige Spannungsquelle gefunden`);
                 return { voltage: 0, current: 0 };
+            }
+            
+            findPowerSourceForLED(ledId, visited = new Set()) {
+                // Verhindere Endlosschleifen
+                if (visited.has(ledId)) return null;
+                visited.add(ledId);
+                
+                const component = this.graph.nodes.get(ledId);
+                if (!component) return null;
+                
+                console.log(`🔍 findPowerSourceForLED: Analysiere ${ledId}, Verbindungen: ${component.connections.size}`);
+                
+                // Prüfe alle direkten Verbindungen
+                for (const connectedId of component.connections) {
+                    const connectedComponent = this.graph.nodes.get(connectedId);
+                    if (!connectedComponent) continue;
+                    
+                    // DIREKTE TRAFO-VERBINDUNG
+                    if (ComponentSpecs[connectedComponent.type].type === 'transformer') {
+                        if (this.hasValidTransformerConnections(connectedId)) {
+                            const specs = ComponentSpecs[connectedComponent.type];
+                            console.log(`🔄 LED ${ledId}: Direkt mit Trafo ${connectedId} verbunden`);
+                            return {
+                                voltage: specs.outputVoltage,
+                                sourceType: 'trafo',
+                                sourceId: connectedId
+                            };
+                        } else {
+                            console.log(`⚠️ LED ${ledId}: Verbundener Trafo ${connectedId} ist nicht funktionsfähig`);
+                            continue;
+                        }
+                    }
+                    
+                    // DIREKTE STROMQUELLEN-VERBINDUNG (GEFÄHRLICH!)
+                    if (connectedComponent.type === ComponentTypes.POWER_SOURCE) {
+                        console.log(`⚠️ LED ${ledId}: Direkt mit 230V Stromquelle verbunden - GEFÄHRLICH!`);
+                        return {
+                            voltage: ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage,
+                            sourceType: 'stromquelle',
+                            sourceId: connectedId
+                        };
+                    }
+                    
+                    // LED-ZU-LED PARALLELSCHALTUNG
+                    if (ComponentSpecs[connectedComponent.type].type === 'load') {
+                        console.log(`🔗 LED ${ledId}: Verbunden mit anderer LED ${connectedId} - prüfe Parallelschaltung`);
+                        
+                        // Prüfe ob die andere LED eine gültige Spannungsquelle hat
+                        const otherLEDPower = this.findPowerSourceForLED(connectedId, visited);
+                        if (otherLEDPower) {
+                            console.log(`✅ LED ${ledId}: Bekommt Spannung über Parallelschaltung von LED ${connectedId}`);
+                            return otherLEDPower;
+                        }
+                    }
+                }
+                
+                return null;
             }
             
             calculateSourceCurrent(sourceId) {
@@ -1800,21 +1863,83 @@
             calculateTransformerCurrent(transformerId) {
                 const transformer = this.graph.nodes.get(transformerId);
                 const specs = ComponentSpecs[transformer.type];
-                let outputPower = 0;
                 
-                // Berechne die gesamte Last auf der Ausgangsseite
-                for (const connectedId of transformer.connections) {
-                    const connectedComponent = this.graph.nodes.get(connectedId);
-                    if (connectedComponent && ComponentSpecs[connectedComponent.type].type === 'load') {
-                        outputPower += ComponentSpecs[connectedComponent.type].power;
-                    }
+                // 🔍 NEUE LEISTUNGSBERECHNUNG: Alle LEDs im Parallelschaltungs-Netzwerk
+                const totalPower = this.calculateTotalLoadOnTransformer(transformerId);
+                
+                console.log(`⚡ Trafo ${transformerId}: Gesamtlast = ${totalPower.toFixed(2)}W / ${specs.power}W (${(totalPower/specs.power*100).toFixed(1)}%)`);
+                
+                // 🚨 ÜBERLASTUNGSCHECK
+                if (totalPower > specs.power) {
+                    console.log(`💥 ÜBERLASTUNG! Trafo ${transformerId}: ${totalPower.toFixed(2)}W > ${specs.power}W`);
+                    this.setTransformerOverloaded(transformerId);
+                    return 0; // Trafo schaltet ab
                 }
                 
                 // Eingangsstrom = Ausgangsstrom / Effizienz
                 const efficiency = 0.87; // 87% Effizienz für Trafos
-                const inputCurrent = (outputPower / efficiency) / specs.inputVoltage;
+                const inputCurrent = (totalPower / efficiency) / specs.inputVoltage;
                 
                 return inputCurrent;
+            }
+            
+            calculateTotalLoadOnTransformer(transformerId) {
+                const allLEDs = this.getAllLEDsConnectedToTransformer(transformerId);
+                let totalPower = 0;
+                
+                console.log(`🔍 Trafo ${transformerId}: Analysiere ${allLEDs.length} angeschlossene LEDs`);
+                
+                for (const ledId of allLEDs) {
+                    const ledComponent = this.graph.nodes.get(ledId);
+                    if (ledComponent && this.isComponentProperlyConnected(ledId)) {
+                        const ledPower = ComponentSpecs[ledComponent.type].power;
+                        totalPower += ledPower;
+                        console.log(`💡 LED ${ledId}: +${ledPower}W (Gesamt: ${totalPower.toFixed(2)}W)`);
+                    }
+                }
+                
+                return totalPower;
+            }
+            
+            getAllLEDsConnectedToTransformer(transformerId, visited = new Set()) {
+                const connectedLEDs = [];
+                
+                // Verhindere Endlosschleifen
+                if (visited.has(transformerId)) return connectedLEDs;
+                visited.add(transformerId);
+                
+                // Finde alle LEDs die direkt oder indirekt mit diesem Trafo verbunden sind
+                this.findLEDsRecursive(transformerId, connectedLEDs, new Set());
+                
+                return connectedLEDs;
+            }
+            
+            findLEDsRecursive(componentId, foundLEDs, visited) {
+                if (visited.has(componentId)) return;
+                visited.add(componentId);
+                
+                const component = this.graph.nodes.get(componentId);
+                if (!component) return;
+                
+                // Wenn es eine LED ist, füge sie zur Liste hinzu
+                if (ComponentSpecs[component.type].type === 'load') {
+                    if (!foundLEDs.includes(componentId)) {
+                        foundLEDs.push(componentId);
+                    }
+                }
+                
+                // Durchsuche alle Verbindungen rekursiv
+                for (const connectedId of component.connections) {
+                    this.findLEDsRecursive(connectedId, foundLEDs, visited);
+                }
+            }
+            
+            setTransformerOverloaded(transformerId) {
+                const stateMachine = this.graph.stateMachines.get(transformerId);
+                if (stateMachine) {
+                    stateMachine.setState(ComponentStates.BROKEN);
+                    console.log(`💥 Trafo ${transformerId}: Auf BROKEN gesetzt wegen Überlastung`);
+                }
             }
             
             powerOffAllComponents() {
@@ -3757,9 +3882,78 @@
             `;
         }
 
+        // ===== POWER TOOLTIP SYSTEM =====
+        function setupPowerTooltips() {
+            console.log('⚡ Power Tooltips werden eingerichtet...');
+            
+            // Finde alle Trafos
+            const trafos = document.querySelectorAll('[data-component-type^="trafo-"]');
+            
+            trafos.forEach(trafo => {
+                trafo.addEventListener('mouseenter', showPowerTooltip);
+                trafo.addEventListener('mouseleave', hidePowerTooltip);
+                trafo.addEventListener('mousemove', updatePowerTooltipPosition);
+            });
+            
+            console.log(`⚡ Power Tooltips für ${trafos.length} Trafos eingerichtet`);
+        }
+        
+        function showPowerTooltip(e) {
+            const trafoId = e.currentTarget.id;
+            const powerInfo = getPowerInfoForTrafo(trafoId);
+            
+            if (!powerInfo) return;
+            
+            // Erstelle Tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'power-tooltip';
+            tooltip.id = `tooltip-${trafoId}`;
+            
+            const percentage = (powerInfo.used / powerInfo.max * 100).toFixed(1);
+            tooltip.textContent = `${powerInfo.used.toFixed(1)}W / ${powerInfo.max}W (${percentage}%)`;
+            
+            if (powerInfo.used > powerInfo.max) {
+                tooltip.classList.add('overloaded');
+            }
+            
+            document.body.appendChild(tooltip);
+            updatePowerTooltipPosition(e);
+        }
+        
+        function hidePowerTooltip(e) {
+            const trafoId = e.currentTarget.id;
+            const tooltip = document.getElementById(`tooltip-${trafoId}`);
+            if (tooltip) {
+                tooltip.remove();
+            }
+        }
+        
+        function updatePowerTooltipPosition(e) {
+            const trafoId = e.currentTarget.id;
+            const tooltip = document.getElementById(`tooltip-${trafoId}`);
+            if (tooltip) {
+                tooltip.style.left = e.clientX + 'px';
+                tooltip.style.top = e.clientY + 'px';
+            }
+        }
+        
+        function getPowerInfoForTrafo(trafoId) {
+            if (!window.circuit || !window.circuit.physics) return null;
+            
+            const trafoSpecs = ComponentSpecs[document.getElementById(trafoId)?.dataset.componentType];
+            if (!trafoSpecs) return null;
+            
+            const totalPower = window.circuit.physics.calculateTotalLoadOnTransformer(trafoId);
+            
+            return {
+                used: totalPower,
+                max: trafoSpecs.power
+            };
+        }
+
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.49 - CRITICAL BUGFIX: Korrekte ComponentType Validierung...');
+            console.log('🚀 LED Foundation v0.00.50 - PARALLELSCHALTUNG: Intelligente Brücken + Überlastungsschutz...');
             
             // 1. Circuit Simulation initialisieren
             try {
@@ -3826,6 +4020,9 @@
             } else {
                 console.log('❌ CACHE-BUST: hasRequiredLEDConnections NICHT gefunden!');
             }
+            
+            // ⚡ POWER TOOLTIP: Setup für Trafo-Leistungsanzeige
+            setupPowerTooltips();
             
             // Status-Report ausgeben
             outputStatusReport();
