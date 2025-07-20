@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LED & EVG Drag-and-Drop Werkbank v0.00.60 - SICHERHEITSFUNKEN LIVE</title>
+    <title>LED & EVG Drag-and-Drop Werkbank v0.00.60</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -896,11 +896,7 @@
             90% { transform: translate(-50%, -50%); }
         }
 
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
+
 
         .connection-socket {
             fill: #4CAF50;
@@ -1128,12 +1124,6 @@
             
             <div class="workspace" id="workspace">
                 <div class="version-display">v0.00.60</div>
-                <div style="position: absolute; top: 50px; left: 20px; background: #ff0000; color: white; padding: 5px; border-radius: 5px; font-size: 12px; font-weight: bold; z-index: 9999;">
-                    🚨 CACHE-BUST: 18:47:30 - SICHERHEITSFUNKEN AKTIV ⚡
-                </div>
-                <div style="position: absolute; top: 10px; right: 10px; background: #00ff00; color: black; padding: 10px; border-radius: 10px; font-size: 16px; font-weight: bold; z-index: 9999; animation: blink 1s infinite;">
-                    ✅ LIVE UPDATE v0.00.60 ✅
-                </div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4428,10 +4418,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.60 - SICHERHEITSFUNKEN LIVE: Arbeitsfläche funken bei Arbeiten unter Spannung...');
-            console.log('🚨 CACHE-BUST: 2024-12-20-18:47:30-SICHERHEITSFUNKEN-LIVE');
-            console.log('⚡💀 NEUE FEATURES: Funken-Effekte bei Arbeiten unter Spannung!');
-            console.log('🔥 MEGA CACHE-BUST: Falls du das hier liest, ist das Update da!');
+            console.log('🚀 LED Foundation v0.00.60 - SICHERHEITSFUNKEN: Arbeitsfläche funken bei Arbeiten unter Spannung...');
             
             // 1. Circuit Simulation initialisieren
             try {
