@@ -948,7 +948,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.21</div>
+                <div class="version-display">v0.00.22</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1277,12 +1277,7 @@
                     return;
                 }
                 
-                console.log('⚡ Power Source gefunden:', powerSource);
-                console.log('🔌 Alle Verbindungen:', Array.from(this.graph.edges.entries()));
-                console.log('📦 Alle Komponenten:', Array.from(this.graph.nodes.entries()));
-                
                 const connectedComponents = this.graph.getConnectedComponents(powerSource);
-                console.log('🔗 Verbundene Komponenten:', connectedComponents);
                 
                 this.calculateVoltagesAndCurrents(connectedComponents);
             }
@@ -1301,10 +1296,7 @@
                     const component = this.graph.nodes.get(componentId);
                     const stateMachine = this.graph.stateMachines.get(componentId);
                     
-                    if (!component || !stateMachine) {
-                        console.log('❌ Komponente oder StateMachine fehlt für:', componentId);
-                        continue;
-                    }
+                    if (!component || !stateMachine) continue;
                     
                     let voltage = 0;
                     let current = 0;
@@ -1312,12 +1304,13 @@
                     if (component.type === ComponentTypes.POWER_SOURCE) {
                         voltage = ComponentSpecs[component.type].voltage;
                         current = this.calculateSourceCurrent(componentId);
-                        console.log(`🔌 Power Source ${componentId}: ${voltage}V, ${current}A`);
+                    } else if (ComponentSpecs[component.type].type === 'transformer') {
+                        voltage = ComponentSpecs[component.type].inputVoltage;
+                        current = this.calculateTransformerCurrent(componentId);
                     } else {
                         const result = this.calculateComponentPower(componentId);
                         voltage = result.voltage;
                         current = result.current;
-                        console.log(`⚡ Komponente ${componentId} (${component.type}): ${voltage}V, ${current}A`);
                     }
                     
                     stateMachine.updateState(voltage, current);
@@ -1364,6 +1357,26 @@
                 }
                 
                 return totalCurrent;
+            }
+            
+            calculateTransformerCurrent(transformerId) {
+                const transformer = this.graph.nodes.get(transformerId);
+                const specs = ComponentSpecs[transformer.type];
+                let outputPower = 0;
+                
+                // Berechne die gesamte Last auf der Ausgangsseite
+                for (const connectedId of transformer.connections) {
+                    const connectedComponent = this.graph.nodes.get(connectedId);
+                    if (connectedComponent && ComponentSpecs[connectedComponent.type].type === 'load') {
+                        outputPower += ComponentSpecs[connectedComponent.type].power;
+                    }
+                }
+                
+                // Eingangsstrom = Ausgangsstrom / Effizienz
+                const efficiency = 0.87; // 87% Effizienz für Trafos
+                const inputCurrent = (outputPower / efficiency) / specs.inputVoltage;
+                
+                return inputCurrent;
             }
             
             powerOffAllComponents() {
@@ -3020,7 +3033,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.21 - Trafo Physik: Bereit für Engine-Tests...');
+            console.log('🚀 LED Foundation v0.00.22 - Physik-Engine Fix: Trafo NaN repariert...');
             
             // 1. Circuit Simulation initialisieren
             try {
