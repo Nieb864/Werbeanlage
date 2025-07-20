@@ -692,45 +692,7 @@
             margin-bottom: 0;
         }
 
-        /* LED States */
-        .state-off .cls-5, 
-        .state-off .led24-center {
-            fill: #ddd !important;
-        }
-
-        .state-on .cls-5, 
-        .state-on .led24-center {
-            fill: #ffeb3b !important;
-            filter: drop-shadow(0 0 5px #ffeb3b);
-        }
-
-        .state-blinking .cls-5, 
-        .state-blinking .led24-center {
-            fill: #ff9800 !important;
-            animation: blink 0.5s infinite alternate;
-        }
-
-        .state-broken .cls-5, 
-        .state-broken .led24-center {
-            fill: #f44336 !important;
-            filter: drop-shadow(0 0 3px #f44336);
-        }
-
-        .state-overloaded .cls-5, 
-        .state-overloaded .led24-center {
-            fill: #e91e63 !important;
-            animation: flicker 0.2s infinite;
-        }
-
-        @keyframes blink {
-            0% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes flicker {
-            0%, 50%, 100% { opacity: 1; }
-            25%, 75% { opacity: 0.3; }
-        }
+        /* LED States - Jetzt über JavaScript gesteuert */
 
         /* Connection States */
         .connection-socket.connected,
@@ -990,7 +952,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.25</div>
+                <div class="version-display">v0.00.26</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1163,8 +1125,13 @@
                 this.currentVoltage = 0;
                 this.currentPower = 0;
                 
+                // Blink-Animation State
+                this.blinkInterval = null;
+                this.blinkState = true;
+                
                 // Initial state CSS setzen
                 this.applyStateCSS();
+                this.applyDynamicColors();
             }
             
             updateState(voltage, current) {
@@ -1181,6 +1148,7 @@
                 
                 if (previousState !== this.state) {
                     this.animateStateChange();
+                    this.updateBlinkAnimation();
                 }
             }
             
@@ -1226,6 +1194,73 @@
                 
                 element.classList.remove('state-off', 'state-on', 'state-blinking', 'state-broken', 'state-overloaded');
                 element.classList.add(`state-${this.state}`);
+            }
+            
+            updateBlinkAnimation() {
+                // Stoppe vorherige Blink-Animation
+                if (this.blinkInterval) {
+                    clearInterval(this.blinkInterval);
+                    this.blinkInterval = null;
+                }
+                
+                // Starte Blink-Animation nur bei BLINKING state
+                if (this.state === ComponentStates.BLINKING) {
+                    this.blinkInterval = setInterval(() => {
+                        this.blinkState = !this.blinkState;
+                        this.applyDynamicColors();
+                    }, 500); // Blinkt alle 500ms wie im React-Code
+                } else {
+                    this.blinkState = true;
+                    this.applyDynamicColors();
+                }
+            }
+            
+            applyDynamicColors() {
+                const element = document.getElementById(this.elementId);
+                if (!element) return;
+                
+                const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
+                
+                ledCenters.forEach(led => {
+                    const color = this.getLedColor(this.state, this.blinkState);
+                    const filter = this.getGlowEffect(this.state, this.blinkState);
+                    
+                    led.setAttribute('fill', color);
+                    if (filter) {
+                        led.setAttribute('filter', filter);
+                    } else {
+                        led.removeAttribute('filter');
+                    }
+                });
+            }
+            
+            getLedColor(state, isBlinking) {
+                switch (state) {
+                    case ComponentStates.OFF:
+                        return '#ddd'; // Grau (aus)
+                    case ComponentStates.ON:
+                        return '#ffff00'; // Gelb (an)
+                    case ComponentStates.BLINKING:
+                        return isBlinking ? '#ffff00' : '#ddd'; // Gelb blinkend
+                    case ComponentStates.BROKEN:
+                        return '#1a1a1a'; // Schwarz (kaputt)
+                    case ComponentStates.OVERLOADED:
+                        return '#e91e63'; // Pink (überlastet)
+                    default:
+                        return '#ddd';
+                }
+            }
+            
+            getGlowEffect(state, isBlinking) {
+                if (state === ComponentStates.OFF) return null;
+                if (state === ComponentStates.BROKEN) return null;
+                if (state === ComponentStates.BLINKING && !isBlinking) return null;
+                
+                // Verwende die passenden Filter IDs basierend auf LED-Typ
+                const filterId = this.type.includes('24v') ? 'ledGlow24' : 'ledGlow';
+                const strongFilterId = this.type.includes('24v') ? 'ledGlowStrong24' : 'ledGlowStrong';
+                
+                return state === ComponentStates.BLINKING ? `url(#${strongFilterId})` : `url(#${filterId})`;
             }
         }
 
@@ -2650,6 +2685,26 @@
                         .cls-5 { fill: #fff; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
                         .cls-7 { fill: #1d1d1b; font-family: Arial, sans-serif; font-size: 7.77px; }
                     </style>
+                    
+                    <!-- Glow-Filter für LEDs -->
+                    <filter id="ledGlow" x="-200%" y="-200%" width="500%" height="500%">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feMerge> 
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    
+                    <filter id="ledGlowStrong" x="-200%" y="-200%" width="500%" height="500%">
+                        <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                        <feMerge> 
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
                 </defs>
                 <g>
                     <!-- Anschlusskabel Links -->
@@ -2911,6 +2966,26 @@
                         .cls-5 { fill: #fff; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
                         .cls-7 { fill: #1d1d1b; font-family: Arial, sans-serif; font-size: 7.77px; }
                     </style>
+                    
+                    <!-- Glow-Filter für LEDs -->
+                    <filter id="ledGlow24" x="-200%" y="-200%" width="500%" height="500%">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feMerge> 
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                    
+                    <filter id="ledGlowStrong24" x="-200%" y="-200%" width="500%" height="500%">
+                        <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                        <feMerge> 
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
                 </defs>
                 <g>
                     <!-- Anschlusskabel Links -->
@@ -3081,7 +3156,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.25 - BACKUP: Vor React-Animation Integration...');
+            console.log('🚀 LED Foundation v0.00.26 - React-Animationen: JS-Blinken + SVG-Glow...');
             
             // 1. Circuit Simulation initialisieren
             try {
