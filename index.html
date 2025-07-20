@@ -2505,16 +2505,12 @@
 
         // ===== SVG FACTORY =====
         function createComponentSVG(componentType) {
-            console.log('🏭 SVG Factory aufgerufen für:', componentType);
             switch(componentType) {
                 case 'led-12v-1.2w':
-                    console.log('✅ LED 12V SVG wird erstellt');
                     return createLEDModuleSVG();
                 case 'trafo-12v-40w':
-                    console.log('✅ Trafo 12V SVG wird erstellt');
                     return createTransformer12VSVG();
                 case 'trafo-24v-60w':
-                    console.log('✅ Trafo 24V SVG wird erstellt');
                     return createTransformer24VSVG();
                 case 'fi-schalter':
                     return createFISwitchSVG();
@@ -2637,7 +2633,6 @@
 
         // ===== TRANSFORMATOR 12V =====
         function createTransformer12VSVG() {
-            console.log('🔨 createTransformer12VSVG() aufgerufen');
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 120 80');
             svg.setAttribute('class', 'transformer-svg');
@@ -2714,13 +2709,11 @@
                       data-bezier-start-x="117" data-bezier-start-y="50"/>
             `;
             
-            console.log('✅ Trafo 12V SVG erfolgreich erstellt');
             return svg;
         }
 
         // ===== TRANSFORMATOR 24V =====
         function createTransformer24VSVG() {
-            console.log('🔨 createTransformer24VSVG() aufgerufen');
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 120 80');
             svg.setAttribute('class', 'transformer-svg');
@@ -2771,7 +2764,6 @@
                       data-wire-type="minus" data-voltage="24" data-bezier-start-x="117" data-bezier-start-y="50"/>
             `;
             
-            console.log('✅ Trafo 24V SVG erfolgreich erstellt');
             return svg;
         }
 
