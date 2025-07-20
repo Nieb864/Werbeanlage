@@ -938,7 +938,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.15</div>
+                <div class="version-display">v0.00.16</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2049,11 +2049,23 @@
                     toComponent: targetComponent ? targetComponent.id : 'unknown'
                 });
                 
+                // Connection Points als "connected" markieren
+                outputLine.classList.add('connected');
+                inputSocket.classList.add('connected');
+                
                 console.log('🔗 Bezier-Verbindung erstellt:', connectionId);
             }
             
             deleteConnection(path) {
                 const connectionId = path.id;
+                const connection = this.connections.get(connectionId);
+                
+                // Connection Points wieder als "available" markieren
+                if (connection) {
+                    connection.from.classList.remove('connected');
+                    connection.to.classList.remove('connected');
+                }
+                
                 path.remove();
                 this.connections.delete(connectionId);
                 console.log('🗑️ Verbindung gelöscht:', connectionId);
@@ -2976,7 +2988,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.15 - Smart Hover-Areas: Zeigen Verfügbarkeit...');
+            console.log('🚀 LED Foundation v0.00.16 - Connection State Management aktiv...');
             
             // 1. Circuit Simulation initialisieren
             try {
