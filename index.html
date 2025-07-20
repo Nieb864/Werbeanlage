@@ -979,7 +979,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.48c</div>
+                <div class="version-display">v0.00.48d</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2610,9 +2610,11 @@
                 if (!component) return false;
                 
                 const componentType = component.dataset.componentType;
+                console.log(`🚨 DEBUG isCircuitComplete: ${componentId}, componentType="${componentType}"`);
                 
                 // TRAFO: Braucht mindestens phase+neutral Eingang UND mindestens 1 Ausgang
                 if (componentType === 'transformer_12v' || componentType === 'transformer_24v') {
+                    console.log(`🔍 isCircuitComplete: Prüfe TRAFO ${componentId}...`);
                     return this.hasRequiredTransformerConnections(componentId);
                 }
                 
@@ -2624,6 +2626,7 @@
                     return result;
                 }
                 
+                console.log(`🔍 isCircuitComplete: ${componentId} ist ANDERER TYP → true`);
                 return true; // Andere Komponenten haben keine speziellen Anforderungen
             }
             
