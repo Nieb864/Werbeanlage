@@ -1025,7 +1025,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.56</div>
+                <div class="version-display">v0.00.57</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1577,6 +1577,13 @@
             
             // ===== COMPONENT STATE MANAGEMENT =====
             setComponentState(componentId, state) {
+                // PERSISTENZ: Broken Components bleiben broken
+                const currentState = this.componentStates.get(componentId);
+                if (currentState === 'broken' && state !== 'broken') {
+                    console.log(`🚫 Component ${componentId} bleibt broken - State change ${state} ignoriert`);
+                    return; // Broken Components können nicht repariert werden
+                }
+                
                 this.componentStates.set(componentId, state);
                 console.log(`🔧 Component ${componentId} State → ${state}`);
                 
@@ -1590,6 +1597,19 @@
             
             getComponentState(componentId) {
                 return this.componentStates.get(componentId) || 'off';
+            }
+            
+            // RESET: Kaputte Bauteile reparieren (für Lerneffekt)
+            resetComponentState(componentId) {
+                this.componentStates.delete(componentId);
+                console.log(`🔄 Component ${componentId} zurückgesetzt (repariert)`);
+                
+                // Visual update
+                const element = document.getElementById(componentId);
+                if (element) {
+                    element.classList.remove('component-on', 'component-off', 'component-broken');
+                    element.classList.add('component-off');
+                }
             }
         }
 
@@ -1926,6 +1946,12 @@
                     // LED-ZU-LED PARALLELSCHALTUNG
                     if (ComponentSpecs[connectedComponent.type].type === 'load') {
                         console.log(`🔗 LED ${ledId}: Verbunden mit anderer LED ${connectedId} - prüfe Parallelschaltung`);
+                        
+                        // BUGFIX: Prüfe erst ob die andere LED vollständig angeschlossen ist
+                        if (!window.workspaceManager.isCircuitComplete(connectedId)) {
+                            console.log(`❌ LED ${connectedId} ist nicht vollständig angeschlossen - keine Parallelschaltung möglich`);
+                            continue;
+                        }
                         
                         // Prüfe ob die andere LED eine gültige Spannungsquelle hat
                         const otherLEDPower = this.findPowerSourceForLED(connectedId, visited);
@@ -2454,6 +2480,9 @@
                     if (circuit && circuit.graph && circuit.graph.nodes.has(componentId)) {
                         circuit.graph.nodes.delete(componentId);
                         circuit.graph.stateMachines.delete(componentId);
+                        // CLEANUP: Component State löschen
+                        circuit.graph.componentStates.delete(componentId);
+                        console.log(`🧹 Component State für ${componentId} gelöscht`);
                     }
                     
                     deletedComponents.push(`${componentType} (${componentId})`);
@@ -4186,7 +4215,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.56 - ÜBERLASTUNGSSCHUTZ: Trafo wird schwarz, LEDs gehen aus...');
+            console.log('🚀 LED Foundation v0.00.57 - PERSISTENZ: Kaputte Bauteile bleiben kaputt, Parallelschaltung gefixt...');
             
             // 1. Circuit Simulation initialisieren
             try {
