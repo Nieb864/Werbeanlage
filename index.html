@@ -1039,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.35</div>
+                <div class="version-display">v0.00.36</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1467,29 +1467,29 @@
                 if (!this.smokeOverlay) return;
                 
                 const element = document.getElementById(this.elementId);
-                const ledCenter = element.querySelector('.cls-5, .led24-center');
-                if (!ledCenter) return;
+                if (!element) return;
                 
-                // Aktuelle Position berechnen
-                const ledRect = ledCenter.getBoundingClientRect();
+                // MODUL-ZENTRUM berechnen (nicht LED-Zentrum!)
+                const moduleRect = element.getBoundingClientRect();
                 const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
                 
-                const centerX = ledRect.left - workspaceRect.left + ledRect.width / 2;
-                const centerY = ledRect.top - workspaceRect.top + ledRect.height / 2;
+                // Mitte des gesamten LED-Moduls
+                const centerX = moduleRect.left - workspaceRect.left + moduleRect.width / 2;
+                const centerY = moduleRect.top - workspaceRect.top + moduleRect.height / 2;
                 
                 // LED-Rotation abrufen
                 const rotation = window.workspaceManager?.componentRotations?.get(element) || 0;
                 
-                // Rauch-Overlay positionieren (mittig über LED)
+                // Rauch-Overlay positionieren (mittig über MODUL)
                 this.smokeOverlay.style.position = 'absolute';
                 this.smokeOverlay.style.left = (centerX - 40) + 'px'; // 40 = halbe Rauch-Breite
                 this.smokeOverlay.style.top = (centerY - 50) + 'px';  // 50 = Rauch-Höhe Offset
                 this.smokeOverlay.style.transform = `rotate(${-rotation}deg)`; // GEGEN-Rotation!
                 this.smokeOverlay.style.pointerEvents = 'none';
                 this.smokeOverlay.style.zIndex = '100';
-                this.smokeOverlay.style.transformOrigin = '40px 50px'; // Rotation um LED-Zentrum
+                this.smokeOverlay.style.transformOrigin = '40px 50px'; // Rotation um Modul-Zentrum
                 
-                console.log(`🔄 Rauch-Position update: (${centerX}, ${centerY}), LED-Rotation: ${rotation}°, Rauch-Rotation: ${-rotation}°`);
+                console.log(`🔄 Rauch MODUL-Zentrum: (${centerX}, ${centerY}), Rotation: ${rotation}° → Rauch: ${-rotation}°`);
             }
             
             removeSmokeOverlay() {
@@ -2629,6 +2629,9 @@
             
             dragElement.style.left = (e.clientX - dragOffset.x) + 'px';
             dragElement.style.top = (e.clientY - dragOffset.y) + 'px';
+            
+            // Rauch-Position bei Drag aktualisieren
+            workspaceManager.updateSmokeForComponent(dragElement);
         }
 
         function endDrag(e) {
@@ -3414,7 +3417,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.35 - Rauch-Overlay mit Gegen-Rotation: Physikalisch korrekter Rauch...');
+            console.log('🚀 LED Foundation v0.00.36 - Rauch-Fix: Modul-Zentrum + Drag-Sync...');
             
             // 1. Circuit Simulation initialisieren
             try {
