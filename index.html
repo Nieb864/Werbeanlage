@@ -1039,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.40</div>
+                <div class="version-display">v0.00.41</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1413,17 +1413,31 @@
             updateSmokeAnimation() {
                 console.log(`🔧 updateSmokeAnimation: State=${this.state}, BROKEN=${ComponentStates.BROKEN}`);
                 const element = document.getElementById(this.elementId);
+                console.log(`🔍 Element gefunden: ${!!element}, ID: ${this.elementId}`);
                 if (!element) return;
                 
                 const smokeContainer = element.querySelector('.smoke-container');
+                console.log(`🔍 SmokeContainer gefunden: ${!!smokeContainer}`);
+                if (smokeContainer) {
+                    console.log(`📊 Aktueller Display-Style: ${smokeContainer.style.display}`);
+                    console.log(`📊 Computed Display: ${getComputedStyle(smokeContainer).display}`);
+                }
+                
                 if (!smokeContainer) {
-                    console.log(`⚠️ Kein Rauch-Container im SVG gefunden`);
+                    console.log(`⚠️ Kein Rauch-Container im SVG gefunden - Suche alle .smoke-container`);
+                    const allSmokeContainers = document.querySelectorAll('.smoke-container');
+                    console.log(`📊 Gesamt .smoke-container im DOM: ${allSmokeContainers.length}`);
                     return;
                 }
                 
                 if (this.state === ComponentStates.BROKEN) {
                     console.log(`💨 State ist BROKEN - Zeige Rauch`);
                     smokeContainer.style.display = 'block';
+                    console.log(`✅ Rauch-Display gesetzt auf: ${smokeContainer.style.display}`);
+                    
+                    // FORCE-TEST: Auch via setAttribute versuchen
+                    smokeContainer.setAttribute('style', 'display: block !important;');
+                    console.log(`🔧 Force-Style gesetzt via setAttribute`);
                 } else {
                     console.log(`🧹 State ist nicht BROKEN - Verstecke Rauch`);
                     smokeContainer.style.display = 'none';
@@ -3480,7 +3494,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.40 - SVG-Debug: Große Test-Elemente für Sichtbarkeit...');
+            console.log('🚀 LED Foundation v0.00.41 - Debug-Diagnostik: Detaillierte Rauch-Container-Analyse...');
             
             // 1. Circuit Simulation initialisieren
             try {
