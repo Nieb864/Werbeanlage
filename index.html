@@ -1007,7 +1007,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.50</div>
+                <div class="version-display">v0.00.51</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1686,15 +1686,65 @@
                 // Nur LEDs können durch gefährliche Verbindungen beschädigt werden
                 if (ComponentSpecs[component.type].type !== 'load') return null;
                 
-                // Prüfe alle Verbindungen zu diesem Bauteil
-                for (const edge of this.graph.edges.values()) {
-                    if (edge.to === componentId || edge.from === componentId) {
-                        const danger = this.analyzeConnectionDanger(edge, componentId);
-                        if (danger) return danger;
+                console.log(`🔍 checkForDangerousConditions: Prüfe LED ${componentId} auf Überspannung...`);
+                
+                // 🚨 NUR DIREKTE VERBINDUNGEN ZU DIESER LED PRÜFEN
+                // Nicht die gesamte Schaltung, sondern nur was direkt an dieser LED anliegt
+                const directConnections = this.getDirectConnectionsToLED(componentId);
+                
+                for (const connectionInfo of directConnections) {
+                    const danger = this.analyzeDirectConnectionDanger(connectionInfo, componentId);
+                    if (danger) {
+                        console.log(`💥 LED ${componentId}: Direkte Gefahr erkannt - ${danger}`);
+                        return danger;
                     }
                 }
                 
+                console.log(`✅ LED ${componentId}: Keine direkte Gefahr erkannt`);
                 return null;
+            }
+            
+            getDirectConnectionsToLED(ledId) {
+                const connections = [];
+                
+                if (!window.workspaceManager || !window.workspaceManager.connections) return connections;
+                
+                // Finde alle direkten Verbindungen zu dieser LED
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if (connectionData.toComponent === ledId || connectionData.fromComponent === ledId) {
+                        const fromData = window.workspaceManager.getConnectionData(connectionData.from);
+                        const toData = window.workspaceManager.getConnectionData(connectionData.to);
+                        
+                        connections.push({
+                            fromData,
+                            toData,
+                            connectionId: connId,
+                            isToThisLED: connectionData.toComponent === ledId
+                        });
+                    }
+                }
+                
+                console.log(`🔍 LED ${ledId}: ${connections.length} direkte Verbindungen gefunden`);
+                return connections;
+            }
+            
+            analyzeDirectConnectionDanger(connectionInfo, targetComponentId) {
+                const { fromData, toData, isToThisLED } = connectionInfo;
+                
+                // Nur prüfen wenn diese LED das ZIEL der Verbindung ist
+                if (!isToThisLED) return null;
+                
+                console.log(`🔍 LED ${targetComponentId}: Prüfe Verbindung ${fromData.wireType}(${fromData.voltage}V) → ${toData.wireType}(${toData.voltage}V)`);
+                
+                // 1. ÜBERSPANNUNG: 230V an 12V/24V LED
+                if (this.isOvervoltage(fromData, toData, targetComponentId)) {
+                    return 'Überspannung: 230V an DC-LED';
+                }
+                
+                // 2. FALSCHE POLARITÄT: Macht LED NICHT kaputt, nur funktionslos
+                // (Diese Prüfung wurde entfernt - falsche Polarität = kein Schaden)
+                
+                return null; // Keine anderen Gefahren für LEDs
             }
             
             analyzeConnectionDanger(edge, targetComponentId) {
@@ -3900,9 +3950,15 @@
         
         function showPowerTooltip(e) {
             const trafoId = e.currentTarget.id;
-            const powerInfo = getPowerInfoForTrafo(trafoId);
+            console.log(`⚡ showPowerTooltip: Trafo ${trafoId}`);
             
-            if (!powerInfo) return;
+            const powerInfo = getPowerInfoForTrafo(trafoId);
+            console.log(`⚡ powerInfo:`, powerInfo);
+            
+            if (!powerInfo) {
+                console.log(`❌ Keine powerInfo für Trafo ${trafoId}`);
+                return;
+            }
             
             // Erstelle Tooltip
             const tooltip = document.createElement('div');
@@ -3916,6 +3972,7 @@
                 tooltip.classList.add('overloaded');
             }
             
+            console.log(`✅ Tooltip erstellt: ${tooltip.textContent}`);
             document.body.appendChild(tooltip);
             updatePowerTooltipPosition(e);
         }
@@ -3938,12 +3995,32 @@
         }
         
         function getPowerInfoForTrafo(trafoId) {
-            if (!window.circuit || !window.circuit.physics) return null;
+            console.log(`🔍 getPowerInfoForTrafo: ${trafoId}`);
             
-            const trafoSpecs = ComponentSpecs[document.getElementById(trafoId)?.dataset.componentType];
-            if (!trafoSpecs) return null;
+            if (!window.circuit || !window.circuit.physics) {
+                console.log(`❌ circuit oder physics nicht verfügbar`);
+                return null;
+            }
+            
+            const trafoElement = document.getElementById(trafoId);
+            if (!trafoElement) {
+                console.log(`❌ Trafo Element ${trafoId} nicht gefunden`);
+                return null;
+            }
+            
+            const componentType = trafoElement.dataset.componentType;
+            console.log(`🔍 componentType: ${componentType}`);
+            
+            const trafoSpecs = ComponentSpecs[componentType];
+            if (!trafoSpecs) {
+                console.log(`❌ Keine Specs für ${componentType}`);
+                return null;
+            }
+            
+            console.log(`🔍 trafoSpecs:`, trafoSpecs);
             
             const totalPower = window.circuit.physics.calculateTotalLoadOnTransformer(trafoId);
+            console.log(`🔍 totalPower: ${totalPower}`);
             
             return {
                 used: totalPower,
@@ -3953,7 +4030,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.50 - PARALLELSCHALTUNG: Intelligente Brücken + Überlastungsschutz...');
+            console.log('🚀 LED Foundation v0.00.51 - BUGFIX: Isolierte Gefährdungslogik + Tooltip Debug...');
             
             // 1. Circuit Simulation initialisieren
             try {
