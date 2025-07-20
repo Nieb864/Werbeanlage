@@ -978,7 +978,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.45</div>
+                <div class="version-display">v0.00.46</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1604,12 +1604,16 @@
             isComponentProperlyConnected(componentId) {
                 // Benutze WorkspaceManager-Validierung wenn verfügbar
                 if (window.workspaceManager && window.workspaceManager.isCircuitComplete) {
-                    return window.workspaceManager.isCircuitComplete(componentId);
+                    const result = window.workspaceManager.isCircuitComplete(componentId);
+                    console.log(`🔍 WorkspaceManager.isCircuitComplete(${componentId}): ${result}`);
+                    return result;
                 }
                 
                 // Fallback: Grundlegende Verbindungsprüfung
                 const component = this.graph.nodes.get(componentId);
                 if (!component) return false;
+                
+                console.log(`🔍 Fallback-Prüfung für ${componentId}: ${component.connections.size} Verbindungen`);
                 
                 // Transformer braucht mindestens 2 Verbindungen (Input)
                 if (ComponentSpecs[component.type].type === 'transformer') {
@@ -1742,10 +1746,19 @@
             calculateComponentPower(componentId) {
                 const component = this.graph.nodes.get(componentId);
                 
+                // Prüfe Verbindungen zu Transformatoren
                 for (const connectedId of component.connections) {
                     const connectedComponent = this.graph.nodes.get(connectedId);
                     if (connectedComponent && ComponentSpecs[connectedComponent.type].type === 'transformer') {
+                        
+                        // 🔍 WICHTIG: Prüfe ob der Trafo selbst funktionsfähig ist!
+                        if (!this.hasValidTransformerConnections(connectedId)) {
+                            console.log(`⚠️ LED ${componentId}: Verbundener Trafo ${connectedId} ist nicht funktionsfähig`);
+                            return { voltage: 0, current: 0 };
+                        }
+                        
                         const specs = ComponentSpecs[connectedComponent.type];
+                        console.log(`✅ LED ${componentId}: Bekommt ${specs.outputVoltage}V vom funktionsfähigen Trafo ${connectedId}`);
                         return {
                             voltage: specs.outputVoltage,
                             current: ComponentSpecs[component.type].power / specs.outputVoltage
@@ -1753,9 +1766,11 @@
                     }
                 }
                 
+                // Prüfe direkte Verbindungen zur Stromquelle
                 for (const connectedId of component.connections) {
                     const connectedComponent = this.graph.nodes.get(connectedId);
                     if (connectedComponent && connectedComponent.type === ComponentTypes.POWER_SOURCE) {
+                        console.log(`⚠️ LED ${componentId}: Direkt mit 230V Stromquelle verbunden - GEFÄHRLICH!`);
                         return {
                             voltage: ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage,
                             current: ComponentSpecs[component.type].power / ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage
@@ -1763,6 +1778,7 @@
                     }
                 }
                 
+                console.log(`⚠️ LED ${componentId}: Keine gültige Spannungsquelle gefunden`);
                 return { voltage: 0, current: 0 };
             }
             
@@ -2637,7 +2653,7 @@
                 const hasPlusConnection = this.hasActiveConnection(plusInput);
                 const hasMinusConnection = this.hasActiveConnection(minusInput);
                 
-                console.log(`🔍 LED ${ledId}: Plus=${hasPlusConnection}, Minus=${hasMinusConnection}`);
+                console.log(`🔍 LED ${ledId}: Plus=${hasPlusConnection}, Minus=${hasMinusConnection} → Komplett: ${hasPlusConnection && hasMinusConnection}`);
                 
                 return hasPlusConnection && hasMinusConnection;
             }
@@ -3682,7 +3698,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.45 - Learning: Gefährliche Verbindungen erlaubt, LEDs können kaputt gehen...');
+            console.log('🚀 LED Foundation v0.00.46 - Bugfix: Trafo und LED Validierung korrigiert...');
             
             // 1. Circuit Simulation initialisieren
             try {
