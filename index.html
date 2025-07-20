@@ -935,7 +935,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.05</div>
+                <div class="version-display">v0.00.06</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1030,6 +1030,7 @@
                             <!-- Connection Lines (für Bézier-Kurven) -->
                             <line class="connection-line std-wire-phase" 
                                   x1="11.77" y1="71.94" x2="11.77" y2="81.94" 
+                                  stroke="#683c11"
                                   data-connection-type="output-line"
                                   data-connection-id="out-phase"
                                   data-wire-type="phase"
@@ -1039,6 +1040,7 @@
                                   
                             <line class="connection-line std-wire-neutral" 
                                   x1="15.73" y1="71.94" x2="15.73" y2="81.94" 
+                                  stroke="#1d71b8"
                                   data-connection-type="output-line"
                                   data-connection-id="out-neutral"
                                   data-wire-type="neutral"
@@ -1048,6 +1050,7 @@
                                   
                             <line class="connection-line std-wire-earth" 
                                   x1="19.65" y1="71.94" x2="19.65" y2="81.94" 
+                                  stroke="#ffed00"
                                   data-connection-type="output-line"
                                   data-connection-id="out-earth"
                                   data-wire-type="earth"
@@ -2964,7 +2967,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.05 - Initialisiere...');
+            console.log('🚀 LED Foundation v0.00.06 - Initialisiere...');
             
             // 1. Circuit Simulation initialisieren
             try {
