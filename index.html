@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED & EVG Drag-and-Drop Werkbank</title>
+    <style>
+        :root {
+            /* Standard-Elektrofarben */
+            --wire-brown: #683c11;           /* Phase L1 */
+            --wire-blue: #1d71b8;            /* Neutral N */
+            --wire-yellow-green: #ffed00;    /* Schutzleiter PE */
+            --wire-black: #1d1d1b;           /* Allgemein/Minus */
+            --wire-red: #e30613;             /* Plus/Phase */
+            
+            /* Standard-Materialien */
+            --metal-dark: #3c3c3b;           /* Dunkles Metall */
+            --metal-light: #878787;          /* Helles Metall */
+            --plastic-light: #e8e8e8;        /* Heller Kunststoff */
+            --plastic-dark: #9e9e9e;         /* Dunkler Kunststoff */
+            --housing-white: #ffffff;        /* Weißes Gehäuse */
+            
+            /* Interface-Farben */
+            --font-family: Arial, sans-serif;
+            --font-size-h1: 18px;
+            --font-size-h2: 14px;
+            --font-size-text: 16px;
+            --font-size-small: 12px;
+            --font-weight-h1: bold;
+            --font-weight-h2: bold;
+            --font-weight-text: normal;
+            --font-weight-small: normal;
+            --color-primary: #333;
+            --color-secondary: #666;
+            --color-light: #f8f9fa;
+            --color-border: #dee2e6;
+            --color-hover: #e8f5e8;
+            --color-hover-border: #4CAF50;
+            --color-background: #f0f0f0;
+            --color-white: white;
+            --color-success: #008800;
+            --color-error: #cc0000;
+            --color-warning: #856404;
+            --color-success-bg: #e6ffe6;
+            --color-error-bg: #ffe6e6;
+            --color-warning-bg: #fff3cd;
+            --spacing-xs: 5px;
+            --spacing-sm: 8px;
+            --spacing-md: 10px;
+            --spacing-lg: 15px;
+            --spacing-xl: 20px;
+            --border-radius: 8px;
+            --border-width: 2px;
+            --border-color: #333;
+            --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            --box-shadow-hover: 0 4px 12px rgba(76, 175, 80, 0.2);
+            --svg-stroke-width: 2px;
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            background: var(--color-background);
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Typography */
+        .text-h1 {
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-h1);
+            color: var(--color-primary);
+            margin: 0;
+            padding-bottom: var(--spacing-md);
+            border-bottom: var(--border-width) solid #eee;
+        }
+
+        .text-h2 {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            color: var(--color-primary);
+            margin: 0;
+        }
+
+        .text-body {
+            font-size: var(--font-size-text);
+            font-weight: var(--font-weight-text);
+            color: var(--color-secondary);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .text-small {
+            font-size: var(--font-size-small);
+            font-weight: var(--font-weight-small);
+            color: var(--color-secondary);
+            line-height: 1.4;
+        }
+
+        /* Layout */
+        .layout-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .sidebar-left {
+            width: 260px;
+            background: var(--color-white);
+            border-right: var(--border-width) solid var(--border-color);
+            padding: var(--spacing-lg);
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-xl);
+            min-width: 0;
+        }
+
+        /* Task Area */
+        .task-area {
+            background: var(--color-white);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .task-menu-btn {
+            background: var(--color-light);
+            color: var(--color-primary);
+            border: var(--border-width) solid var(--color-border);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            font-family: var(--font-family);
+            min-width: 120px;
+        }
+
+        .task-menu-btn:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Workspace */
+        .workspace {
+            flex: 1;
+            background: var(--color-white);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            min-height: 400px;
+        }
+
+        .workspace-info-btn {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            width: 30px;
+            height: 30px;
+            background: var(--color-light);
+            border: var(--border-width) solid var(--color-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-h2);
+            font-weight: bold;
+            color: var(--color-primary);
+            z-index: 100;
+        }
+
+        .workspace-info-btn:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+            transform: scale(1.1);
+        }
+
+        .info-tooltip {
+            position: absolute;
+            top: 45px;
+            right: -10px;
+            width: 320px;
+            max-height: 500px;
+            background: var(--color-white);
+            border: var(--border-width) solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            box-shadow: var(--box-shadow);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            color: var(--color-primary);
+            font-size: var(--font-size-small);
+            overflow-y: auto;
+        }
+
+        .workspace-info-btn:hover + .info-tooltip,
+        .info-tooltip:hover {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .info-category {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .info-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-category-title {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-sm);
+            border-bottom: 1px solid #eee;
+            padding-bottom: var(--spacing-xs);
+        }
+
+        .info-rule {
+            font-size: var(--font-size-small);
+            color: var(--color-secondary);
+            margin-bottom: var(--spacing-xs);
+            line-height: 1.4;
+        }
+
+        .info-rule:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Components Section */
+        .components-section {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .components-header {
+            flex-shrink: 0;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .components-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: var(--spacing-xs);
+        }
+
+        /* Datasheet Section */
+        .datasheet-section {
+            flex-shrink: 0;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            border-bottom: var(--border-width) solid #eee;
+            padding-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .datasheet-header {
+            flex-shrink: 0;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .datasheet-toggle {
+            background: var(--color-light);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-small);
+            color: var(--color-secondary);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .datasheet-toggle:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+        }
+
+        .datasheet-section.collapsed {
+            height: auto;
+        }
+
+        .datasheet-section.collapsed .datasheet-content {
+            display: none;
+        }
+
+        .technical-datasheet {
+            flex-shrink: 0;
+        }
+
+        .datasheet-content {
+            height: 200px;
+            overflow-y: auto;
+            padding: var(--spacing-md) 0;
+            border: var(--border-width) solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            background: var(--color-light);
+        }
+
+        /* Component Items */
+        .component-item {
+            background: var(--color-light);
+            border: var(--border-width) solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-md) 0;
+            cursor: grab;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .component-item:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--box-shadow-hover);
+        }
+
+        .component-item:active {
+            cursor: grabbing;
+            transform: translateY(0);
+        }
+
+        .component-name {
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .component-category {
+            border-bottom: var(--border-width) solid #eee;
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .category-title {
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--color-light);
+            color: var(--color-primary);
+            border: var(--border-width) solid var(--color-border);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 4px;
+            cursor: pointer;
+            margin: var(--spacing-xs);
+            transition: all 0.3s ease;
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+            font-family: var(--font-family);
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            border-color: #ccc;
+            transform: none;
+        }
+
+        /* Function Controls */
+        .function-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-lg);
+            border-top: var(--border-width) solid #eee;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .function-controls .btn {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex: 1;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .power-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .power-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .btn-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        /* Component States */
+        .component {
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            transition: border 0.3s ease;
+            border: var(--border-width) solid transparent;
+        }
+
+        .component:hover {
+            border: var(--border-width) solid var(--color-hover-border);
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .component.dragging {
+            z-index: 1000;
+            border: var(--border-width) solid #FF9800;
+            box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
+        }
+
+        .component.selected {
+            border: 2px solid #4CAF50 !important;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5) !important;
+        }
+
+        .component.dragging {
+            z-index: 1000 !important;
+            opacity: 0.8 !important;
+            cursor: grabbing !important;
+            border: 2px solid #FF9800 !important;
+            box-shadow: 0 0 12px rgba(255, 152, 0, 0.5) !important;
+        }
+
+        .component {
+            transition: transform 0.3s ease !important;
+            transform-origin: center center !important;
+        }
+
+        /* Power Source */
+        .power-source {
+            position: absolute;
+            top: var(--spacing-xl);
+            left: var(--spacing-xl);
+            background: transparent;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0;
+            color: var(--color-warning);
+            box-shadow: none;
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+        }
+
+        .power-source svg {
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        /* Connection System */
+        .connection-point {
+            cursor: crosshair;
+            transition: all 0.3s ease;
+        }
+
+        .connection-point:hover {
+            transform: scale(1.5);
+            opacity: 1 !important;
+        }
+
+        .connection-point.dragging-connection {
+            opacity: 1 !important;
+            transform: scale(1.8);
+        }
+
+        .connection-socket { 
+            fill: #888; 
+            stroke: #666; 
+            stroke-width: 1; 
+            cursor: crosshair; 
+            transition: all 0.3s; 
+            opacity: 0.7; 
+        }
+
+        .connection-socket:hover { 
+            opacity: 1; 
+            transform: scale(1.3); 
+            fill: #4CAF50;
+        }
+
+        .connection-line {
+            stroke-width: 3;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.8;
+        }
+
+        .connection-line:hover {
+            opacity: 1;
+            stroke-width: 4;
+            filter: drop-shadow(0 0 3px currentColor);
+        }
+
+        .connection-area {
+            cursor: crosshair;
+            transition: all 0.3s;
+            opacity: 0;
+        }
+
+        .connection-area:hover {
+            opacity: 0.2;
+            fill: #4CAF50;
+        }
+
+        .connection-area:hover + .connection-visual {
+            opacity: 1;
+            transform: scale(1.3);
+            filter: drop-shadow(0 0 5px #4CAF50);
+        }
+
+        .connection-visual {
+            transition: all 0.3s;
+            opacity: 0.8;
+        }
+
+        /* Bezier Connections */
+        .bezier-connection {
+            fill: none;
+            stroke-width: 3;
+            opacity: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+            pointer-events: all;
+            stroke-width: 4;
+        }
+
+        .bezier-connection:hover {
+            opacity: 1;
+            stroke-width: 6;
+            filter: drop-shadow(0 0 5px currentColor);
+        }
+
+        .bezier-connection.red-wire {
+            stroke: #ff0000;
+        }
+
+        .bezier-connection.black-wire {
+            stroke: #000000;
+        }
+
+        /* LED Cables */
+        .led-cable {
+            fill: none;
+            stroke-width: 3;
+            pointer-events: none;
+        }
+
+        .led-cable.plus {
+            stroke: #ff0000;
+        }
+
+        .led-cable.minus {
+            stroke: #000000;
+        }
+
+        .temp-line {
+            stroke: #888;
+            stroke-width: 2;
+            stroke-dasharray: 5,5;
+            opacity: 0.7;
+        }
+
+        /* Dragging Component */
+        .dragging-component {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.8;
+        }
+
+        /* LED Module */
+        .led-module-svg {
+            width: auto;
+            height: 30px;
+        }
+
+        /* Info Box */
+        .info-box {
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background: var(--color-light);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--color-border);
+        }
+
+        .info-box h4 {
+            margin-top: 0;
+            color: var(--color-primary);
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+        }
+
+        .info-box p {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Connection States */
+        .connection-socket.connected,
+        .connection-line.connected,
+        .std-connection-socket.connected,
+        .std-connection-line.connected {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
+        /* === LED FOUNDATION SVG STANDARDS v1.0 === */
+
+        /* Standard Elektro-Farben */
+        .std-wire-plus { stroke: var(--wire-red); fill: none; stroke-width: 3; }
+        .std-wire-minus { stroke: var(--wire-black); fill: none; stroke-width: 3; }
+        .std-wire-phase { stroke: var(--wire-brown); fill: none; stroke-width: 3; }
+        .std-wire-neutral { stroke: var(--wire-blue); fill: none; stroke-width: 3; }
+        .std-wire-earth { stroke: var(--wire-yellow-green); fill: none; stroke-width: 3; }
+
+        /* Standard Material-Farben */
+        .std-housing-light { fill: var(--plastic-light); stroke: var(--color-primary); stroke-width: 1; }
+        .std-housing-dark { fill: var(--plastic-dark); stroke: var(--color-primary); stroke-width: 1; }
+        .std-metal-light { fill: var(--metal-light); stroke: var(--color-primary); stroke-width: 1; }
+        .std-metal-dark { fill: var(--metal-dark); stroke: var(--color-primary); stroke-width: 1; }
+        .std-led-off { fill: #ccc; stroke: var(--color-primary); stroke-width: 1; }
+
+        /* Standard Strichstärken */
+        .std-hairline { stroke-width: 0.5; }
+        .std-thin { stroke-width: 1; }
+        .std-cable { stroke-width: 3; }
+        .std-connection { stroke-width: 3; }
+        .std-thick { stroke-width: 5; }
+
+        /* Standard Text */
+        .std-text { fill: var(--color-primary); font-family: Arial, sans-serif; stroke: none; }
+        .std-text-small { font-size: 6px; }
+        .std-text-medium { font-size: 8px; }
+        .std-text-large { font-size: 10px; }
+
+        /* Standard Connection Points */
+        .std-connection-socket { 
+            fill: #888; 
+            stroke: #666; 
+            stroke-width: 1; 
+            cursor: crosshair; 
+            transition: all 0.3s; 
+            opacity: 0.7; 
+        }
+
+        .std-connection-socket:hover { 
+            opacity: 1; 
+            transform: scale(1.3); 
+            fill: #4CAF50;
+        }
+
+        .std-connection-line {
+            stroke-width: 3;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.8;
+            fill: none;
+        }
+
+        .std-connection-line:hover {
+            opacity: 1;
+            stroke-width: 5;
+            filter: drop-shadow(0 0 3px currentColor);
+        }
+
+        /* Connection Lines mit spezifischen Farben */
+        .std-connection-line.std-wire-plus { stroke: var(--wire-red); }
+        .std-connection-line.std-wire-minus { stroke: var(--wire-black); }
+        .std-connection-line.std-wire-phase { stroke: var(--wire-brown); }
+        .std-connection-line.std-wire-neutral { stroke: var(--wire-blue); }
+        .std-connection-line.std-wire-earth { stroke: var(--wire-yellow-green); }
+
+        /* Standard Gradients für Schalter */
+        .std-gradient-off {
+            stop-color: var(--color-border);
+        }
+
+        .std-gradient-on {
+            stop-color: var(--color-success);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hier kommt das HTML -->
+</body>
+</html>
