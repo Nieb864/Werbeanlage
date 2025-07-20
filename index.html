@@ -823,6 +823,17 @@
         .connection-line.std-wire-phase { stroke: var(--wire-brown); }
         .connection-line.std-wire-neutral { stroke: var(--wire-blue); }
         .connection-line.std-wire-earth { stroke: var(--wire-yellow-green); }
+        
+        /* Component States */
+        .component-broken {
+            filter: brightness(0.3) !important;
+            opacity: 0.7 !important;
+        }
+        
+        .component-broken .trafo-housing {
+            fill: #333 !important;
+            stroke: #666 !important;
+        }
 
         .wire-hover-area.std-wire-plus { color: var(--wire-red); }
         .wire-hover-area.std-wire-minus { color: var(--wire-black); }
@@ -1014,7 +1025,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.55</div>
+                <div class="version-display">v0.00.56</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1492,6 +1503,7 @@
                 this.nodes = new Map();
                 this.edges = new Map();
                 this.stateMachines = new Map();
+                this.componentStates = new Map(); // Component states: 'on', 'off', 'broken', etc.
             }
             
             addComponent(id, type, position) {
@@ -1561,6 +1573,23 @@
                 
                 dfs(startNode);
                 return connected;
+            }
+            
+            // ===== COMPONENT STATE MANAGEMENT =====
+            setComponentState(componentId, state) {
+                this.componentStates.set(componentId, state);
+                console.log(`🔧 Component ${componentId} State → ${state}`);
+                
+                // Visual update
+                const element = document.getElementById(componentId);
+                if (element) {
+                    element.classList.remove('component-on', 'component-off', 'component-broken');
+                    element.classList.add(`component-${state}`);
+                }
+            }
+            
+            getComponentState(componentId) {
+                return this.componentStates.get(componentId) || 'off';
             }
         }
 
@@ -1869,7 +1898,8 @@
                     
                     // DIREKTE TRAFO-VERBINDUNG
                     if (ComponentSpecs[connectedComponent.type].type === 'transformer') {
-                        if (this.hasValidTransformerConnections(connectedId)) {
+                        const trafoState = this.graph.getComponentState(connectedId);
+                        if (this.hasValidTransformerConnections(connectedId) && trafoState !== 'broken') {
                             const specs = ComponentSpecs[connectedComponent.type];
                             console.log(`🔄 LED ${ledId}: Direkt mit Trafo ${connectedId} verbunden`);
                             return {
@@ -1878,7 +1908,7 @@
                                 sourceId: connectedId
                             };
                         } else {
-                            console.log(`⚠️ LED ${ledId}: Verbundener Trafo ${connectedId} ist nicht funktionsfähig`);
+                            console.log(`⚠️ LED ${ledId}: Verbundener Trafo ${connectedId} ist nicht funktionsfähig (State: ${trafoState})`);
                             continue;
                         }
                     }
@@ -1931,12 +1961,12 @@
                 // 🔍 NEUE LEISTUNGSBERECHNUNG: Alle LEDs im Parallelschaltungs-Netzwerk
                 const totalPower = this.calculateTotalLoadOnTransformer(transformerId);
                 
-                console.log(`⚡ Trafo ${transformerId}: Gesamtlast = ${totalPower.toFixed(2)}W / ${specs.power}W (${(totalPower/specs.power*100).toFixed(1)}%)`);
+                console.log(`⚡ Trafo ${transformerId}: Gesamtlast = ${totalPower.toFixed(2)}W / ${specs.maxPower}W (${(totalPower/specs.maxPower*100).toFixed(1)}%)`);
                 
                 // 🚨 ÜBERLASTUNGSCHECK
-                if (totalPower > specs.power) {
-                    console.log(`💥 ÜBERLASTUNG! Trafo ${transformerId}: ${totalPower.toFixed(2)}W > ${specs.power}W`);
-                    this.setTransformerOverloaded(transformerId);
+                if (totalPower > specs.maxPower) {
+                    console.log(`💥 ÜBERLASTUNG! Trafo ${transformerId}: ${totalPower.toFixed(2)}W > ${specs.maxPower}W`);
+                    this.graph.setComponentState(transformerId, 'broken');
                     return 0; // Trafo schaltet ab
                 }
                 
@@ -4156,7 +4186,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.55 - HOTFIX: Endless Loop gestoppt...');
+            console.log('🚀 LED Foundation v0.00.56 - ÜBERLASTUNGSSCHUTZ: Trafo wird schwarz, LEDs gehen aus...');
             
             // 1. Circuit Simulation initialisieren
             try {
