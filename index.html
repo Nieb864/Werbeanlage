@@ -4529,7 +4529,7 @@
             // 4. Sound-Effekt (wenn verfügbar)
             playElectricalSound();
             
-            // 5. Aufräumen nach Animation
+            // 5. Aufräumen nach Animation (3 Sekunden für bessere Lesbarkeit)
             setTimeout(() => {
                 if (dangerOverlay.parentNode) {
                     dangerOverlay.parentNode.removeChild(dangerOverlay);
@@ -4537,7 +4537,7 @@
                 if (warningMessage.parentNode) {
                     warningMessage.parentNode.removeChild(warningMessage);
                 }
-            }, 2000);
+            }, 3000);
             
             return false; // Verhindere weitere Aktionen
         }
