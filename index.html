@@ -978,7 +978,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.48a</div>
+                <div class="version-display">v0.00.48b</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2643,22 +2643,33 @@
             }
             
             hasRequiredLEDConnections(ledId) {
+                console.log(`🚨 DEBUGGING hasRequiredLEDConnections für ${ledId}`);
+                
                 const led = document.getElementById(ledId);
-                if (!led) return false;
+                if (!led) {
+                    console.log(`❌ LED ${ledId}: Element nicht gefunden`);
+                    return false;
+                }
                 
                 // Prüfe: plus UND minus müssen verbunden sein
                 const plusInput = led.querySelector('[data-connection-id="in-plus"]');
                 const minusInput = led.querySelector('[data-connection-id="in-minus"]');
                 
+                console.log(`🔍 LED ${ledId}: plusInput=${!!plusInput}, minusInput=${!!minusInput}`);
+                
                 const hasPlusConnection = this.hasActiveConnection(plusInput);
                 const hasMinusConnection = this.hasActiveConnection(minusInput);
+                
+                console.log(`🔍 LED ${ledId}: hasPlusConnection=${hasPlusConnection}, hasMinusConnection=${hasMinusConnection}`);
                 
                 // ZUSÄTZLICH: Prüfe ob Polarität korrekt ist
                 const hasCorrectPolarity = this.hasCorrectLEDPolarity(ledId);
                 
+                console.log(`🔍 LED ${ledId}: hasCorrectPolarity=${hasCorrectPolarity}`);
+                
                 const isComplete = hasPlusConnection && hasMinusConnection && hasCorrectPolarity;
                 
-                console.log(`🔍 LED ${ledId}: Plus=${hasPlusConnection}, Minus=${hasMinusConnection}, Polarität=${hasCorrectPolarity} → Komplett: ${isComplete}`);
+                console.log(`🎯 LED ${ledId}: FINALE BEWERTUNG → Plus=${hasPlusConnection} && Minus=${hasMinusConnection} && Polarität=${hasCorrectPolarity} = ${isComplete}`);
                 
                 return isComplete;
             }
