@@ -978,7 +978,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.46</div>
+                <div class="version-display">v0.00.47</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1684,10 +1684,8 @@
                             return 'Überspannung: 230V an DC-LED';
                         }
                         
-                        // 2. FALSCHE POLARITÄT: Plus an Minus
-                        if (this.isWrongPolarity(fromData, toData, targetComponentId)) {
-                            return 'Falsche Polarität: Plus-Minus vertauscht';
-                        }
+                        // 2. FALSCHE POLARITÄT: Macht LED NICHT kaputt, nur funktionslos
+                        // (Diese Prüfung wurde entfernt - falsche Polarität = kein Schaden)
                         
                         // 3. KURZSCHLUSS: Direkte Plus-Minus Verbindung
                         if (this.isShortCircuit(fromData, toData)) {
@@ -1724,7 +1722,8 @@
             }
             
             isWrongPolarity(fromData, toData, targetComponentId) {
-                // Plus-Output zu Minus-Input oder umgekehrt
+                // FALSCHE POLARITÄT MACHT LED NICHT KAPUTT - nur funktionslos
+                // Diese Funktion wird nur für Referenz behalten, aber nicht für Schäden verwendet
                 if ((fromData.wireType === 'plus' && toData.wireType === 'minus') ||
                     (fromData.wireType === 'minus' && toData.wireType === 'plus')) {
                     return true;
@@ -2592,11 +2591,9 @@
             }
             
             wouldCreateShortCircuit(outputData, inputData) {
-                // Plus zu Minus = Kurzschluss
-                if ((outputData.wireType === 'plus' && inputData.wireType === 'minus') ||
-                    (outputData.wireType === 'minus' && inputData.wireType === 'plus')) {
-                    return true;
-                }
+                // DIREKTE Plus-Minus Verbindung ohne Verbraucher dazwischen  
+                // Aber: Plus-Output zu Minus-Input einer LED ist NORMAL, kein Kurzschluss!
+                // Nur direkte Kabel-zu-Kabel Verbindungen sind Kurzschlüsse
                 
                 // Phase zu Neutral ohne Verbraucher = Kurzschluss  
                 if ((outputData.wireType === 'phase' && inputData.wireType === 'neutral') ||
@@ -2653,9 +2650,45 @@
                 const hasPlusConnection = this.hasActiveConnection(plusInput);
                 const hasMinusConnection = this.hasActiveConnection(minusInput);
                 
-                console.log(`🔍 LED ${ledId}: Plus=${hasPlusConnection}, Minus=${hasMinusConnection} → Komplett: ${hasPlusConnection && hasMinusConnection}`);
+                // ZUSÄTZLICH: Prüfe ob Polarität korrekt ist
+                const hasCorrectPolarity = this.hasCorrectLEDPolarity(ledId);
                 
-                return hasPlusConnection && hasMinusConnection;
+                const isComplete = hasPlusConnection && hasMinusConnection && hasCorrectPolarity;
+                
+                console.log(`🔍 LED ${ledId}: Plus=${hasPlusConnection}, Minus=${hasMinusConnection}, Polarität=${hasCorrectPolarity} → Komplett: ${isComplete}`);
+                
+                return isComplete;
+            }
+            
+            hasCorrectLEDPolarity(ledId) {
+                const led = document.getElementById(ledId);
+                if (!led) return false;
+                
+                const plusInput = led.querySelector('[data-connection-id="in-plus"]');
+                const minusInput = led.querySelector('[data-connection-id="in-minus"]');
+                
+                // Prüfe alle Verbindungen zu diesem LED
+                for (const [connId, connectionData] of this.connections) {
+                    if (connectionData.toComponent === ledId) {
+                        const fromData = this.getConnectionData(connectionData.from);
+                        const toData = this.getConnectionData(connectionData.to);
+                        
+                        // Plus-Ausgang sollte zu Plus-Eingang
+                        if (fromData.wireType === 'plus' && toData.wireType === 'minus') {
+                            console.log(`❌ LED ${ledId}: Plus-Ausgang an Minus-Eingang - falsche Polarität`);
+                            return false;
+                        }
+                        
+                        // Minus-Ausgang sollte zu Minus-Eingang  
+                        if (fromData.wireType === 'minus' && toData.wireType === 'plus') {
+                            console.log(`❌ LED ${ledId}: Minus-Ausgang an Plus-Eingang - falsche Polarität`);
+                            return false;
+                        }
+                    }
+                }
+                
+                console.log(`✅ LED ${ledId}: Polarität ist korrekt`);
+                return true;
             }
             
             hasActiveConnection(connectionElement) {
@@ -3698,7 +3731,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.46 - Bugfix: Trafo und LED Validierung korrigiert...');
+            console.log('🚀 LED Foundation v0.00.47 - Polarität: Falsche Polarität macht LED nicht kaputt...');
             
             // 1. Circuit Simulation initialisieren
             try {
