@@ -1039,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.36</div>
+                <div class="version-display">v0.00.37</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1454,13 +1454,15 @@
                     </svg>
                 `;
                 
-                // Positionierung und Gegen-Rotation
-                this.updateSmokePosition();
-                
                 // Zum Workspace hinzufügen
                 document.getElementById('workspace').appendChild(this.smokeOverlay);
                 
-                console.log(`💨 Rauch-Overlay erstellt und positioniert`);
+                // Positionierung und Gegen-Rotation (nach DOM-Einfügung!)
+                setTimeout(() => {
+                    this.updateSmokePosition();
+                }, 10); // Kurze Verzögerung für DOM-Update
+                
+                console.log(`💨 Rauch-Overlay erstellt und wird positioniert`);
             }
             
             updateSmokePosition() {
@@ -2090,10 +2092,14 @@
             }
             
             updateSmokeForComponent(component) {
+                console.log(`🔍 updateSmokeForComponent aufgerufen für ${component.id}`);
                 const stateMachine = window.circuitGraph?.stateMachines?.get(component.id);
+                console.log(`🔍 StateMachine gefunden: ${!!stateMachine}, SmokeOverlay: ${!!stateMachine?.smokeOverlay}`);
                 if (stateMachine && stateMachine.smokeOverlay) {
                     stateMachine.updateSmokePosition();
                     console.log(`💨 Rauch-Position synchronisiert für ${component.id}`);
+                } else {
+                    console.log(`⚠️ Kein Rauch-Update möglich für ${component.id}`);
                 }
             }
             
@@ -2631,7 +2637,10 @@
             dragElement.style.top = (e.clientY - dragOffset.y) + 'px';
             
             // Rauch-Position bei Drag aktualisieren
-            workspaceManager.updateSmokeForComponent(dragElement);
+            if (workspaceManager && dragElement) {
+                console.log(`🎮 Drag-Update für ${dragElement.id}`);
+                workspaceManager.updateSmokeForComponent(dragElement);
+            }
         }
 
         function endDrag(e) {
@@ -2712,6 +2721,7 @@
 
         // Globale Instanz
         let workspaceManager = null;
+        window.workspaceManager = null; // Global verfügbar machen
 
         console.log('🎮 Workspace Manager geladen');
 
@@ -3417,7 +3427,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.36 - Rauch-Fix: Modul-Zentrum + Drag-Sync...');
+            console.log('🚀 LED Foundation v0.00.37 - Sync-Fix: Global WorkspaceManager + Debug-Logs...');
             
             // 1. Circuit Simulation initialisieren
             try {
@@ -3432,6 +3442,7 @@
             // 2. WorkspaceManager initialisieren
             try {
                 workspaceManager = new WorkspaceManager();
+                window.workspaceManager = workspaceManager; // Global setzen
                 console.log('✅ WorkspaceManager initialisiert');
             } catch (error) {
                 console.error('❌ Fehler bei WorkspaceManager:', error);
