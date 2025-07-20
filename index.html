@@ -800,6 +800,102 @@
             filter: drop-shadow(0 0 3px currentColor);
         }
 
+        /* ===== SICHERHEITS-FUNKEN EFFEKT ===== */
+        .electrical-danger-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 0, 0, 0.1);
+            z-index: 10000;
+            pointer-events: none;
+            animation: danger-flash 0.5s ease-out;
+        }
+
+        @keyframes danger-flash {
+            0% { 
+                background: rgba(255, 255, 0, 0.8);
+                box-shadow: inset 0 0 50px rgba(255, 255, 0, 0.8);
+            }
+            25% { 
+                background: rgba(255, 0, 0, 0.6);
+                box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.6);
+            }
+            50% { 
+                background: rgba(255, 255, 255, 0.9);
+                box-shadow: inset 0 0 150px rgba(255, 255, 255, 0.9);
+            }
+            75% { 
+                background: rgba(255, 0, 0, 0.4);
+                box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.4);
+            }
+            100% { 
+                background: rgba(255, 0, 0, 0);
+                box-shadow: inset 0 0 0px rgba(255, 0, 0, 0);
+            }
+        }
+
+        .spark-effect {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #ffff00 0%, #ff6600 50%, transparent 100%);
+            border-radius: 50%;
+            animation: spark-burst 0.3s ease-out;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        @keyframes spark-burst {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+                box-shadow: 0 0 10px #ffff00;
+            }
+            50% {
+                transform: scale(3);
+                opacity: 0.8;
+                box-shadow: 0 0 30px #ff6600;
+            }
+            100% {
+                transform: scale(6);
+                opacity: 0;
+                box-shadow: 0 0 50px #ff0000;
+            }
+        }
+
+        .electrical-warning-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.95);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 10001;
+            border: 3px solid #ffff00;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            animation: warning-shake 0.5s ease-out;
+        }
+
+        @keyframes warning-shake {
+            0%, 100% { transform: translate(-50%, -50%); }
+            10% { transform: translate(-48%, -50%); }
+            20% { transform: translate(-52%, -50%); }
+            30% { transform: translate(-48%, -50%); }
+            40% { transform: translate(-52%, -50%); }
+            50% { transform: translate(-50%, -52%); }
+            60% { transform: translate(-50%, -48%); }
+            70% { transform: translate(-50%, -52%); }
+            80% { transform: translate(-50%, -48%); }
+            90% { transform: translate(-50%, -50%); }
+        }
+
         .connection-socket {
             fill: #4CAF50;
             stroke: #333;
@@ -1025,7 +1121,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.58</div>
+                <div class="version-display">v0.00.59</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2341,6 +2437,11 @@
             
             // ===== DRAG & DROP SYSTEM =====
             startDragging(e) {
+                // 🚨 SICHERHEITSPRÜFUNG: Kein Bewegen bei eingeschaltetem Strom
+                if (!checkElectricalSafety(e, "Bauteile bewegen")) {
+                    return;
+                }
+                
                 this.isDraggingComponents = true;
                 this.dragStartPos = { x: e.clientX, y: e.clientY };
                 
@@ -2463,6 +2564,12 @@
             
             // ===== DELETION SYSTEM =====
             deleteSelectedComponents() {
+                // 🚨 SICHERHEITSPRÜFUNG: Kein Löschen bei eingeschaltetem Strom
+                if (systemPower) {
+                    triggerElectricalDanger(null, "Niemals Bauteile bei eingeschaltetem Strom entfernen!");
+                    return;
+                }
+                
                 if (this.selectedComponents.size === 0) {
                     console.log('⚠️ Keine Bauteile zum Löschen ausgewählt');
                     return;
@@ -2604,6 +2711,11 @@
             handleConnectionMouseDown(e) {
                 if (e.target.classList.contains('connection-line') && 
                     e.target.dataset.connectionType === 'output-line') {
+                    
+                    // 🚨 SICHERHEITSPRÜFUNG: Keine Verkabelung bei eingeschaltetem Strom
+                    if (!checkElectricalSafety(e, "Kabel anschließen")) {
+                        return;
+                    }
                     
                     e.preventDefault();
                     e.stopPropagation();
@@ -2760,6 +2872,12 @@
             }
             
             deleteConnection(path) {
+                // 🚨 SICHERHEITSPRÜFUNG: Keine Verbindung bei eingeschaltetem Strom löschen
+                if (systemPower) {
+                    triggerElectricalDanger(null, "Niemals Kabel bei eingeschaltetem Strom entfernen!");
+                    return;
+                }
+                
                 const connectionId = path.id;
                 const connection = this.connections.get(connectionId);
                 
@@ -3184,6 +3302,11 @@
 
         function startDrag(e) {
             e.preventDefault();
+            
+            // 🚨 SICHERHEITSPRÜFUNG: Kein Drag & Drop bei eingeschaltetem Strom
+            if (!checkElectricalSafety(e, "Bauteile hinzufügen")) {
+                return;
+            }
             
             const componentType = e.currentTarget.getAttribute('data-component-type');
             console.log('🎯 Drag gestartet für Typ:', componentType);
@@ -4293,7 +4416,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.58 - NEUBERECHNUNG: Beim Einschalten wird alles neu berechnet, kaputte Bauteile bleiben kaputt...');
+            console.log('🚀 LED Foundation v0.00.59 - SICHERHEITSFUNKEN: Arbeitsfläche funken bei Arbeiten unter Spannung...');
             
             // 1. Circuit Simulation initialisieren
             try {
@@ -4366,6 +4489,114 @@
             
             // Status-Report ausgeben
             outputStatusReport();
+        }
+
+        // ===== ELEKTRISCHE SICHERHEITS-FUNKTIONEN =====
+        
+        function triggerElectricalDanger(event, message = "⚠️ GEFAHR! Niemals an stromführenden Anlagen arbeiten!") {
+            // Verhindere die ursprüngliche Aktion
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            console.log('⚡💥 ELEKTRISCHE GEFAHR AUSGELÖST!', message);
+            
+            // 1. Bildschirm-Flash Effekt
+            const dangerOverlay = document.createElement('div');
+            dangerOverlay.className = 'electrical-danger-overlay';
+            document.body.appendChild(dangerOverlay);
+            
+            // 2. Funken-Effekte an der Mausposition
+            if (event) {
+                createSparkEffects(event.clientX, event.clientY);
+            }
+            
+            // 3. Warnmeldung anzeigen
+            const warningMessage = document.createElement('div');
+            warningMessage.className = 'electrical-warning-message';
+            warningMessage.innerHTML = `
+                <div>⚡💀 ELEKTRISCHE GEFAHR! ⚡💀</div>
+                <div style="font-size: 14px; margin-top: 10px;">${message}</div>
+                <div style="font-size: 12px; margin-top: 10px; color: #ffff00;">
+                    🔒 Schalte zuerst den Hauptschalter AUS!
+                </div>
+            `;
+            document.body.appendChild(warningMessage);
+            
+            // 4. Sound-Effekt (wenn verfügbar)
+            playElectricalSound();
+            
+            // 5. Aufräumen nach Animation
+            setTimeout(() => {
+                if (dangerOverlay.parentNode) {
+                    dangerOverlay.parentNode.removeChild(dangerOverlay);
+                }
+                if (warningMessage.parentNode) {
+                    warningMessage.parentNode.removeChild(warningMessage);
+                }
+            }, 2000);
+            
+            return false; // Verhindere weitere Aktionen
+        }
+        
+        function createSparkEffects(x, y) {
+            // Erstelle mehrere Funken um die Mausposition
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    const spark = document.createElement('div');
+                    spark.className = 'spark-effect';
+                    
+                    // Zufällige Position um den Mausklick
+                    const offsetX = (Math.random() - 0.5) * 100;
+                    const offsetY = (Math.random() - 0.5) * 100;
+                    
+                    spark.style.left = (x + offsetX) + 'px';
+                    spark.style.top = (y + offsetY) + 'px';
+                    
+                    document.body.appendChild(spark);
+                    
+                    // Funke nach Animation entfernen
+                    setTimeout(() => {
+                        if (spark.parentNode) {
+                            spark.parentNode.removeChild(spark);
+                        }
+                    }, 300);
+                }, i * 50);
+            }
+        }
+        
+        function playElectricalSound() {
+            // Erstelle einen kurzen "Zap" Sound mit Web Audio API
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Elektrischer "Zap" Sound
+                oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (error) {
+                console.log('🔇 Audio-Kontext nicht verfügbar:', error);
+            }
+        }
+        
+        function checkElectricalSafety(event, action) {
+            if (systemPower) {
+                console.log(`🚨 SICHERHEITSWARNUNG: Versuch ${action} bei eingeschaltetem Hauptschalter!`);
+                triggerElectricalDanger(event, `Niemals ${action} bei eingeschaltetem Strom!`);
+                return false;
+            }
+            return true;
         }
 
         function outputStatusReport() {
