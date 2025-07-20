@@ -718,6 +718,69 @@
             fill: #e91e63 !important;
         }
 
+        /* Rauch-Animationen für kaputte LEDs */
+        .smoke-group {
+            animation: smokeFloat 5s infinite linear;
+        }
+        
+        .smoke-group-alt {
+            animation: smokeFloatAlt 5s infinite linear;
+        }
+        
+        .smoke-1 {
+            animation-delay: 0s;
+        }
+        
+        .smoke-2 {
+            animation-delay: 0.5s;
+        }
+        
+        .smoke-3 {
+            animation-delay: 1s;
+        }
+        
+        .smoke-alt-1 {
+            animation-delay: 0s;
+        }
+        
+        .smoke-alt-2 {
+            animation-delay: 0.5s;
+        }
+        
+        .smoke-alt-3 {
+            animation-delay: 1s;
+        }
+        
+        @keyframes smokeFloat {
+            0% { 
+                opacity: 0.7; 
+                transform: translateY(0) scale(0.8) rotate(0deg); 
+            }
+            50% { 
+                opacity: 0.4; 
+                transform: translateY(-15px) scale(1.1) rotate(5deg); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-30px) scale(1.4) rotate(10deg); 
+            }
+        }
+        
+        @keyframes smokeFloatAlt {
+            0% { 
+                opacity: 0.6; 
+                transform: translateY(0) scale(0.9) rotate(0deg); 
+            }
+            50% { 
+                opacity: 0.3; 
+                transform: translateY(-18px) scale(1.2) rotate(-7deg); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-35px) scale(1.6) rotate(-12deg); 
+            }
+        }
+
         /* Connection States */
         .connection-socket.connected,
         .connection-line.connected {
@@ -976,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.30</div>
+                <div class="version-display">v0.00.31</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1153,6 +1216,9 @@
                 this.blinkInterval = null;
                 this.blinkState = true;
                 
+                // Rauch-Animation State
+                this.smokeElements = [];
+                
                 // Initial state CSS setzen
                 this.applyStateCSS();
                 
@@ -1177,6 +1243,7 @@
                 if (previousState !== this.state) {
                     this.animateStateChange();
                     this.updateBlinkAnimation();
+                    this.updateSmokeAnimation();
                 }
             }
             
@@ -1342,6 +1409,98 @@
                 const strongFilterId = this.type.includes('24v') ? 'ledGlowStrong24' : 'ledGlowStrong';
                 
                 return state === ComponentStates.BLINKING ? `url(#${strongFilterId})` : `url(#${filterId})`;
+            }
+            
+            updateSmokeAnimation() {
+                if (this.state === ComponentStates.BROKEN) {
+                    this.createSmokeEffects();
+                } else {
+                    this.removeSmokeEffects();
+                }
+            }
+            
+            createSmokeEffects() {
+                const element = document.getElementById(this.elementId);
+                if (!element || this.specs.type !== 'load') return;
+                
+                const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
+                
+                ledCenters.forEach((led, index) => {
+                    if (this.smokeElements[index]) return; // Rauch bereits vorhanden
+                    
+                    const ledRect = led.getBoundingClientRect();
+                    const elementRect = element.getBoundingClientRect();
+                    
+                    const relativeX = ledRect.left - elementRect.left + ledRect.width / 2;
+                    const relativeY = ledRect.top - elementRect.top + ledRect.height / 2;
+                    
+                    const smokeContainer = this.createSmokeElement(relativeX, relativeY);
+                    element.appendChild(smokeContainer);
+                    this.smokeElements[index] = smokeContainer;
+                    
+                    console.log(`💨 Rauch-Effekt erstellt für LED ${index} bei (${relativeX}, ${relativeY})`);
+                });
+            }
+            
+            createSmokeElement(centerX, centerY) {
+                const smokeContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                smokeContainer.setAttribute('class', 'smoke-container');
+                smokeContainer.style.position = 'absolute';
+                smokeContainer.style.pointerEvents = 'none';
+                smokeContainer.style.zIndex = '10';
+                
+                smokeContainer.innerHTML = `
+                    <g style="transform: translate(${centerX}px, ${centerY}px)">
+                        <!-- Erste Rauchserie -->
+                        <g class="smoke-group">
+                            <svg x="0" y="-18" width="5.34" height="13.79" viewBox="0 0 5.34 13.79" class="smoke smoke-1" style="transform: translateX(-2.67px)">
+                                <path fill="#999" opacity="0.7" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                            </svg>
+                        </g>
+                        
+                        <g class="smoke-group">
+                            <svg x="0" y="-16" width="4.5" height="12" viewBox="0 0 5.34 13.79" class="smoke smoke-2" style="transform: translateX(-2.2px)">
+                                <path fill="#aaa" opacity="0.5" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                            </svg>
+                        </g>
+                        
+                        <g class="smoke-group">
+                            <svg x="0" y="-14" width="3.6" height="10" viewBox="0 0 5.34 13.79" class="smoke smoke-3" style="transform: translateX(-1.8px)">
+                                <path fill="#bbb" opacity="0.4" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                            </svg>
+                        </g>
+
+                        <!-- Zweite Rauchserie - gespiegelt -->
+                        <g class="smoke-group-alt">
+                            <svg x="0" y="-18" width="5.34" height="13.79" viewBox="0 0 5.34 13.79" class="smoke smoke-alt-1" style="transform: translateX(-2.67px) scaleX(-1)">
+                                <path fill="#888" opacity="0.6" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                            </svg>
+                        </g>
+                        
+                        <g class="smoke-group-alt">
+                            <svg x="0" y="-16" width="4.8" height="12.5" viewBox="0 0 5.34 13.79" class="smoke smoke-alt-2" style="transform: translateX(-2.4px) scaleX(-1)">
+                                <path fill="#999" opacity="0.4" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                            </svg>
+                        </g>
+                        
+                        <g class="smoke-group-alt">
+                            <svg x="0" y="-15" width="4.0" height="11" viewBox="0 0 5.34 13.79" class="smoke smoke-alt-3" style="transform: translateX(-2.0px) scaleX(-1)">
+                                <path fill="#aaa" opacity="0.3" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
+                            </svg>
+                        </g>
+                    </g>
+                `;
+                
+                return smokeContainer;
+            }
+            
+            removeSmokeEffects() {
+                this.smokeElements.forEach(smokeElement => {
+                    if (smokeElement && smokeElement.parentNode) {
+                        smokeElement.parentNode.removeChild(smokeElement);
+                    }
+                });
+                this.smokeElements = [];
             }
         }
 
@@ -3245,7 +3404,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.30 - Farb-Fix: CSS + JavaScript Hybrid...');
+            console.log('🚀 LED Foundation v0.00.31 - Rauch-Animation: Epische Broken-LEDs...');
             
             // 1. Circuit Simulation initialisieren
             try {
