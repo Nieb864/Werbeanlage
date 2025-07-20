@@ -731,16 +731,21 @@
             fill: #4CAF50;
         }
 
-        /* DEBUG: Wire Hover Areas sichtbar */
+        /* Smart Wire Hover Areas */
         .wire-hover-area {
             cursor: pointer;
             transition: all 0.3s;
         }
 
         .wire-hover-area:hover {
-            opacity: 0.8 !important;
-            transform: scale(1.1);
+            opacity: 0.7 !important;
+            transform: scale(1.05);
             filter: drop-shadow(0 0 3px black);
+        }
+
+        .wire-hover-area.connected {
+            opacity: 0 !important;
+            pointer-events: none;
         }
 
         /* Wire Type Colors for Power Source */
@@ -933,7 +938,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.14</div>
+                <div class="version-display">v0.00.15</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -991,11 +996,13 @@
                         
                         <!-- Connection Points -->
                         <g data-name="connections">
-                            <!-- Hover-Areas (unsichtbar) -->
+                            <!-- Smart Hover-Areas (sichtbar wenn verfügbar) -->
                             <rect class="wire-hover-area std-wire-phase" 
                                   x="17.23" y="86.4" width="3.2" height="16" 
-                                  fill="transparent"
-                                  opacity="0"
+                                  fill="red"
+                                  stroke="black"
+                                  stroke-width="0.8"
+                                  opacity="0.4"
                                   data-connection-type="output-line"
                                   data-connection-id="out-phase"
                                   data-wire-type="phase"
@@ -1005,8 +1012,10 @@
                                   
                             <rect class="wire-hover-area std-wire-neutral" 
                                   x="29.84" y="86.4" width="3.2" height="16" 
-                                  fill="transparent"
-                                  opacity="0"
+                                  fill="blue"
+                                  stroke="black"
+                                  stroke-width="0.8"
+                                  opacity="0.4"
                                   data-connection-type="output-line"
                                   data-connection-id="out-neutral"
                                   data-wire-type="neutral"
@@ -1016,8 +1025,10 @@
                                   
                             <rect class="wire-hover-area std-wire-earth" 
                                   x="23.49" y="86.4" width="3.2" height="16" 
-                                  fill="transparent"
-                                  opacity="0"
+                                  fill="yellow"
+                                  stroke="black"
+                                  stroke-width="0.8"
+                                  opacity="0.4"
                                   data-connection-type="output-line"
                                   data-connection-id="out-earth"
                                   data-wire-type="earth"
@@ -2965,7 +2976,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.14 - Finale Präzision: +2px rechts, +1px unten...');
+            console.log('🚀 LED Foundation v0.00.15 - Smart Hover-Areas: Zeigen Verfügbarkeit...');
             
             // 1. Circuit Simulation initialisieren
             try {
