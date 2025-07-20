@@ -692,7 +692,31 @@
             margin-bottom: 0;
         }
 
-        /* LED States - Jetzt über JavaScript gesteuert */
+        /* LED States - JavaScript + CSS Hybrid */
+        .state-off .cls-5, 
+        .state-off .led24-center {
+            fill: #ddd !important;
+        }
+
+        .state-on .cls-5, 
+        .state-on .led24-center {
+            fill: #ffff00 !important;
+        }
+
+        .state-blinking .cls-5, 
+        .state-blinking .led24-center {
+            fill: #ffff00 !important;
+        }
+
+        .state-broken .cls-5, 
+        .state-broken .led24-center {
+            fill: #1a1a1a !important;
+        }
+
+        .state-overloaded .cls-5, 
+        .state-overloaded .led24-center {
+            fill: #e91e63 !important;
+        }
 
         /* Connection States */
         .connection-socket.connected,
@@ -952,7 +976,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.29</div>
+                <div class="version-display">v0.00.30</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1225,12 +1249,39 @@
                     this.blinkInterval = setInterval(() => {
                         this.blinkState = !this.blinkState;
                         console.log(`🔄 Blink ${this.elementId}: ${this.blinkState}`);
-                        this.applyDynamicColors();
+                        this.applyBlinkColors();
                     }, 500); // Blinkt alle 500ms wie im React-Code
                 } else {
                     this.blinkState = true;
                     this.applyDynamicColors();
                 }
+            }
+            
+            applyBlinkColors() {
+                const element = document.getElementById(this.elementId);
+                if (!element) return;
+                
+                // Nur LEDs färben, nicht Trafos oder andere Komponenten
+                if (this.specs.type !== 'load') return;
+                
+                const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
+                
+                ledCenters.forEach((led, index) => {
+                    const color = this.blinkState ? '#ffff00' : '#ddd';
+                    const filter = this.blinkState ? this.getGlowEffect(this.state, true) : null;
+                    
+                    console.log(`🔄 Blink LED ${index}: ${color}, Filter: ${filter}`);
+                    
+                    led.style.setProperty('fill', color, 'important');
+                    
+                    if (filter) {
+                        led.style.filter = filter;
+                        led.setAttribute('filter', filter);
+                    } else {
+                        led.style.filter = '';
+                        led.removeAttribute('filter');
+                    }
+                });
             }
             
             applyDynamicColors() {
@@ -1245,29 +1296,23 @@
                     return;
                 }
                 
-                const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
-                console.log(`🎨 Färbe ${ledCenters.length} LEDs für ${this.elementId}, State: ${this.state}, Blink: ${this.blinkState}`);
+                console.log(`🎨 Setze LED State für ${this.elementId}: ${this.state}`);
                 
-                ledCenters.forEach((led, index) => {
-                    const color = this.getLedColor(this.state, this.blinkState);
-                    const filter = this.getGlowEffect(this.state, this.blinkState);
-                    
-                    console.log(`💡 LED ${index}: Farbe ${color}, Filter ${filter}`);
-                    
-                    // Direkte Style-Manipulation um CSS zu überschreiben
-                    led.style.fill = color + ' !important';
-                    
-                    if (filter) {
-                        led.style.filter = filter;
-                        led.setAttribute('filter', filter);
-                    } else {
-                        led.style.filter = '';
-                        led.removeAttribute('filter');
-                    }
-                    
-                    // Zusätzlich auch das Attribut setzen
-                    led.setAttribute('fill', color);
-                });
+                // Für statische States (nicht BLINKING) nur CSS-Klassen verwenden
+                if (this.state !== ComponentStates.BLINKING) {
+                    const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
+                    ledCenters.forEach((led, index) => {
+                        const filter = this.getGlowEffect(this.state, true);
+                        
+                        if (filter) {
+                            led.style.filter = filter;
+                            led.setAttribute('filter', filter);
+                        } else {
+                            led.style.filter = '';
+                            led.removeAttribute('filter');
+                        }
+                    });
+                }
             }
             
             getLedColor(state, isBlinking) {
@@ -3200,7 +3245,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.29 - Toleranz-Fix: Korrekte Blink-Schwellenwerte...');
+            console.log('🚀 LED Foundation v0.00.30 - Farb-Fix: CSS + JavaScript Hybrid...');
             
             // 1. Circuit Simulation initialisieren
             try {
