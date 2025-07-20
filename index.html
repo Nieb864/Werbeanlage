@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.64</div>
+                <div class="version-display">v0.00.65</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1324,19 +1324,21 @@
                 
                 const previousState = this.state;
                 
-                // 🔧 BROKEN STATE: Nur bei eingeschaltetem Hauptschalter sichtbar
+                // 🔧 BROKEN STATE: Überprüfe ob diese Komponente dauerhaft kaputt ist
                 const componentState = window.circuit?.graph?.getComponentState?.(this.elementId);
                 const isSystemPowered = window.systemPower || false;
                 
-                if (componentState === 'broken' && !isSystemPowered) {
-                    // Wenn Hauptschalter AUS ist, zeige kaputte LEDs als normale AUS LEDs
-                    this.state = ComponentStates.OFF;
-                    console.log(`🔧 LED ${this.elementId}: Ist kaputt, aber Hauptschalter AUS → zeige als OFF`);
-                } else if (componentState === 'broken' && isSystemPowered) {
-                    // Nur bei eingeschaltetem Hauptschalter zeige als kaputt
-                    this.state = ComponentStates.BROKEN;
-                    console.log(`💀 LED ${this.elementId}: Ist kaputt und Hauptschalter EIN → zeige als BROKEN`);
+                if (componentState === 'broken') {
+                    // Kaputte LEDs bleiben kaputt - zeigen aber unterschiedlich je nach Hauptschalter
+                    if (isSystemPowered) {
+                        this.state = ComponentStates.BROKEN;
+                        console.log(`💀 LED ${this.elementId}: Ist PERMANENT kaputt und Hauptschalter EIN → BROKEN`);
+                    } else {
+                        this.state = ComponentStates.OFF;
+                        console.log(`🔧 LED ${this.elementId}: Ist PERMANENT kaputt, aber Hauptschalter AUS → OFF`);
+                    }
                 } else if (this.specs.type === 'load') {
+                    // Nur nicht-kaputte LEDs können normal funktionieren
                     this.state = this.calculateLEDState(voltage);
                 } else if (this.specs.type === 'transformer') {
                     this.state = this.calculateTransformerState();
@@ -1996,6 +1998,13 @@
             
             calculateComponentPower(componentId) {
                 const component = this.graph.nodes.get(componentId);
+                
+                // 🚨 KAPUTTE LEDs bekommen keinen Strom - sind permanent defekt
+                const componentState = this.graph.getComponentState(componentId);
+                if (componentState === 'broken') {
+                    console.log(`💀 LED ${componentId}: Ist permanent kaputt → 0V/0A`);
+                    return { voltage: 0, current: 0 };
+                }
                 
                 // 🔍 NEUE PARALLELSCHALTUNG: Prüfe LED-zu-LED Verbindungen
                 const powerSource = this.findPowerSourceForLED(componentId);
@@ -4488,7 +4497,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.64 - SICHERHEITSFIX: Gefährliche 230V werden nicht über Parallelschaltung weitergeleitet...');
+            console.log('🚀 LED Foundation v0.00.65 - KAPUTTE LEDs BLEIBEN KAPUTT: Permanent defekte LEDs funktionieren nie wieder...');
             
             // 1. Circuit Simulation initialisieren
             try {
