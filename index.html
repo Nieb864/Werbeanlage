@@ -1152,7 +1152,7 @@
             [ComponentTypes.TRANSFORMER_12V_3W]: {
                 inputVoltage: 230,
                 outputVoltage: 12,
-                power: 3,
+                maxPower: 3,
                 type: 'transformer'
             },
             [ComponentTypes.LED_12V_1_2W]: {
@@ -3731,6 +3731,7 @@
                 <line class="connection-line" 
                       x1="115" y1="30" x2="120" y2="30" 
                       stroke="#e30613" 
+                      stroke-width="4"
                       data-connection-type="output-line"
                       data-connection-id="out-plus"
                       data-wire-type="plus"
@@ -3741,6 +3742,7 @@
                 <line class="connection-line" 
                       x1="115" y1="50" x2="120" y2="50" 
                       stroke="#1d1d1b" 
+                      stroke-width="4"
                       data-connection-type="output-line"
                       data-connection-id="out-minus"
                       data-wire-type="minus"
