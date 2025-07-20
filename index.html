@@ -737,6 +737,264 @@
     </style>
 </head>
 <body>
-    <!-- Hier kommt das HTML -->
+    <div class="layout-container">
+        <div class="sidebar-left">
+            <div class="datasheet-section" id="datasheet-section">
+                <div class="datasheet-header">
+                    <h3 class="text-h1">Technisches Datenblatt</h3>
+                    <button class="datasheet-toggle" onclick="toggleDatasheet()" id="datasheet-toggle">
+                        ▲
+                    </button>
+                </div>
+                
+                <div class="technical-datasheet">
+                    <div class="datasheet-content" id="datasheet-content-wrapper">
+                        <div id="datasheet-content" class="text-small">
+                            <p><em>Bewege den Cursor über ein Bauteil, um technische Informationen und Schaltskizzen anzuzeigen.</em></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="components-section">
+                <div class="components-header">
+                    <h2 class="text-h1">Bauteile</h2>
+                </div>
+                
+                <div class="components-list">
+                    <div class="component-category">
+                        <div class="category-title text-h2">Schutzschalter</div>
+                        <div class="component-item" data-component-type="fi-schalter">
+                            <div class="component-name text-h2">FI-Schutzschalter</div>
+                            <div class="component-specs text-small">
+                                30mA, 16A<br>
+                                Fehlerstromschutz
+                            </div>
+                        </div>
+                        <div class="component-item" data-component-type="ls-schalter">
+                            <div class="component-name text-h2">LS-Schalter</div>
+                            <div class="component-specs text-small">
+                                16A, Überlastschutz<br>
+                                Charakteristik B
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-category">
+                        <div class="category-title text-h2">Steuerungen</div>
+                        <div class="component-item" data-component-type="zeitschaltuhr">
+                            <div class="component-name text-h2">Zeitschaltuhr</div>
+                            <div class="component-specs text-small">
+                                Digital, 16A<br>
+                                Tages-/Wochenprogramm
+                            </div>
+                        </div>
+                        <div class="component-item" data-component-type="daemmerungsschalter">
+                            <div class="component-name text-h2">Dämmerungsschalter</div>
+                            <div class="component-specs text-small">
+                                10A, einstellbar<br>
+                                2-200 Lux
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-category">
+                        <div class="category-title text-h2">Transformatoren</div>
+                        <div class="component-item" data-component-type="trafo-12v-40w">
+                            <div class="component-name text-h2">Trafo 12V</div>
+                            <div class="component-specs text-small">
+                                Eingang: 230V AC<br>
+                                Ausgang: 12V DC, 40W
+                            </div>
+                        </div>
+                        <div class="component-item" data-component-type="trafo-24v-60w">
+                            <div class="component-name text-h2">Trafo 24V</div>
+                            <div class="component-specs text-small">
+                                Eingang: 230V AC<br>
+                                Ausgang: 24V DC, 60W
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-category">
+                        <div class="category-title text-h2">LED-Module</div>
+                        <div class="component-item" data-component-type="led-12v-1.2w">
+                            <div class="component-name text-h2">LED-Modul 12V-1,2W-WW</div>
+                            <div class="component-specs text-small">
+                                1,2W, Warmweiß<br>
+                                12V DC, 3x LED
+                            </div>
+                        </div>
+                        <div class="component-item" data-component-type="led-24v-5w">
+                            <div class="component-name text-h2">LED-Modul 24V</div>
+                            <div class="component-specs text-small">
+                                5W, Warmweiß<br>
+                                24V DC
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-area">
+            <div class="task-area">
+                <div class="task-header">
+                    <h3 class="text-h1">Aufgabenstellung</h3>
+                    <button class="task-menu-btn" onclick="openTaskMenu()">
+                        Zum Aufgaben-Menü
+                    </button>
+                </div>
+                
+                <p class="text-body">
+                    Baue eine Schaltung mit einem 12V Transformator und verbinde die LED-Module korrekt. 
+                    Achte auf die richtige Polarität und die maximale Leistung des Transformators.
+                </p>
+                
+                <div class="function-controls">
+                    <button id="powerBtn" class="btn" onclick="togglePower()">
+                        <span class="power-icon">
+                            <svg id="power-icon" viewBox="0 0 21.74 22.48" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="powerGradientOff" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:var(--color-border);stop-opacity:1" />
+                                        <stop offset="3%" style="stop-color:#c1c1c1;stop-opacity:1" />
+                                        <stop offset="44%" style="stop-color:#888887;stop-opacity:1" />
+                                        <stop offset="75%" style="stop-color:#646463;stop-opacity:1" />
+                                        <stop offset="92%" style="stop-color:#575756;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <rect fill="url(#powerGradientOff)" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                      x="2.13" y=".34" width="17.49" height="20.74" transform="translate(21.58 -.16) rotate(90)"/>
+                                <g>
+                                    <g>
+                                        <polygon fill="var(--color-border)" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                                 points="16.53 13.82 16.53 5.43 5.36 5.43 5.36 13.82 3.22 13.82 3.22 21.98 18.52 21.98 18.52 13.82 16.53 13.82"/>
+                                        <line fill="none" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                              x1="5.12" y1="19.7" x2="16.25" y2="19.7"/>
+                                        <line fill="none" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                              x1="5.12" y1="18.02" x2="16.25" y2="18.02"/>
+                                    </g>
+                                    <rect fill="var(--color-success)" stroke="var(--color-primary)" stroke-width="1.1" stroke-miterlimit="10"
+                                          x="5.36" y="7.68" width="11.18" height="4.98"/>
+                                    <text fill="var(--color-white)" font-family="Arial, sans-serif" font-size="4.15px" 
+                                          transform="translate(6.36 11.7)">
+                                        <tspan x="0" y="0">O</tspan>
+                                        <tspan x="2.92" y="0">-</tspan>
+                                        <tspan x="4.27" y="0">off</tspan>
+                                    </text>
+                                </g>
+                            </svg>
+                        </span>
+                        <span class="btn-text">
+                            <span>Haupt-</span>
+                            <span>schalter</span>
+                        </span>
+                    </button>
+                    
+                    <button class="btn" onclick="clearWorkspace()">
+                        Arbeitsfläche leeren
+                    </button>
+                    
+                    <button class="btn" onclick="resetConnections()">
+                        Verbindungen zurücksetzen
+                    </button>
+                </div>
+            </div>
+            
+            <div class="workspace" id="workspace">
+                <div class="workspace-info-btn" id="info-btn">
+                    i
+                </div>
+                <div class="info-tooltip" id="info-tooltip">
+                    <div class="info-category">
+                        <div class="info-category-title">Bauteile</div>
+                        <div class="info-rule">• Aus Sidebar ziehen zum Platzieren</div>
+                        <div class="info-rule">• Klick: Einzelnes Bauteil auswählen</div>
+                        <div class="info-rule">• Strg + Klick: Mehrere Bauteile auswählen</div>
+                        <div class="info-rule">• Rechteck aufziehen: Gruppenauswahl</div>
+                        <div class="info-rule">• Doppelklick: 90° Drehung</div>
+                        <div class="info-rule">• Ziehen: Ausgewählte Bauteile verschieben</div>
+                        <div class="info-rule">• Entf-Taste: Ausgewählte Bauteile löschen</div>
+                    </div>
+                    
+                    <div class="info-category">
+                        <div class="info-category-title">Verbindungen</div>
+                        <div class="info-rule">• Anschlusspunkte verbinden durch Klicken und Ziehen</div>
+                        <div class="info-rule">• Klick auf Verbindung: Auswählen</div>
+                        <div class="info-rule">• Entf-Taste: Ausgewählte Verbindung löschen</div>
+                    </div>
+                    
+                    <div class="info-category">
+                        <div class="info-category-title">Allgemein</div>
+                        <div class="info-rule">• Klick ins Leere: Auswahl aufheben</div>
+                        <div class="info-rule">• Esc-Taste: Alle Auswahlen aufheben</div>
+                        <div class="info-rule">• Strg + Z: Rückgängig (geplant)</div>
+                    </div>
+                </div>
+                
+                <div class="power-source" id="power-source-svg">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 31.43 71.94" width="50.29" height="115.10">
+                        <defs>
+                            <style>
+                                .power-cls-4 {
+                                    fill: #3c3c3b;
+                                    stroke: #1d1d1b;
+                                    stroke-width: 1px;
+                                }
+                                .power-cls-5 {
+                                    fill: #878787;
+                                }
+                            </style>
+                        </defs>
+                        <g data-name="Ebene_1">
+                            <!-- Anschlusskabel -->
+                            <line class="std-wire-earth" x1="15.68" y1="71.94" x2="15.73" y2="36.06"/>
+                            <line class="std-wire-phase" x1="11.77" y1="39.64" x2="11.77" y2="71.94"/>
+                            <line class="std-wire-neutral" x1="19.65" y1="39.46" x2="19.65" y2="71.94"/>
+                            
+                            <!-- Gehäuse -->
+                            <circle class="std-metal-dark" cx="15.71" cy="15.71" r="15.21"/>
+                            <path class="std-metal-light" d="M8.87,16.86c0-4.43,3.09-8.08,6.84-8.08s6.84,3.65,6.84,8.08v37.32l-13.67-.17c0-12.38,0-24.76-.01-37.14Z"/>
+                        </g>
+                        
+                        <!-- Connection Points -->
+                        <line class="std-connection-line" 
+                              x1="11.77" y1="71.94" x2="11.77" y2="81.94" 
+                              stroke="#683c11"
+                              data-connection-type="output-line"
+                              data-connection-id="out-phase"
+                              data-wire-type="phase"
+                              data-voltage="230"
+                              data-bezier-start-x="11.77" data-bezier-start-y="76.94"
+                              data-bezier-direction="0,10,0,0"/>
+                              
+                        <line class="std-connection-line" 
+                              x1="15.73" y1="71.94" x2="15.73" y2="81.94" 
+                              stroke="#1d71b8"
+                              data-connection-type="output-line"
+                              data-connection-id="out-neutral"
+                              data-wire-type="neutral"
+                              data-voltage="230"
+                              data-bezier-start-x="15.73" data-bezier-start-y="76.94"
+                              data-bezier-direction="0,10,0,0"/>
+                              
+                        <line class="std-connection-line" 
+                              x1="19.65" y1="71.94" x2="19.65" y2="81.94" 
+                              stroke="#ffed00"
+                              data-connection-type="output-line"
+                              data-connection-id="out-earth"
+                              data-wire-type="earth"
+                              data-voltage="230"
+                              data-bezier-start-x="19.65" data-bezier-start-y="76.94"
+                              data-bezier-direction="0,10,0,0"/>
+                    </svg>
+                </div>
+                
+                <svg id="connectionSvg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                </svg>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
