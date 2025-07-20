@@ -952,7 +952,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.28</div>
+                <div class="version-display">v0.00.29</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1162,24 +1162,30 @@
                 const ratedVoltage = this.specs.ratedVoltage;
                 const tolerance = this.specs.tolerance;
                 
-                console.log(`🔍 LED State Calc: ${voltage}V für ${ratedVoltage}V LED (tolerance: ${tolerance})`);
+                // Toleranz 1.1 = 110% zusätzlich, also Faktoren:
+                const maxNormal = ratedVoltage * tolerance;        // 12V * 1.1 = 13.2V
+                const maxBlink = ratedVoltage * (tolerance * 2);   // 12V * 2.2 = 26.4V  
+                const minVoltage = ratedVoltage * 0.8;             // 12V * 0.8 = 9.6V (20% unter Nennspannung)
                 
-                if (voltage > ratedVoltage * (1 + tolerance * 3)) {
-                    console.log(`🔴 BROKEN: ${voltage}V > ${ratedVoltage * (1 + tolerance * 3)}V`);
+                console.log(`🔍 LED State Calc: ${voltage}V für ${ratedVoltage}V LED`);
+                console.log(`📊 Grenzen: ON>${minVoltage}V, BLINK>${maxNormal}V, BROKEN>${maxBlink}V`);
+                
+                if (voltage > maxBlink) {
+                    console.log(`🔴 BROKEN: ${voltage}V > ${maxBlink}V`);
                     return ComponentStates.BROKEN;
                 }
                 
-                if (voltage > ratedVoltage * (1 + tolerance)) {
-                    console.log(`🟠 BLINKING: ${voltage}V > ${ratedVoltage * (1 + tolerance)}V`);
+                if (voltage > maxNormal) {
+                    console.log(`🟠 BLINKING: ${voltage}V > ${maxNormal}V`);
                     return ComponentStates.BLINKING;
                 }
                 
-                if (voltage >= ratedVoltage * (1 - tolerance)) {
-                    console.log(`🟡 ON: ${voltage}V >= ${ratedVoltage * (1 - tolerance)}V`);
+                if (voltage >= minVoltage) {
+                    console.log(`🟡 ON: ${voltage}V >= ${minVoltage}V`);
                     return ComponentStates.ON;
                 }
                 
-                console.log(`⚫ OFF: ${voltage}V < ${ratedVoltage * (1 - tolerance)}V`);
+                console.log(`⚫ OFF: ${voltage}V < ${minVoltage}V`);
                 return ComponentStates.OFF;
             }
             
@@ -1231,6 +1237,11 @@
                 const element = document.getElementById(this.elementId);
                 if (!element) {
                     console.log(`❌ Element nicht gefunden: ${this.elementId}`);
+                    return;
+                }
+                
+                // Nur LEDs färben, nicht Trafos oder andere Komponenten
+                if (this.specs.type !== 'load') {
                     return;
                 }
                 
@@ -3189,7 +3200,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.28 - LED-Farbe Fix: Style + State-Debug...');
+            console.log('🚀 LED Foundation v0.00.29 - Toleranz-Fix: Korrekte Blink-Schwellenwerte...');
             
             // 1. Circuit Simulation initialisieren
             try {
