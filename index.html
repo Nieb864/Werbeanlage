@@ -1014,7 +1014,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.54</div>
+                <div class="version-display">v0.00.55</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3005,7 +3005,16 @@
             
             updateConnectionsForComponent(component) {
                 const componentId = component.id;
-                console.log('🔄 updateConnectionsForComponent aufgerufen für:', componentId);
+                
+                // THROTTLING: Nur alle 50ms ausführen
+                const now = Date.now();
+                if (!this.lastUpdateTime) this.lastUpdateTime = {};
+                if (this.lastUpdateTime[componentId] && (now - this.lastUpdateTime[componentId]) < 50) {
+                    return; // Skip if called too frequently
+                }
+                this.lastUpdateTime[componentId] = now;
+                
+                debugLog('🔄 updateConnectionsForComponent aufgerufen für:', componentId);
                 
                 let foundConnections = 0;
                 
@@ -3018,7 +3027,7 @@
                     }
                 });
                 
-                console.log(`📊 ${foundConnections} Verbindungen für ${componentId} aktualisiert`);
+                debugLog(`📊 ${foundConnections} Verbindungen für ${componentId} aktualisiert`);
             }
             
             redrawConnection(connectionId, connectionData) {
@@ -4147,7 +4156,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.54 - HOTFIX: Debug-Spam reduziert...');
+            console.log('🚀 LED Foundation v0.00.55 - HOTFIX: Endless Loop gestoppt...');
             
             // 1. Circuit Simulation initialisieren
             try {
