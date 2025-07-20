@@ -978,7 +978,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.44</div>
+                <div class="version-display">v0.00.45</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1179,6 +1179,17 @@
                 }
                 
                 if (previousState !== this.state) {
+                    this.animateStateChange();
+                    this.updateBlinkAnimation();
+                }
+            }
+            
+            setState(newState) {
+                const previousState = this.state;
+                this.state = newState;
+                
+                if (previousState !== this.state) {
+                    console.log(`🔄 ${this.elementId}: ${previousState} → ${newState}`);
                     this.animateStateChange();
                     this.updateBlinkAnimation();
                 }
@@ -1549,7 +1560,15 @@
                     
                     if (!component || !stateMachine) continue;
                     
-                    // 🔍 SCHALTUNGSVALIDIERUNG: Prüfe ob Bauteil komplett angeschlossen ist
+                    // 🔍 GEFÄHRLICHE VERBINDUNGEN: Prüfe auf Schäden
+                    const dangerousCondition = this.checkForDangerousConditions(componentId);
+                    if (dangerousCondition) {
+                        console.log(`💥 ${componentId} BESCHÄDIGT durch: ${dangerousCondition}`);
+                        stateMachine.setState(ComponentStates.BROKEN);
+                        continue;
+                    }
+                    
+                    // 🔍 UNVOLLSTÄNDIGE SCHALTUNG: Bleibt AUS aber wird nicht kaputt
                     if (!this.isComponentProperlyConnected(componentId)) {
                         console.log(`⚠️ ${componentId} nicht vollständig angeschlossen - bleibt AUS`);
                         stateMachine.updateState(0, 0);
@@ -1625,6 +1644,99 @@
                 }
                 
                 return true; // Fallback wenn WorkspaceManager nicht verfügbar
+            }
+            
+            checkForDangerousConditions(componentId) {
+                const component = this.graph.nodes.get(componentId);
+                if (!component) return null;
+                
+                // Nur LEDs können durch gefährliche Verbindungen beschädigt werden
+                if (ComponentSpecs[component.type].type !== 'load') return null;
+                
+                // Prüfe alle Verbindungen zu diesem Bauteil
+                for (const edge of this.graph.edges.values()) {
+                    if (edge.to === componentId || edge.from === componentId) {
+                        const danger = this.analyzeConnectionDanger(edge, componentId);
+                        if (danger) return danger;
+                    }
+                }
+                
+                return null;
+            }
+            
+            analyzeConnectionDanger(edge, targetComponentId) {
+                // Hole die tatsächlichen DOM-Verbindungen für detaillierte Analyse
+                if (!window.workspaceManager || !window.workspaceManager.connections) return null;
+                
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if ((connectionData.fromComponent === edge.from && connectionData.toComponent === edge.to) ||
+                        (connectionData.fromComponent === edge.to && connectionData.toComponent === edge.from)) {
+                        
+                        const fromData = window.workspaceManager.getConnectionData(connectionData.from);
+                        const toData = window.workspaceManager.getConnectionData(connectionData.to);
+                        
+                        // 1. ÜBERSPANNUNG: 230V an 12V/24V LED
+                        if (this.isOvervoltage(fromData, toData, targetComponentId)) {
+                            return 'Überspannung: 230V an DC-LED';
+                        }
+                        
+                        // 2. FALSCHE POLARITÄT: Plus an Minus
+                        if (this.isWrongPolarity(fromData, toData, targetComponentId)) {
+                            return 'Falsche Polarität: Plus-Minus vertauscht';
+                        }
+                        
+                        // 3. KURZSCHLUSS: Direkte Plus-Minus Verbindung
+                        if (this.isShortCircuit(fromData, toData)) {
+                            return 'Kurzschluss: Plus direkt mit Minus verbunden';
+                        }
+                    }
+                }
+                
+                return null;
+            }
+            
+            isOvervoltage(fromData, toData, targetComponentId) {
+                const targetElement = document.getElementById(targetComponentId);
+                if (!targetElement) return false;
+                
+                const targetType = targetElement.dataset.componentType;
+                
+                // 230V AC an 12V/24V DC LED = Überspannung
+                if ((targetType === 'led_12v' || targetType === 'led_24v') &&
+                    (fromData.voltage === 230 || toData.voltage === 230)) {
+                    return true;
+                }
+                
+                // Spannung deutlich über Nennspannung
+                const expectedVoltage = targetType === 'led_12v' ? 12 : (targetType === 'led_24v' ? 24 : 0);
+                if (expectedVoltage > 0) {
+                    const maxVoltage = Math.max(fromData.voltage || 0, toData.voltage || 0);
+                    if (maxVoltage > expectedVoltage * 1.5) { // 50% Überspannung = Schaden
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+            
+            isWrongPolarity(fromData, toData, targetComponentId) {
+                // Plus-Output zu Minus-Input oder umgekehrt
+                if ((fromData.wireType === 'plus' && toData.wireType === 'minus') ||
+                    (fromData.wireType === 'minus' && toData.wireType === 'plus')) {
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            isShortCircuit(fromData, toData) {
+                // Direkte Plus-Minus Verbindung ohne Verbraucher
+                if ((fromData.wireType === 'plus' && toData.wireType === 'minus') ||
+                    (fromData.wireType === 'minus' && toData.wireType === 'plus')) {
+                    return true;
+                }
+                
+                return false;
             }
             
             calculateComponentPower(componentId) {
@@ -2300,13 +2412,11 @@
                 const targetComponentId = targetComponent ? targetComponent.id : 'unknown';
                 const inputData = this.getConnectionData(inputSocket);
                 
-                // VALIDIERUNG VOR VERBINDUNGSERSTELLUNG
+                // GEFÄHRLICHE VERBINDUNGEN ERLAUBEN ABER WARNEN
                 const validation = this.validateConnection(this.activeConnection.outputLine, inputSocket);
                 if (!validation.valid) {
-                    console.log('❌ Verbindung ABGELEHNT:', validation.reason);
-                    alert(`⚠️ Verbindung nicht möglich:\n${validation.reason}`);
-                    this.cancelConnection();
-                    return;
+                    console.log('⚠️ Gefährliche Verbindung wird erstellt:', validation.reason);
+                    // KEINE Blockierung - Verbindung wird trotzdem erstellt!
                 }
                 
                 console.log('✅ Verbindung erfolgreich:', 
@@ -3572,7 +3682,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.44 - Physics: Korrekte Schaltungsvalidierung implementiert...');
+            console.log('🚀 LED Foundation v0.00.45 - Learning: Gefährliche Verbindungen erlaubt, LEDs können kaputt gehen...');
             
             // 1. Circuit Simulation initialisieren
             try {
