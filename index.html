@@ -978,7 +978,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.48</div>
+                <div class="version-display">v0.00.48a</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2617,7 +2617,10 @@
                 
                 // LED: Braucht plus UND minus Anschluss
                 if (componentType === 'led_12v' || componentType === 'led_24v') {
-                    return this.hasRequiredLEDConnections(componentId);
+                    console.log(`🔍 isCircuitComplete: Prüfe LED ${componentId}...`);
+                    const result = this.hasRequiredLEDConnections(componentId);
+                    console.log(`🔍 isCircuitComplete: LED ${componentId} → ${result}`);
+                    return result;
                 }
                 
                 return true; // Andere Komponenten haben keine speziellen Anforderungen
