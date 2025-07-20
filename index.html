@@ -718,68 +718,7 @@
             fill: #e91e63 !important;
         }
 
-        /* Rauch-Animationen für kaputte LEDs */
-        .smoke-group {
-            animation: smokeFloat 5s infinite linear;
-        }
-        
-        .smoke-group-alt {
-            animation: smokeFloatAlt 5s infinite linear;
-        }
-        
-        .smoke-1 {
-            animation-delay: 0s;
-        }
-        
-        .smoke-2 {
-            animation-delay: 0.5s;
-        }
-        
-        .smoke-3 {
-            animation-delay: 1s;
-        }
-        
-        .smoke-alt-1 {
-            animation-delay: 0s;
-        }
-        
-        .smoke-alt-2 {
-            animation-delay: 0.5s;
-        }
-        
-        .smoke-alt-3 {
-            animation-delay: 1s;
-        }
-        
-        @keyframes smokeFloat {
-            0% { 
-                opacity: 0.7; 
-                transform: translate(0, 0) scale(0.8) rotate(0deg); 
-            }
-            50% { 
-                opacity: 0.4; 
-                transform: translate(0, -15) scale(1.1) rotate(5deg); 
-            }
-            100% { 
-                opacity: 0; 
-                transform: translate(0, -30) scale(1.4) rotate(10deg); 
-            }
-        }
-        
-        @keyframes smokeFloatAlt {
-            0% { 
-                opacity: 0.6; 
-                transform: translate(0, 0) scale(0.9) rotate(0deg); 
-            }
-            50% { 
-                opacity: 0.3; 
-                transform: translate(0, -18) scale(1.2) rotate(-7deg); 
-            }
-            100% { 
-                opacity: 0; 
-                transform: translate(0, -35) scale(1.6) rotate(-12deg); 
-            }
-        }
+
 
         /* Connection States */
         .connection-socket.connected,
@@ -1039,7 +978,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.42</div>
+                <div class="version-display">v0.00.43</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1216,7 +1155,7 @@
                 this.blinkInterval = null;
                 this.blinkState = true;
                 
-                // Rauch-Animation: Nur noch CSS-basiert (im SVG)
+
                 
                 // Initial state CSS setzen
                 this.applyStateCSS();
@@ -1242,7 +1181,6 @@
                 if (previousState !== this.state) {
                     this.animateStateChange();
                     this.updateBlinkAnimation();
-                    this.updateSmokeAnimation();
                 }
             }
             
@@ -1410,39 +1348,7 @@
                 return state === ComponentStates.BLINKING ? `url(#${strongFilterId})` : `url(#${filterId})`;
             }
             
-            updateSmokeAnimation() {
-                console.log(`🔧 updateSmokeAnimation: State=${this.state}, BROKEN=${ComponentStates.BROKEN}`);
-                const element = document.getElementById(this.elementId);
-                console.log(`🔍 Element gefunden: ${!!element}, ID: ${this.elementId}`);
-                if (!element) return;
-                
-                const smokeContainer = element.querySelector('.smoke-container');
-                console.log(`🔍 SmokeContainer gefunden: ${!!smokeContainer}`);
-                if (smokeContainer) {
-                    console.log(`📊 Aktueller Display-Style: ${smokeContainer.style.display}`);
-                    console.log(`📊 Computed Display: ${getComputedStyle(smokeContainer).display}`);
-                }
-                
-                if (!smokeContainer) {
-                    console.log(`⚠️ Kein Rauch-Container im SVG gefunden - Suche alle .smoke-container`);
-                    const allSmokeContainers = document.querySelectorAll('.smoke-container');
-                    console.log(`📊 Gesamt .smoke-container im DOM: ${allSmokeContainers.length}`);
-                    return;
-                }
-                
-                if (this.state === ComponentStates.BROKEN) {
-                    console.log(`💨 State ist BROKEN - Zeige Rauch`);
-                    smokeContainer.style.display = 'block';
-                    console.log(`✅ Rauch-Display gesetzt auf: ${smokeContainer.style.display}`);
-                    
-                    // FORCE-TEST: Auch via setAttribute versuchen
-                    smokeContainer.setAttribute('style', 'display: block !important;');
-                    console.log(`🔧 Force-Style gesetzt via setAttribute`);
-                } else {
-                    console.log(`🧹 State ist nicht BROKEN - Verstecke Rauch`);
-                    smokeContainer.style.display = 'none';
-                }
-            }
+
             
             createSmokeOverlay() {
                 const element = document.getElementById(this.elementId);
@@ -2106,7 +2012,7 @@
                 // Verbindungen sofort nach Rotation aktualisieren
                 this.updateConnectionsForComponent(component);
                 
-                // Rauch rotiert automatisch mit SVG - keine Updates nötig
+
                 
                 console.log(`🔄 Bauteil ${component.id} gedreht auf ${currentRotation}°`);
             }
@@ -2656,7 +2562,7 @@
             dragElement.style.left = (e.clientX - dragOffset.x) + 'px';
             dragElement.style.top = (e.clientY - dragOffset.y) + 'px';
             
-            // Rauch bewegt sich automatisch mit SVG - keine Drag-Updates nötig
+
         }
 
         function endDrag(e) {
@@ -2990,21 +2896,7 @@
                     </filter>
                 </defs>
                 
-                <!-- TEST-RAUCH (versteckt per CSS) -->
-                <g class="smoke-container" style="display: none;">
-                    <!-- SICHTBARE ELEMENTE INNERHALB DER VIEWBOX -->
-                    <rect x="40" y="5" width="15" height="8" fill="#000" opacity="1.0"/>
-                    <rect x="60" y="5" width="15" height="8" fill="#000" opacity="1.0"/>
-                    <rect x="80" y="5" width="15" height="8" fill="#000" opacity="1.0"/>
-                    
-                    <!-- DEBUG: Rote Kreise ÜBER den LEDs (innerhalb ViewBox) -->
-                    <circle cx="44.73" cy="5" r="3" fill="red" opacity="1.0"/>
-                    <circle cx="67.455" cy="5" r="3" fill="red" opacity="1.0"/>
-                    <circle cx="90.18" cy="5" r="3" fill="red" opacity="1.0"/>
-                    
-                    <!-- TEST: Großer grüner Balken INNERHALB der ViewBox -->
-                    <rect x="20" y="1" width="90" height="3" fill="lime" opacity="1.0"/>
-                </g>
+
                 
                 <g>
                     <!-- Anschlusskabel Links -->
@@ -3292,38 +3184,7 @@
                     </filter>
                 </defs>
                 
-                <!-- RAUCH-ELEMENTE (versteckt per CSS) -->
-                <g class="smoke-container" style="display: none;">
-                    <!-- Rauch über LED 1 (44.73, 13.77) -->
-                    <g transform="translate(44.73, 13.77)">
-                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
-                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
-                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
-                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
-                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
-                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
-                    </g>
-                    
-                    <!-- Rauch über LED 2 (67.455, 13.77) -->
-                    <g transform="translate(67.455, 13.77)">
-                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
-                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
-                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
-                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
-                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
-                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
-                    </g>
-                    
-                    <!-- Rauch über LED 3 (90.18, 13.77) -->
-                    <g transform="translate(90.18, 13.77)">
-                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
-                              d="M0,-25 Q-3,-20 2,-15 Q3,-10 0,-5 Q-2,-2 0,0"/>
-                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
-                              d="M-2,-23 Q2,-18 -1,-13 Q-2,-8 1,-3 Q2,-1 0,0"/>
-                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
-                              d="M1,-24 Q-2,-19 3,-14 Q1,-9 -1,-4 Q-1,-2 0,0"/>
-                    </g>
-                </g>
+
                 
                 <g>
                     <!-- Anschlusskabel Links -->
@@ -3494,7 +3355,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.42 - ViewBox-Fix: Elemente innerhalb sichtbarem Bereich...');
+            console.log('🚀 LED Foundation v0.00.43 - Cleanup: Alle Rauch-Reste entfernt...');
             
             // 1. Circuit Simulation initialisieren
             try {
