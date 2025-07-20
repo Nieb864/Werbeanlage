@@ -978,7 +978,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.47</div>
+                <div class="version-display">v0.00.48</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1560,18 +1560,18 @@
                     
                     if (!component || !stateMachine) continue;
                     
-                    // 🔍 GEFÄHRLICHE VERBINDUNGEN: Prüfe auf Schäden
+                    // 🔍 ERST: Unvollständige Schaltung prüfen (falsche Polarität = unvollständig)
+                    if (!this.isComponentProperlyConnected(componentId)) {
+                        console.log(`⚠️ ${componentId} nicht vollständig angeschlossen - bleibt AUS`);
+                        stateMachine.updateState(0, 0);
+                        continue;
+                    }
+                    
+                    // 🔍 DANN: Gefährliche Verbindungen prüfen (nur bei vollständigen Schaltungen)
                     const dangerousCondition = this.checkForDangerousConditions(componentId);
                     if (dangerousCondition) {
                         console.log(`💥 ${componentId} BESCHÄDIGT durch: ${dangerousCondition}`);
                         stateMachine.setState(ComponentStates.BROKEN);
-                        continue;
-                    }
-                    
-                    // 🔍 UNVOLLSTÄNDIGE SCHALTUNG: Bleibt AUS aber wird nicht kaputt
-                    if (!this.isComponentProperlyConnected(componentId)) {
-                        console.log(`⚠️ ${componentId} nicht vollständig angeschlossen - bleibt AUS`);
-                        stateMachine.updateState(0, 0);
                         continue;
                     }
                     
@@ -2662,16 +2662,26 @@
             
             hasCorrectLEDPolarity(ledId) {
                 const led = document.getElementById(ledId);
-                if (!led) return false;
+                if (!led) {
+                    console.log(`❌ LED ${ledId}: Element nicht gefunden`);
+                    return false;
+                }
                 
-                const plusInput = led.querySelector('[data-connection-id="in-plus"]');
-                const minusInput = led.querySelector('[data-connection-id="in-minus"]');
+                // Prüfe alle Verbindungen zu diesem LED via window.workspaceManager
+                if (!window.workspaceManager || !window.workspaceManager.connections) {
+                    console.log(`❌ LED ${ledId}: WorkspaceManager.connections nicht verfügbar`);
+                    return false;
+                }
+                
+                console.log(`🔍 LED ${ledId}: Prüfe ${window.workspaceManager.connections.size} Verbindungen auf Polarität`);
                 
                 // Prüfe alle Verbindungen zu diesem LED
-                for (const [connId, connectionData] of this.connections) {
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
                     if (connectionData.toComponent === ledId) {
-                        const fromData = this.getConnectionData(connectionData.from);
-                        const toData = this.getConnectionData(connectionData.to);
+                        const fromData = window.workspaceManager.getConnectionData(connectionData.from);
+                        const toData = window.workspaceManager.getConnectionData(connectionData.to);
+                        
+                        console.log(`🔍 LED ${ledId}: Verbindung ${fromData.wireType} → ${toData.wireType}`);
                         
                         // Plus-Ausgang sollte zu Plus-Eingang
                         if (fromData.wireType === 'plus' && toData.wireType === 'minus') {
@@ -3731,7 +3741,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.47 - Polarität: Falsche Polarität macht LED nicht kaputt...');
+            console.log('🚀 LED Foundation v0.00.48 - Debug: Polaritätsprüfung und Reihenfolge korrigiert...');
             
             // 1. Circuit Simulation initialisieren
             try {
