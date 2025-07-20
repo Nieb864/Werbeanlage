@@ -2200,8 +2200,10 @@
 
         function initializeDragAndDrop() {
             const componentItems = document.querySelectorAll('.component-item');
-            
-            componentItems.forEach(item => {
+            console.log('🔧 Gefundene Component Items:', componentItems.length);
+            componentItems.forEach((item, index) => {
+                const type = item.getAttribute('data-component-type');
+                console.log(`📦 Item ${index}: ${type}`);
                 item.addEventListener('mousedown', startDrag);
             });
             
@@ -2214,6 +2216,7 @@
             
             const componentType = e.currentTarget.getAttribute('data-component-type');
             console.log('🎯 Drag gestartet für Typ:', componentType);
+            console.log('🔍 Element:', e.currentTarget);
             
             const svg = createComponentSVG(componentType);
             
