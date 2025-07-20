@@ -952,7 +952,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.26</div>
+                <div class="version-display">v0.00.27</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1205,8 +1205,10 @@
                 
                 // Starte Blink-Animation nur bei BLINKING state
                 if (this.state === ComponentStates.BLINKING) {
+                    console.log(`🟠 Starte Blink-Animation für ${this.elementId}`);
                     this.blinkInterval = setInterval(() => {
                         this.blinkState = !this.blinkState;
+                        console.log(`🔄 Blink ${this.elementId}: ${this.blinkState}`);
                         this.applyDynamicColors();
                     }, 500); // Blinkt alle 500ms wie im React-Code
                 } else {
@@ -1217,13 +1219,19 @@
             
             applyDynamicColors() {
                 const element = document.getElementById(this.elementId);
-                if (!element) return;
+                if (!element) {
+                    console.log(`❌ Element nicht gefunden: ${this.elementId}`);
+                    return;
+                }
                 
                 const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
+                console.log(`🎨 Färbe ${ledCenters.length} LEDs für ${this.elementId}, State: ${this.state}, Blink: ${this.blinkState}`);
                 
                 ledCenters.forEach(led => {
                     const color = this.getLedColor(this.state, this.blinkState);
                     const filter = this.getGlowEffect(this.state, this.blinkState);
+                    
+                    console.log(`💡 LED Farbe: ${color}, Filter: ${filter}`);
                     
                     led.setAttribute('fill', color);
                     if (filter) {
@@ -2688,7 +2696,9 @@
                     
                     <!-- Glow-Filter für LEDs -->
                     <filter id="ledGlow" x="-200%" y="-200%" width="500%" height="500%">
-                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feFlood flood-color="#ffff00" flood-opacity="0.8" result="glowColor"/>
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+                        <feComposite in="glowColor" in2="blur" operator="in" result="coloredBlur"/>
                         <feMerge> 
                             <feMergeNode in="coloredBlur"/>
                             <feMergeNode in="coloredBlur"/>
@@ -2697,7 +2707,9 @@
                     </filter>
                     
                     <filter id="ledGlowStrong" x="-200%" y="-200%" width="500%" height="500%">
-                        <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                        <feFlood flood-color="#ffff00" flood-opacity="1.0" result="glowColor"/>
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+                        <feComposite in="glowColor" in2="blur" operator="in" result="coloredBlur"/>
                         <feMerge> 
                             <feMergeNode in="coloredBlur"/>
                             <feMergeNode in="coloredBlur"/>
@@ -2969,7 +2981,9 @@
                     
                     <!-- Glow-Filter für LEDs -->
                     <filter id="ledGlow24" x="-200%" y="-200%" width="500%" height="500%">
-                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                        <feFlood flood-color="#ffff00" flood-opacity="0.8" result="glowColor"/>
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+                        <feComposite in="glowColor" in2="blur" operator="in" result="coloredBlur"/>
                         <feMerge> 
                             <feMergeNode in="coloredBlur"/>
                             <feMergeNode in="coloredBlur"/>
@@ -2978,7 +2992,9 @@
                     </filter>
                     
                     <filter id="ledGlowStrong24" x="-200%" y="-200%" width="500%" height="500%">
-                        <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                        <feFlood flood-color="#ffff00" flood-opacity="1.0" result="glowColor"/>
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+                        <feComposite in="glowColor" in2="blur" operator="in" result="coloredBlur"/>
                         <feMerge> 
                             <feMergeNode in="coloredBlur"/>
                             <feMergeNode in="coloredBlur"/>
@@ -3156,7 +3172,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.26 - React-Animationen: JS-Blinken + SVG-Glow...');
+            console.log('🚀 LED Foundation v0.00.27 - Glow-Fix: Gelber Glow + Blink-Debug...');
             
             // 1. Circuit Simulation initialisieren
             try {
