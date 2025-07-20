@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- CACHE-BUST: 2024-12-20-17:33:00 -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -978,7 +979,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.48b</div>
+                <div class="version-display">v0.00.48c</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3755,7 +3756,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.48 - Debug: Polaritätsprüfung und Reihenfolge korrigiert...');
+            console.log('🚀 LED Foundation v0.00.48c-CACHE-BUST - Erzwungenes Update mit Debug-Logs...');
             
             // 1. Circuit Simulation initialisieren
             try {
@@ -3814,6 +3815,14 @@
             }
             
             console.log('🎉 LED-Lernspiel vollständig initialisiert!');
+            
+            // 🚨 CACHE-BUST TEST: Prüfe ob neue hasRequiredLEDConnections da ist
+            if (window.workspaceManager && window.workspaceManager.hasRequiredLEDConnections) {
+                console.log('🚨 CACHE-BUST: hasRequiredLEDConnections Funktion gefunden!');
+                console.log('🚨 CACHE-BUST: Funktionslänge:', window.workspaceManager.hasRequiredLEDConnections.toString().length);
+            } else {
+                console.log('❌ CACHE-BUST: hasRequiredLEDConnections NICHT gefunden!');
+            }
             
             // Status-Report ausgeben
             outputStatusReport();
