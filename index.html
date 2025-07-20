@@ -978,7 +978,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.43</div>
+                <div class="version-display">v0.00.44</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1549,6 +1549,13 @@
                     
                     if (!component || !stateMachine) continue;
                     
+                    // 🔍 SCHALTUNGSVALIDIERUNG: Prüfe ob Bauteil komplett angeschlossen ist
+                    if (!this.isComponentProperlyConnected(componentId)) {
+                        console.log(`⚠️ ${componentId} nicht vollständig angeschlossen - bleibt AUS`);
+                        stateMachine.updateState(0, 0);
+                        continue;
+                    }
+                    
                     let voltage = 0;
                     let current = 0;
                     
@@ -1556,8 +1563,15 @@
                         voltage = ComponentSpecs[component.type].voltage;
                         current = this.calculateSourceCurrent(componentId);
                     } else if (ComponentSpecs[component.type].type === 'transformer') {
-                        voltage = ComponentSpecs[component.type].inputVoltage;
-                        current = this.calculateTransformerCurrent(componentId);
+                        // 🔍 TRAFO: Nur funktionsfähig wenn Input UND Output korrekt angeschlossen
+                        if (this.hasValidTransformerConnections(componentId)) {
+                            voltage = ComponentSpecs[component.type].inputVoltage;
+                            current = this.calculateTransformerCurrent(componentId);
+                        } else {
+                            console.log(`⚠️ Trafo ${componentId} hat ungültige Verbindungen`);
+                            voltage = 0;
+                            current = 0;
+                        }
                     } else {
                         const result = this.calculateComponentPower(componentId);
                         voltage = result.voltage;
@@ -1566,6 +1580,51 @@
                     
                     stateMachine.updateState(voltage, current);
                 }
+            }
+            
+            isComponentProperlyConnected(componentId) {
+                // Benutze WorkspaceManager-Validierung wenn verfügbar
+                if (window.workspaceManager && window.workspaceManager.isCircuitComplete) {
+                    return window.workspaceManager.isCircuitComplete(componentId);
+                }
+                
+                // Fallback: Grundlegende Verbindungsprüfung
+                const component = this.graph.nodes.get(componentId);
+                if (!component) return false;
+                
+                // Transformer braucht mindestens 2 Verbindungen (Input)
+                if (ComponentSpecs[component.type].type === 'transformer') {
+                    return component.connections.size >= 2;
+                }
+                
+                // LEDs brauchen mindestens 2 Verbindungen (Plus + Minus)
+                if (ComponentSpecs[component.type].type === 'load') {
+                    return component.connections.size >= 2;
+                }
+                
+                return true;
+            }
+            
+            hasValidTransformerConnections(transformerId) {
+                // Prüfe ob sowohl Input als auch Output korrekt angeschlossen sind
+                if (window.workspaceManager && window.workspaceManager.hasRequiredTransformerConnections) {
+                    const hasInput = window.workspaceManager.hasRequiredTransformerConnections(transformerId);
+                    
+                    // Zusätzlich: Mindestens 1 Output muss angeschlossen sein
+                    const transformer = document.getElementById(transformerId);
+                    if (!transformer) return false;
+                    
+                    const plusOutput = transformer.querySelector('[data-connection-id="out-plus"]');
+                    const minusOutput = transformer.querySelector('[data-connection-id="out-minus"]');
+                    
+                    const hasOutput = window.workspaceManager.hasActiveConnection(plusOutput) || 
+                                     window.workspaceManager.hasActiveConnection(minusOutput);
+                    
+                    console.log(`🔍 Trafo ${transformerId}: Input=${hasInput}, Output=${hasOutput}`);
+                    return hasInput && hasOutput;
+                }
+                
+                return true; // Fallback wenn WorkspaceManager nicht verfügbar
             }
             
             calculateComponentPower(componentId) {
@@ -2241,6 +2300,15 @@
                 const targetComponentId = targetComponent ? targetComponent.id : 'unknown';
                 const inputData = this.getConnectionData(inputSocket);
                 
+                // VALIDIERUNG VOR VERBINDUNGSERSTELLUNG
+                const validation = this.validateConnection(this.activeConnection.outputLine, inputSocket);
+                if (!validation.valid) {
+                    console.log('❌ Verbindung ABGELEHNT:', validation.reason);
+                    alert(`⚠️ Verbindung nicht möglich:\n${validation.reason}`);
+                    this.cancelConnection();
+                    return;
+                }
+                
                 console.log('✅ Verbindung erfolgreich:', 
                     `${this.activeConnection.componentId}.${this.activeConnection.outputData.id}`, 
                     '→', 
@@ -2248,6 +2316,13 @@
                 
                 this.createBezierConnection(this.activeConnection.outputLine, inputSocket, targetComponent);
                 this.cancelConnection();
+                
+                // Nach der Verbindung: Physik neu berechnen
+                if (circuit) {
+                    setTimeout(() => {
+                        circuit.physics.calculateCircuit();
+                    }, 100);
+                }
             }
             
             createBezierConnection(outputLine, inputSocket, targetComponent) {
@@ -2335,6 +2410,148 @@
                     console.log('❌ Verbindung abgebrochen');
                     this.activeConnection = null;
                 }
+            }
+            
+            // ===== VERBINDUNGS-VALIDIERUNG =====
+            validateConnection(outputElement, inputElement) {
+                const outputData = this.getConnectionData(outputElement);
+                const inputData = this.getConnectionData(inputElement);
+                
+                console.log('🔍 Validiere Verbindung:', outputData, '→', inputData);
+                
+                // 1. KABEL-TYP KOMPATIBILITÄT
+                if (!this.areWireTypesCompatible(outputData.wireType, inputData.wireType)) {
+                    console.log('❌ Inkompatible Kabeltypen:', outputData.wireType, '≠', inputData.wireType);
+                    return { valid: false, reason: `Kabeltypen inkompatibel: ${outputData.wireType} ≠ ${inputData.wireType}` };
+                }
+                
+                // 2. SPANNUNGS-KOMPATIBILITÄT  
+                if (!this.areVoltagesCompatible(outputData.voltage, inputData.voltage)) {
+                    console.log('❌ Inkompatible Spannungen:', outputData.voltage, '≠', inputData.voltage);
+                    return { valid: false, reason: `Spannungen inkompatibel: ${outputData.voltage}V ≠ ${inputData.voltage}V` };
+                }
+                
+                // 3. KURZSCHLUSS-PRÜFUNG
+                if (this.wouldCreateShortCircuit(outputData, inputData)) {
+                    console.log('❌ Kurzschluss erkannt!');
+                    return { valid: false, reason: 'Kurzschluss: Plus und Minus direkt verbunden!' };
+                }
+                
+                console.log('✅ Verbindung ist gültig');
+                return { valid: true };
+            }
+            
+            areWireTypesCompatible(outputType, inputType) {
+                // Gleiche Typen sind immer kompatibel
+                if (outputType === inputType) return true;
+                
+                // AC-Kompatibilität: phase/neutral/earth können teilweise kombiniert werden
+                const acTypes = ['phase', 'neutral', 'earth'];
+                const dcTypes = ['plus', 'minus'];
+                
+                // AC zu DC oder DC zu AC ist NICHT kompatibel
+                if (acTypes.includes(outputType) && dcTypes.includes(inputType)) return false;
+                if (dcTypes.includes(outputType) && acTypes.includes(inputType)) return false;
+                
+                return true;
+            }
+            
+            areVoltagesCompatible(outputVoltage, inputVoltage) {
+                // Spannungen müssen exakt übereinstimmen (±5% Toleranz)
+                const tolerance = 0.05;
+                const minVoltage = inputVoltage * (1 - tolerance);
+                const maxVoltage = inputVoltage * (1 + tolerance);
+                
+                return outputVoltage >= minVoltage && outputVoltage <= maxVoltage;
+            }
+            
+            wouldCreateShortCircuit(outputData, inputData) {
+                // Plus zu Minus = Kurzschluss
+                if ((outputData.wireType === 'plus' && inputData.wireType === 'minus') ||
+                    (outputData.wireType === 'minus' && inputData.wireType === 'plus')) {
+                    return true;
+                }
+                
+                // Phase zu Neutral ohne Verbraucher = Kurzschluss  
+                if ((outputData.wireType === 'phase' && inputData.wireType === 'neutral') ||
+                    (outputData.wireType === 'neutral' && inputData.wireType === 'phase')) {
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            isCircuitComplete(componentId) {
+                const component = document.getElementById(componentId);
+                if (!component) return false;
+                
+                const componentType = component.dataset.componentType;
+                
+                // TRAFO: Braucht mindestens phase+neutral Eingang UND mindestens 1 Ausgang
+                if (componentType === 'transformer_12v' || componentType === 'transformer_24v') {
+                    return this.hasRequiredTransformerConnections(componentId);
+                }
+                
+                // LED: Braucht plus UND minus Anschluss
+                if (componentType === 'led_12v' || componentType === 'led_24v') {
+                    return this.hasRequiredLEDConnections(componentId);
+                }
+                
+                return true; // Andere Komponenten haben keine speziellen Anforderungen
+            }
+            
+            hasRequiredTransformerConnections(transformerId) {
+                const transformer = document.getElementById(transformerId);
+                if (!transformer) return false;
+                
+                // Prüfe Eingänge: phase UND neutral müssen verbunden sein
+                const phaseInput = transformer.querySelector('[data-connection-id="in-phase"]');
+                const neutralInput = transformer.querySelector('[data-connection-id="in-neutral"]');
+                
+                const hasPhaseConnection = this.hasActiveConnection(phaseInput);
+                const hasNeutralConnection = this.hasActiveConnection(neutralInput);
+                
+                console.log(`🔍 Trafo ${transformerId}: Phase=${hasPhaseConnection}, Neutral=${hasNeutralConnection}`);
+                
+                return hasPhaseConnection && hasNeutralConnection;
+            }
+            
+            hasRequiredLEDConnections(ledId) {
+                const led = document.getElementById(ledId);
+                if (!led) return false;
+                
+                // Prüfe: plus UND minus müssen verbunden sein
+                const plusInput = led.querySelector('[data-connection-id="in-plus"]');
+                const minusInput = led.querySelector('[data-connection-id="in-minus"]');
+                
+                const hasPlusConnection = this.hasActiveConnection(plusInput);
+                const hasMinusConnection = this.hasActiveConnection(minusInput);
+                
+                console.log(`🔍 LED ${ledId}: Plus=${hasPlusConnection}, Minus=${hasMinusConnection}`);
+                
+                return hasPlusConnection && hasMinusConnection;
+            }
+            
+            hasActiveConnection(connectionElement) {
+                if (!connectionElement) return false;
+                
+                const connectionId = connectionElement.dataset.connectionId;
+                const componentId = connectionElement.closest('.component')?.id;
+                
+                // Durchsuche alle aktiven Verbindungen
+                for (const [connId, connectionData] of this.connections) {
+                    // Prüfe ob diese Verbindung zu unserem Anschlusspunkt führt
+                    if (connectionData.toComponent === componentId && 
+                        connectionData.to.dataset.connectionId === connectionId) {
+                        return true;
+                    }
+                    if (connectionData.fromComponent === componentId && 
+                        connectionData.from.dataset.connectionId === connectionId) {
+                        return true;
+                    }
+                }
+                
+                return false;
             }
             
             getConnectionData(element) {
@@ -3355,7 +3572,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.43 - Cleanup: Alle Rauch-Reste entfernt...');
+            console.log('🚀 LED Foundation v0.00.44 - Physics: Korrekte Schaltungsvalidierung implementiert...');
             
             // 1. Circuit Simulation initialisieren
             try {
