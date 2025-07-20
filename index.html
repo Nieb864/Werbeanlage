@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.63</div>
+                <div class="version-display">v0.00.64</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2071,15 +2071,24 @@
                             // Suche rekursiv weiter nach anderen Stromquellen über diese kaputte LED
                         }
                         
-                        // Prüfe ob die andere LED eine gültige Spannungsquelle hat (auch wenn sie kaputt ist - Durchleitung!)
+                        // Prüfe ob die andere LED eine gültige UND SICHERE Spannungsquelle hat
                         const otherLEDPower = this.findPowerSourceForLED(connectedId, visited);
                         if (otherLEDPower) {
-                            if (otherLEDState === 'broken') {
-                                console.log(`⚡ LED ${ledId}: Bekommt Spannung über KAPUTTE LED ${connectedId} (Kontakte leiten weiter)`);
-                            } else {
-                                console.log(`✅ LED ${ledId}: Bekommt Spannung über Parallelschaltung von LED ${connectedId}`);
+                            // 🚨 SICHERHEITSCHECK: Keine gefährlichen Spannungen weiterleiten!
+                            if (otherLEDPower.sourceType === 'stromquelle') {
+                                console.log(`🚫 LED ${ledId}: Andere LED ${connectedId} hat gefährliche 230V-Quelle - NICHT weiterleiten!`);
+                                continue; // Suche nach sicheren Alternativen
                             }
-                            return otherLEDPower;
+                            
+                            // Nur sichere Trafo-Quellen weiterleiten
+                            if (otherLEDPower.sourceType === 'trafo') {
+                                if (otherLEDState === 'broken') {
+                                    console.log(`⚡ LED ${ledId}: Bekommt SICHERE ${otherLEDPower.voltage}V über KAPUTTE LED ${connectedId} (Kontakte leiten weiter)`);
+                                } else {
+                                    console.log(`✅ LED ${ledId}: Bekommt SICHERE ${otherLEDPower.voltage}V über Parallelschaltung von LED ${connectedId}`);
+                                }
+                                return otherLEDPower;
+                            }
                         }
                     }
                 }
@@ -4479,7 +4488,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.63 - PARALLELSCHALTUNG REALISTISCH: Kaputte LEDs blockieren andere nicht...');
+            console.log('🚀 LED Foundation v0.00.64 - SICHERHEITSFIX: Gefährliche 230V werden nicht über Parallelschaltung weitergeleitet...');
             
             // 1. Circuit Simulation initialisieren
             try {
