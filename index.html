@@ -952,7 +952,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.27</div>
+                <div class="version-display">v0.00.28</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1131,7 +1131,11 @@
                 
                 // Initial state CSS setzen
                 this.applyStateCSS();
-                this.applyDynamicColors();
+                
+                // Warte kurz bis SVG im DOM ist, dann färbe
+                setTimeout(() => {
+                    this.applyDynamicColors();
+                }, 100);
             }
             
             updateState(voltage, current) {
@@ -1158,18 +1162,24 @@
                 const ratedVoltage = this.specs.ratedVoltage;
                 const tolerance = this.specs.tolerance;
                 
+                console.log(`🔍 LED State Calc: ${voltage}V für ${ratedVoltage}V LED (tolerance: ${tolerance})`);
+                
                 if (voltage > ratedVoltage * (1 + tolerance * 3)) {
+                    console.log(`🔴 BROKEN: ${voltage}V > ${ratedVoltage * (1 + tolerance * 3)}V`);
                     return ComponentStates.BROKEN;
                 }
                 
                 if (voltage > ratedVoltage * (1 + tolerance)) {
+                    console.log(`🟠 BLINKING: ${voltage}V > ${ratedVoltage * (1 + tolerance)}V`);
                     return ComponentStates.BLINKING;
                 }
                 
                 if (voltage >= ratedVoltage * (1 - tolerance)) {
+                    console.log(`🟡 ON: ${voltage}V >= ${ratedVoltage * (1 - tolerance)}V`);
                     return ComponentStates.ON;
                 }
                 
+                console.log(`⚫ OFF: ${voltage}V < ${ratedVoltage * (1 - tolerance)}V`);
                 return ComponentStates.OFF;
             }
             
@@ -1227,18 +1237,25 @@
                 const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
                 console.log(`🎨 Färbe ${ledCenters.length} LEDs für ${this.elementId}, State: ${this.state}, Blink: ${this.blinkState}`);
                 
-                ledCenters.forEach(led => {
+                ledCenters.forEach((led, index) => {
                     const color = this.getLedColor(this.state, this.blinkState);
                     const filter = this.getGlowEffect(this.state, this.blinkState);
                     
-                    console.log(`💡 LED Farbe: ${color}, Filter: ${filter}`);
+                    console.log(`💡 LED ${index}: Farbe ${color}, Filter ${filter}`);
                     
-                    led.setAttribute('fill', color);
+                    // Direkte Style-Manipulation um CSS zu überschreiben
+                    led.style.fill = color + ' !important';
+                    
                     if (filter) {
+                        led.style.filter = filter;
                         led.setAttribute('filter', filter);
                     } else {
+                        led.style.filter = '';
                         led.removeAttribute('filter');
                     }
+                    
+                    // Zusätzlich auch das Attribut setzen
+                    led.setAttribute('fill', color);
                 });
             }
             
@@ -3172,7 +3189,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.27 - Glow-Fix: Gelber Glow + Blink-Debug...');
+            console.log('🚀 LED Foundation v0.00.28 - LED-Farbe Fix: Style + State-Debug...');
             
             // 1. Circuit Simulation initialisieren
             try {
