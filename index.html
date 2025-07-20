@@ -1039,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.33</div>
+                <div class="version-display">v0.00.35</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1218,6 +1218,7 @@
                 
                 // Rauch-Animation State
                 this.smokeElements = [];
+                this.smokeOverlay = null;
                 
                 // Initial state CSS setzen
                 this.applyStateCSS();
@@ -1414,91 +1415,91 @@
             updateSmokeAnimation() {
                 console.log(`🔧 updateSmokeAnimation: State=${this.state}, BROKEN=${ComponentStates.BROKEN}`);
                 if (this.state === ComponentStates.BROKEN) {
-                    console.log(`💨 State ist BROKEN - Erstelle Rauch-Effekte`);
-                    this.createSmokeEffects();
+                    console.log(`💨 State ist BROKEN - Erstelle Rauch-Overlay`);
+                    this.createSmokeOverlay();
                 } else {
-                    console.log(`🧹 State ist nicht BROKEN - Entferne Rauch-Effekte`);
-                    this.removeSmokeEffects();
+                    console.log(`🧹 State ist nicht BROKEN - Entferne Rauch-Overlay`);
+                    this.removeSmokeOverlay();
                 }
             }
             
-            createSmokeEffects() {
+            createSmokeOverlay() {
                 const element = document.getElementById(this.elementId);
-                console.log(`🔍 createSmokeEffects: Element=${!!element}, Type=${this.specs.type}`);
-                if (!element || this.specs.type !== 'load') {
-                    console.log(`❌ Rauch-Erstellung abgebrochen: Element=${!!element}, Type=${this.specs.type}`);
+                console.log(`🔍 createSmokeOverlay: Element=${!!element}, Type=${this.specs.type}`);
+                if (!element || this.specs.type !== 'load' || this.smokeOverlay) {
+                    console.log(`❌ Rauch-Overlay abgebrochen: Element=${!!element}, Type=${this.specs.type}, Exists=${!!this.smokeOverlay}`);
                     return;
                 }
                 
-                const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
-                console.log(`🔍 LED-Centers gefunden: ${ledCenters.length}`);
-                
-                ledCenters.forEach((led, index) => {
-                    if (this.smokeElements[index]) {
-                        console.log(`⚠️ Rauch bereits vorhanden für LED ${index}`);
-                        return; // Rauch bereits vorhanden
-                    }
-                    
-                    const ledRect = led.getBoundingClientRect();
-                    const elementRect = element.getBoundingClientRect();
-                    
-                    const relativeX = ledRect.left - elementRect.left + ledRect.width / 2;
-                    const relativeY = ledRect.top - elementRect.top + ledRect.height / 2;
-                    
-                    console.log(`📍 LED ${index} Position: (${relativeX}, ${relativeY})`);
-                    
-                    const smokeContainer = this.createSmokeElement(relativeX, relativeY);
-                    element.appendChild(smokeContainer);
-                    this.smokeElements[index] = smokeContainer;
-                    
-                    console.log(`💨 Rauch-Effekt erstellt für LED ${index} bei (${relativeX}, ${relativeY})`);
-                });
-            }
-            
-            createSmokeElement(centerX, centerY) {
-                const smokeContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                smokeContainer.setAttribute('class', 'smoke-container');
-                smokeContainer.setAttribute('transform', `translate(${centerX}, ${centerY})`);
-                
-                // Rauchpfad als reiner SVG-Path
-                const smokePath = "M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z";
-                
-                // 6 Rauchschichten direkt als SVG-Paths
-                smokeContainer.innerHTML = `
-                    <!-- Erste Rauchserie -->
-                    <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
-                          transform="translate(-2.67, -18) scale(1.0)" 
-                          d="${smokePath}"/>
-                    <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
-                          transform="translate(-2.2, -16) scale(0.85)" 
-                          d="${smokePath}"/>
-                    <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
-                          transform="translate(-1.8, -14) scale(0.7)" 
-                          d="${smokePath}"/>
-                    
-                    <!-- Zweite Rauchserie - gespiegelt -->
-                    <path class="smoke-group-alt smoke-alt-1" fill="#222" opacity="0.7" 
-                          transform="translate(2.67, -18) scale(-1.0, 1.0)" 
-                          d="${smokePath}"/>
-                    <path class="smoke-group-alt smoke-alt-2" fill="#333" opacity="0.5" 
-                          transform="translate(2.4, -16) scale(-0.9, 1.0)" 
-                          d="${smokePath}"/>
-                    <path class="smoke-group-alt smoke-alt-3" fill="#444" opacity="0.3" 
-                          transform="translate(2.0, -15) scale(-0.75, 1.0)" 
-                          d="${smokePath}"/>
+                // Rauch-Overlay erstellen
+                this.smokeOverlay = document.createElement('div');
+                this.smokeOverlay.className = 'smoke-overlay';
+                this.smokeOverlay.innerHTML = `
+                    <svg width="80" height="100" style="overflow: visible;">
+                        <!-- Rauch-Pfade: Steigen vertikal nach oben -->
+                        <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
+                              d="M40,90 Q35,70 45,50 Q50,30 40,10 Q35,5 40,0"/>
+                        <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
+                              d="M35,85 Q40,65 30,45 Q25,25 35,5 Q40,0 35,-5"/>
+                        <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
+                              d="M45,88 Q30,68 50,48 Q55,28 45,8 Q40,3 45,-2"/>
+                              
+                        <!-- Gespiegelte Serie -->
+                        <path class="smoke-group-alt smoke-alt-1" fill="#222" opacity="0.7" 
+                              d="M38,92 Q43,72 33,52 Q28,32 38,12 Q43,7 38,2"/>
+                        <path class="smoke-group-alt smoke-alt-2" fill="#333" opacity="0.5" 
+                              d="M42,87 Q37,67 47,47 Q52,27 42,7 Q37,2 42,-3"/>
+                        <path class="smoke-group-alt smoke-alt-3" fill="#444" opacity="0.3" 
+                              d="M36,89 Q41,69 31,49 Q26,29 36,9 Q41,4 36,-1"/>
+                    </svg>
                 `;
                 
-                console.log(`🎨 SVG-Rauch erstellt mit transform="translate(${centerX}, ${centerY})"`);
-                return smokeContainer;
+                // Positionierung und Gegen-Rotation
+                this.updateSmokePosition();
+                
+                // Zum Workspace hinzufügen
+                document.getElementById('workspace').appendChild(this.smokeOverlay);
+                
+                console.log(`💨 Rauch-Overlay erstellt und positioniert`);
             }
             
-            removeSmokeEffects() {
-                this.smokeElements.forEach(smokeElement => {
-                    if (smokeElement && smokeElement.parentNode) {
-                        smokeElement.parentNode.removeChild(smokeElement);
+            updateSmokePosition() {
+                if (!this.smokeOverlay) return;
+                
+                const element = document.getElementById(this.elementId);
+                const ledCenter = element.querySelector('.cls-5, .led24-center');
+                if (!ledCenter) return;
+                
+                // Aktuelle Position berechnen
+                const ledRect = ledCenter.getBoundingClientRect();
+                const workspaceRect = document.getElementById('workspace').getBoundingClientRect();
+                
+                const centerX = ledRect.left - workspaceRect.left + ledRect.width / 2;
+                const centerY = ledRect.top - workspaceRect.top + ledRect.height / 2;
+                
+                // LED-Rotation abrufen
+                const rotation = window.workspaceManager?.componentRotations?.get(element) || 0;
+                
+                // Rauch-Overlay positionieren (mittig über LED)
+                this.smokeOverlay.style.position = 'absolute';
+                this.smokeOverlay.style.left = (centerX - 40) + 'px'; // 40 = halbe Rauch-Breite
+                this.smokeOverlay.style.top = (centerY - 50) + 'px';  // 50 = Rauch-Höhe Offset
+                this.smokeOverlay.style.transform = `rotate(${-rotation}deg)`; // GEGEN-Rotation!
+                this.smokeOverlay.style.pointerEvents = 'none';
+                this.smokeOverlay.style.zIndex = '100';
+                this.smokeOverlay.style.transformOrigin = '40px 50px'; // Rotation um LED-Zentrum
+                
+                console.log(`🔄 Rauch-Position update: (${centerX}, ${centerY}), LED-Rotation: ${rotation}°, Rauch-Rotation: ${-rotation}°`);
+            }
+            
+            removeSmokeOverlay() {
+                if (this.smokeOverlay) {
+                    if (this.smokeOverlay.parentNode) {
+                        this.smokeOverlay.parentNode.removeChild(this.smokeOverlay);
                     }
-                });
-                this.smokeElements = [];
+                    this.smokeOverlay = null;
+                    console.log(`🧹 Rauch-Overlay entfernt`);
+                }
             }
         }
 
@@ -2082,7 +2083,18 @@
                 // Verbindungen sofort nach Rotation aktualisieren
                 this.updateConnectionsForComponent(component);
                 
+                // Rauch-Position bei Rotation aktualisieren
+                this.updateSmokeForComponent(component);
+                
                 console.log(`🔄 Bauteil ${component.id} gedreht auf ${currentRotation}°`);
+            }
+            
+            updateSmokeForComponent(component) {
+                const stateMachine = window.circuitGraph?.stateMachines?.get(component.id);
+                if (stateMachine && stateMachine.smokeOverlay) {
+                    stateMachine.updateSmokePosition();
+                    console.log(`💨 Rauch-Position synchronisiert für ${component.id}`);
+                }
             }
             
             // ===== DELETION SYSTEM =====
@@ -3402,7 +3414,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.33 - SVG-Rauch-Fix: Reine SVG-Transforms...');
+            console.log('🚀 LED Foundation v0.00.35 - Rauch-Overlay mit Gegen-Rotation: Physikalisch korrekter Rauch...');
             
             // 1. Circuit Simulation initialisieren
             try {
