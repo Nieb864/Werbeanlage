@@ -996,5 +996,371 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // ===== CIRCUIT SIMULATION ENGINE =====
+
+        // Globale Variablen
+        let systemPower = false;
+        let connections = [];
+        let components = [];
+
+        // Komponenten-Typen
+        const ComponentTypes = {
+            POWER_SOURCE: 'power-source',
+            TRANSFORMER_12V: 'trafo-12v-40w',
+            TRANSFORMER_24V: 'trafo-24v-60w',
+            LED_12V_1_2W: 'led-12v-1.2w',
+            LED_12V: 'led-12v-3.5w',
+            LED_24V: 'led-24v-5w',
+            FI_SWITCH: 'fi-schalter',
+            LS_SWITCH: 'ls-schalter'
+        };
+
+        // Technische Spezifikationen
+        const ComponentSpecs = {
+            [ComponentTypes.POWER_SOURCE]: {
+                voltage: 230,
+                maxCurrent: 16,
+                type: 'source'
+            },
+            [ComponentTypes.TRANSFORMER_12V]: {
+                inputVoltage: 230,
+                outputVoltage: 12,
+                maxPower: 40,
+                type: 'transformer'
+            },
+            [ComponentTypes.TRANSFORMER_24V]: {
+                inputVoltage: 230,
+                outputVoltage: 24,
+                maxPower: 60,
+                type: 'transformer'
+            },
+            [ComponentTypes.LED_12V_1_2W]: {
+                ratedVoltage: 12,
+                power: 1.2,
+                tolerance: 0.2,
+                type: 'load'
+            },
+            [ComponentTypes.LED_12V]: {
+                ratedVoltage: 12,
+                power: 3.5,
+                tolerance: 0.2,
+                type: 'load'
+            },
+            [ComponentTypes.LED_24V]: {
+                ratedVoltage: 24,
+                power: 5,
+                tolerance: 0.2,
+                type: 'load'
+            }
+        };
+
+        // Zustände der Komponenten
+        const ComponentStates = {
+            OFF: 'off',
+            ON: 'on',
+            BLINKING: 'blinking',
+            BROKEN: 'broken',
+            OVERLOADED: 'overloaded'
+        };
+
+        // ===== COMPONENT STATE MACHINE =====
+        class ComponentStateMachine {
+            constructor(componentType, elementId) {
+                this.type = componentType;
+                this.elementId = elementId;
+                this.state = ComponentStates.OFF;
+                this.specs = ComponentSpecs[componentType];
+                this.currentVoltage = 0;
+                this.currentPower = 0;
+            }
+            
+            updateState(voltage, current) {
+                this.currentVoltage = voltage;
+                this.currentPower = voltage * current;
+                
+                const previousState = this.state;
+                
+                if (this.specs.type === 'load') {
+                    this.state = this.calculateLEDState(voltage);
+                } else if (this.specs.type === 'transformer') {
+                    this.state = this.calculateTransformerState();
+                }
+                
+                if (previousState !== this.state) {
+                    this.animateStateChange();
+                }
+            }
+            
+            calculateLEDState(voltage) {
+                if (voltage === 0) return ComponentStates.OFF;
+                
+                const ratedVoltage = this.specs.ratedVoltage;
+                const tolerance = this.specs.tolerance;
+                
+                if (voltage > ratedVoltage * (1 + tolerance * 3)) {
+                    return ComponentStates.BROKEN;
+                }
+                
+                if (voltage > ratedVoltage * (1 + tolerance)) {
+                    return ComponentStates.BLINKING;
+                }
+                
+                if (voltage >= ratedVoltage * (1 - tolerance)) {
+                    return ComponentStates.ON;
+                }
+                
+                return ComponentStates.OFF;
+            }
+            
+            calculateTransformerState() {
+                if (this.currentPower > this.specs.maxPower * 1.2) {
+                    return ComponentStates.BROKEN;
+                }
+                if (this.currentPower > this.specs.maxPower) {
+                    return ComponentStates.OVERLOADED;
+                }
+                return this.currentVoltage > 0 ? ComponentStates.ON : ComponentStates.OFF;
+            }
+            
+            animateStateChange() {
+                const element = document.getElementById(this.elementId);
+                if (!element) return;
+                
+                element.classList.remove('state-off', 'state-on', 'state-blinking', 'state-broken', 'state-overloaded');
+                element.classList.add(`state-${this.state}`);
+                
+                console.log(`${this.type} (${this.elementId}): ${this.state} (${this.currentVoltage}V, ${this.currentPower.toFixed(2)}W)`);
+            }
+        }
+
+        // ===== CIRCUIT GRAPH =====
+        class CircuitGraph {
+            constructor() {
+                this.nodes = new Map();
+                this.edges = new Map();
+                this.stateMachines = new Map();
+            }
+            
+            addComponent(id, type, position) {
+                this.nodes.set(id, {
+                    id: id,
+                    type: type,
+                    position: position,
+                    connections: new Set()
+                });
+                
+                this.stateMachines.set(id, new ComponentStateMachine(type, id));
+                
+                console.log(`Bauteil hinzugefügt: ${type} (${id})`);
+            }
+            
+            addConnection(id, fromComponent, toComponent) {
+                this.edges.set(id, {
+                    from: fromComponent,
+                    to: toComponent
+                });
+                
+                if (this.nodes.has(fromComponent)) {
+                    this.nodes.get(fromComponent).connections.add(toComponent);
+                }
+                if (this.nodes.has(toComponent)) {
+                    this.nodes.get(toComponent).connections.add(fromComponent);
+                }
+                
+                console.log(`Verbindung erstellt: ${fromComponent} → ${toComponent}`);
+            }
+            
+            findPath(startNode, endNode, visited = new Set()) {
+                if (startNode === endNode) return [startNode];
+                if (visited.has(startNode)) return null;
+                
+                visited.add(startNode);
+                
+                const component = this.nodes.get(startNode);
+                if (!component) return null;
+                
+                for (const neighbor of component.connections) {
+                    const path = this.findPath(neighbor, endNode, new Set(visited));
+                    if (path) {
+                        return [startNode, ...path];
+                    }
+                }
+                
+                return null;
+            }
+            
+            getConnectedComponents(startNode) {
+                const visited = new Set();
+                const connected = [];
+                
+                const dfs = (nodeId) => {
+                    if (visited.has(nodeId)) return;
+                    visited.add(nodeId);
+                    connected.push(nodeId);
+                    
+                    const component = this.nodes.get(nodeId);
+                    if (component) {
+                        for (const neighbor of component.connections) {
+                            dfs(neighbor);
+                        }
+                    }
+                };
+                
+                dfs(startNode);
+                return connected;
+            }
+        }
+
+        // ===== PHYSICS ENGINE =====
+        class PhysicsEngine {
+            constructor(graph) {
+                this.graph = graph;
+            }
+            
+            calculateCircuit() {
+                if (!systemPower) {
+                    this.powerOffAllComponents();
+                    return;
+                }
+                
+                const powerSource = this.findPowerSource();
+                if (!powerSource) {
+                    console.log('Keine Stromquelle gefunden');
+                    return;
+                }
+                
+                const connectedComponents = this.graph.getConnectedComponents(powerSource);
+                console.log('Verbundene Komponenten:', connectedComponents);
+                
+                this.calculateVoltagesAndCurrents(connectedComponents);
+            }
+            
+            findPowerSource() {
+                for (const [id, component] of this.graph.nodes) {
+                    if (component.type === ComponentTypes.POWER_SOURCE) {
+                        return id;
+                    }
+                }
+                return null;
+            }
+            
+            calculateVoltagesAndCurrents(components) {
+                for (const componentId of components) {
+                    const component = this.graph.nodes.get(componentId);
+                    const stateMachine = this.graph.stateMachines.get(componentId);
+                    
+                    if (!component || !stateMachine) continue;
+                    
+                    let voltage = 0;
+                    let current = 0;
+                    
+                    if (component.type === ComponentTypes.POWER_SOURCE) {
+                        voltage = ComponentSpecs[component.type].voltage;
+                        current = this.calculateSourceCurrent(componentId);
+                    } else {
+                        const result = this.calculateComponentPower(componentId);
+                        voltage = result.voltage;
+                        current = result.current;
+                    }
+                    
+                    stateMachine.updateState(voltage, current);
+                }
+            }
+            
+            calculateComponentPower(componentId) {
+                const component = this.graph.nodes.get(componentId);
+                
+                for (const connectedId of component.connections) {
+                    const connectedComponent = this.graph.nodes.get(connectedId);
+                    if (connectedComponent && ComponentSpecs[connectedComponent.type].type === 'transformer') {
+                        const specs = ComponentSpecs[connectedComponent.type];
+                        return {
+                            voltage: specs.outputVoltage,
+                            current: ComponentSpecs[component.type].power / specs.outputVoltage
+                        };
+                    }
+                }
+                
+                for (const connectedId of component.connections) {
+                    const connectedComponent = this.graph.nodes.get(connectedId);
+                    if (connectedComponent && connectedComponent.type === ComponentTypes.POWER_SOURCE) {
+                        return {
+                            voltage: ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage,
+                            current: ComponentSpecs[component.type].power / ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage
+                        };
+                    }
+                }
+                
+                return { voltage: 0, current: 0 };
+            }
+            
+            calculateSourceCurrent(sourceId) {
+                let totalCurrent = 0;
+                const connectedComponents = this.graph.getConnectedComponents(sourceId);
+                
+                for (const componentId of connectedComponents) {
+                    const component = this.graph.nodes.get(componentId);
+                    if (component && ComponentSpecs[component.type].type === 'load') {
+                        const specs = ComponentSpecs[component.type];
+                        totalCurrent += specs.power / ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage;
+                    }
+                }
+                
+                return totalCurrent;
+            }
+            
+            powerOffAllComponents() {
+                for (const [id, stateMachine] of this.graph.stateMachines) {
+                    stateMachine.updateState(0, 0);
+                }
+            }
+        }
+
+        // ===== REALTIME SIMULATION =====
+        class RealtimeSimulation {
+            constructor() {
+                this.graph = new CircuitGraph();
+                this.physics = new PhysicsEngine(this.graph);
+                this.isRunning = false;
+            }
+            
+            start() {
+                this.isRunning = true;
+                console.log('🔄 Echtzeit-Simulation gestartet');
+            }
+            
+            stop() {
+                this.isRunning = false;
+                console.log('⏸️ Echtzeit-Simulation gestoppt');
+            }
+            
+            update() {
+                if (!this.isRunning) return;
+                this.physics.calculateCircuit();
+            }
+            
+            addComponent(id, type, position) {
+                this.graph.addComponent(id, type, position);
+                this.update();
+            }
+            
+            addConnection(id, fromComponent, toComponent) {
+                this.graph.addConnection(id, fromComponent, toComponent);
+                this.update();
+            }
+            
+            powerStateChanged() {
+                console.log(`⚡ Hauptschalter: ${systemPower ? 'EIN' : 'AUS'}`);
+                this.update();
+            }
+        }
+
+        // Export für globalen Zugriff
+        let circuit = null;
+
+        console.log('🔬 Circuit Simulation Engine geladen');
+    </script>
 </body>
 </html>
