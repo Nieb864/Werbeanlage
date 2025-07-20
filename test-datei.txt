@@ -1,0 +1,8 @@
+Dies ist eine Test-Datei für den GitHub-Upload-Workflow.
+
+Erstellt am: $(date)
+
+Diese Datei zeigt, wie man:
+1. Dateien zu Git hinzufügt
+2. Commits erstellt
+3. Code auf GitHub hochlädt
