@@ -731,18 +731,16 @@
             fill: #4CAF50;
         }
 
-        /* Wire Hover Areas für Stromquellen-Zuleitungen */
+        /* DEBUG: Wire Hover Areas sichtbar */
         .wire-hover-area {
-            fill: transparent;
-            stroke: none;
             cursor: pointer;
-            opacity: 0;
             transition: all 0.3s;
         }
 
         .wire-hover-area:hover {
-            opacity: 0.3;
-            fill: currentColor;
+            opacity: 0.8 !important;
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 3px black);
         }
 
         /* Wire Type Colors for Power Source */
@@ -935,7 +933,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.08</div>
+                <div class="version-display">v0.00.09</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -993,11 +991,13 @@
                         
                         <!-- Connection Points -->
                         <g data-name="connections">
-                            <!-- Hover-Areas für Zuleitungs-Adern (korrekte Koordinaten) -->
+                            <!-- DEBUG: Hover-Areas sichtbar gemacht -->
                             <rect class="wire-hover-area std-wire-phase" 
                                   x="10.77" y="71.94" width="2" height="10" 
-                                  fill="transparent"
-                                  opacity="0"
+                                  fill="red"
+                                  stroke="black"
+                                  stroke-width="0.5"
+                                  opacity="0.5"
                                   data-connection-type="output-line"
                                   data-connection-id="out-phase"
                                   data-wire-type="phase"
@@ -1007,8 +1007,10 @@
                                   
                             <rect class="wire-hover-area std-wire-neutral" 
                                   x="18.65" y="71.94" width="2" height="10" 
-                                  fill="transparent"
-                                  opacity="0"
+                                  fill="blue"
+                                  stroke="black"
+                                  stroke-width="0.5"
+                                  opacity="0.5"
                                   data-connection-type="output-line"
                                   data-connection-id="out-neutral"
                                   data-wire-type="neutral"
@@ -1018,8 +1020,10 @@
                                   
                             <rect class="wire-hover-area std-wire-earth" 
                                   x="14.68" y="71.94" width="2" height="10" 
-                                  fill="transparent"
-                                  opacity="0"
+                                  fill="yellow"
+                                  stroke="black"
+                                  stroke-width="0.5"
+                                  opacity="0.5"
                                   data-connection-type="output-line"
                                   data-connection-id="out-earth"
                                   data-wire-type="earth"
@@ -2967,7 +2971,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.08 - Initialisiere...');
+            console.log('🚀 LED Foundation v0.00.09 - DEBUG-Modus...');
             
             // 1. Circuit Simulation initialisieren
             try {
