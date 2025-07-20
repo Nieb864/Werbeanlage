@@ -731,22 +731,7 @@
             fill: #4CAF50;
         }
 
-        /* Smart Wire Hover Areas */
-        .wire-hover-area {
-            cursor: pointer;
-            transition: all 0.3s;
-        }
 
-        .wire-hover-area:hover {
-            opacity: 0.7 !important;
-            transform: scale(1.05);
-            filter: drop-shadow(0 0 3px black);
-        }
-
-        .wire-hover-area.connected {
-            opacity: 0 !important;
-            pointer-events: none;
-        }
 
         /* Wire Type Colors for Power Source */
         .connection-line.std-wire-plus { stroke: var(--wire-red); }
@@ -938,7 +923,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.16</div>
+                <div class="version-display">v0.00.17</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -984,11 +969,6 @@
                             </style>
                         </defs>
                         <g data-name="Ebene_1">
-                            <!-- Anschlusskabel (×1.6 skaliert) -->
-                            <line class="std-wire-earth" x1="25.09" y1="115.10" x2="25.17" y2="57.70"/>
-                            <line class="std-wire-phase" x1="18.83" y1="63.42" x2="18.83" y2="115.10"/>
-                            <line class="std-wire-neutral" x1="31.44" y1="63.14" x2="31.44" y2="115.10"/>
-                            
                             <!-- Gehäuse (×1.6 skaliert) -->
                             <circle class="std-metal-dark" cx="25.14" cy="25.14" r="24.34"/>
                             <path class="std-metal-light" d="M14.19,26.98c0-7.09,4.94-12.93,10.94-12.93s10.94,5.84,10.94,12.93v59.71l-21.87-.27c0-19.81,0-39.62-.01-59.43Z"/>
@@ -996,45 +976,7 @@
                         
                         <!-- Connection Points -->
                         <g data-name="connections">
-                            <!-- Smart Hover-Areas (sichtbar wenn verfügbar) -->
-                            <rect class="wire-hover-area std-wire-phase" 
-                                  x="17.23" y="86.4" width="3.2" height="16" 
-                                  fill="red"
-                                  stroke="black"
-                                  stroke-width="0.8"
-                                  opacity="0.4"
-                                  data-connection-type="output-line"
-                                  data-connection-id="out-phase"
-                                  data-wire-type="phase"
-                                  data-voltage="230"
-                                  data-bezier-start-x="38.83" data-bezier-start-y="105.4"
-                                  data-bezier-direction="0,16,0,0"/>
-                                  
-                            <rect class="wire-hover-area std-wire-neutral" 
-                                  x="29.84" y="86.4" width="3.2" height="16" 
-                                  fill="blue"
-                                  stroke="black"
-                                  stroke-width="0.8"
-                                  opacity="0.4"
-                                  data-connection-type="output-line"
-                                  data-connection-id="out-neutral"
-                                  data-wire-type="neutral"
-                                  data-voltage="230"
-                                  data-bezier-start-x="51.44" data-bezier-start-y="105.4"
-                                  data-bezier-direction="0,16,0,0"/>
-                                  
-                            <rect class="wire-hover-area std-wire-earth" 
-                                  x="23.49" y="86.4" width="3.2" height="16" 
-                                  fill="yellow"
-                                  stroke="black"
-                                  stroke-width="0.8"
-                                  opacity="0.4"
-                                  data-connection-type="output-line"
-                                  data-connection-id="out-earth"
-                                  data-wire-type="earth"
-                                  data-voltage="230"
-                                  data-bezier-start-x="45.09" data-bezier-start-y="105.4"
-                                  data-bezier-direction="0,16,0,0"/>
+
                             
                             <!-- Connection Lines (Workspace-Koordinaten) -->
                             <line class="connection-line" 
@@ -2988,7 +2930,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.16 - Connection State Management aktiv...');
+            console.log('🚀 LED Foundation v0.00.17 - Clean Connection-Lines: Nur funktionale Elements...');
             
             // 1. Circuit Simulation initialisieren
             try {
