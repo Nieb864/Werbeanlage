@@ -915,7 +915,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.02</div>
+                <div class="version-display">v0.00.03</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -972,35 +972,34 @@
                         </g>
                         
                         <!-- Connection Points -->
-                        <line class="connection-line std-wire-phase" 
-                              x1="11.77" y1="71.94" x2="11.77" y2="81.94" 
-                              stroke="#683c11"
-                              data-connection-type="output-line"
-                              data-connection-id="out-phase"
-                              data-wire-type="phase"
-                              data-voltage="230"
-                              data-bezier-start-x="11.77" data-bezier-start-y="76.94"
-                              data-bezier-direction="0,10,0,0"/>
-                              
-                        <line class="connection-line std-wire-neutral" 
-                              x1="15.73" y1="71.94" x2="15.73" y2="81.94" 
-                              stroke="#1d71b8"
-                              data-connection-type="output-line"
-                              data-connection-id="out-neutral"
-                              data-wire-type="neutral"
-                              data-voltage="230"
-                              data-bezier-start-x="15.73" data-bezier-start-y="76.94"
-                              data-bezier-direction="0,10,0,0"/>
-                              
-                        <line class="connection-line std-wire-earth" 
-                              x1="19.65" y1="71.94" x2="19.65" y2="81.94" 
-                              stroke="#ffed00"
-                              data-connection-type="output-line"
-                              data-connection-id="out-earth"
-                              data-wire-type="earth"
-                              data-voltage="230"
-                              data-bezier-start-x="19.65" data-bezier-start-y="76.94"
-                              data-bezier-direction="0,10,0,0"/>
+                        <g data-name="connections">
+                            <line class="connection-line std-wire-phase" 
+                                  x1="11.77" y1="71.94" x2="11.77" y2="81.94" 
+                                  data-connection-type="output-line"
+                                  data-connection-id="out-phase"
+                                  data-wire-type="phase"
+                                  data-voltage="230"
+                                  data-bezier-start-x="11.77" data-bezier-start-y="76.94"
+                                  data-bezier-direction="0,10,0,0"/>
+                                  
+                            <line class="connection-line std-wire-neutral" 
+                                  x1="15.73" y1="71.94" x2="15.73" y2="81.94" 
+                                  data-connection-type="output-line"
+                                  data-connection-id="out-neutral"
+                                  data-wire-type="neutral"
+                                  data-voltage="230"
+                                  data-bezier-start-x="15.73" data-bezier-start-y="76.94"
+                                  data-bezier-direction="0,10,0,0"/>
+                                  
+                            <line class="connection-line std-wire-earth" 
+                                  x1="19.65" y1="71.94" x2="19.65" y2="81.94" 
+                                  data-connection-type="output-line"
+                                  data-connection-id="out-earth"
+                                  data-wire-type="earth"
+                                  data-voltage="230"
+                                  data-bezier-start-x="19.65" data-bezier-start-y="76.94"
+                                  data-bezier-direction="0,10,0,0"/>
+                        </g>
                     </svg>
                 </div>
                 
@@ -2910,7 +2909,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.02 - Initialisiere...');
+            console.log('🚀 LED Foundation v0.00.03 - Initialisiere...');
             
             // 1. Circuit Simulation initialisieren
             try {
