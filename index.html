@@ -754,30 +754,30 @@
         @keyframes smokeFloat {
             0% { 
                 opacity: 0.7; 
-                transform: translateY(0) scale(0.8) rotate(0deg); 
+                transform: translate(0, 0) scale(0.8) rotate(0deg); 
             }
             50% { 
                 opacity: 0.4; 
-                transform: translateY(-15px) scale(1.1) rotate(5deg); 
+                transform: translate(0, -15) scale(1.1) rotate(5deg); 
             }
             100% { 
                 opacity: 0; 
-                transform: translateY(-30px) scale(1.4) rotate(10deg); 
+                transform: translate(0, -30) scale(1.4) rotate(10deg); 
             }
         }
         
         @keyframes smokeFloatAlt {
             0% { 
                 opacity: 0.6; 
-                transform: translateY(0) scale(0.9) rotate(0deg); 
+                transform: translate(0, 0) scale(0.9) rotate(0deg); 
             }
             50% { 
                 opacity: 0.3; 
-                transform: translateY(-18px) scale(1.2) rotate(-7deg); 
+                transform: translate(0, -18) scale(1.2) rotate(-7deg); 
             }
             100% { 
                 opacity: 0; 
-                transform: translateY(-35px) scale(1.6) rotate(-12deg); 
+                transform: translate(0, -35) scale(1.6) rotate(-12deg); 
             }
         }
 
@@ -1039,7 +1039,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.32</div>
+                <div class="version-display">v0.00.33</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1458,52 +1458,37 @@
             createSmokeElement(centerX, centerY) {
                 const smokeContainer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                 smokeContainer.setAttribute('class', 'smoke-container');
-                smokeContainer.style.position = 'absolute';
-                smokeContainer.style.pointerEvents = 'none';
-                smokeContainer.style.zIndex = '10';
+                smokeContainer.setAttribute('transform', `translate(${centerX}, ${centerY})`);
                 
+                // Rauchpfad als reiner SVG-Path
+                const smokePath = "M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z";
+                
+                // 6 Rauchschichten direkt als SVG-Paths
                 smokeContainer.innerHTML = `
-                    <g style="transform: translate(${centerX}px, ${centerY}px)">
-                        <!-- Erste Rauchserie -->
-                        <g class="smoke-group">
-                            <svg x="0" y="-18" width="5.34" height="13.79" viewBox="0 0 5.34 13.79" class="smoke smoke-1" style="transform: translateX(-2.67px)">
-                                                                 <path fill="#333" opacity="0.8" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
-                            </svg>
-                        </g>
-                        
-                        <g class="smoke-group">
-                            <svg x="0" y="-16" width="4.5" height="12" viewBox="0 0 5.34 13.79" class="smoke smoke-2" style="transform: translateX(-2.2px)">
-                                                                 <path fill="#444" opacity="0.6" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
-                            </svg>
-                        </g>
-                        
-                        <g class="smoke-group">
-                            <svg x="0" y="-14" width="3.6" height="10" viewBox="0 0 5.34 13.79" class="smoke smoke-3" style="transform: translateX(-1.8px)">
-                                                                 <path fill="#555" opacity="0.4" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
-                            </svg>
-                        </g>
-
-                        <!-- Zweite Rauchserie - gespiegelt -->
-                        <g class="smoke-group-alt">
-                            <svg x="0" y="-18" width="5.34" height="13.79" viewBox="0 0 5.34 13.79" class="smoke smoke-alt-1" style="transform: translateX(-2.67px) scaleX(-1)">
-                                                                 <path fill="#222" opacity="0.7" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
-                            </svg>
-                        </g>
-                        
-                        <g class="smoke-group-alt">
-                            <svg x="0" y="-16" width="4.8" height="12.5" viewBox="0 0 5.34 13.79" class="smoke smoke-alt-2" style="transform: translateX(-2.4px) scaleX(-1)">
-                                                                 <path fill="#333" opacity="0.5" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
-                            </svg>
-                        </g>
-                        
-                        <g class="smoke-group-alt">
-                            <svg x="0" y="-15" width="4.0" height="11" viewBox="0 0 5.34 13.79" class="smoke smoke-alt-3" style="transform: translateX(-2.0px) scaleX(-1)">
-                                                                 <path fill="#444" opacity="0.3" d="M2.3,13.79C.19,11.79-.12,10.37.03,9.41c.31-1.95,2.6-2.42,3.65-4.96.67-1.63.5-3.27.22-4.45,1.64,2.73,1.6,4.54,1.24,5.69-.51,1.64-1.76,2.25-2.48,4.45-.48,1.45-.45,2.77-.36,3.65Z"/>
-                            </svg>
-                        </g>
-                    </g>
+                    <!-- Erste Rauchserie -->
+                    <path class="smoke-group smoke-1" fill="#333" opacity="0.8" 
+                          transform="translate(-2.67, -18) scale(1.0)" 
+                          d="${smokePath}"/>
+                    <path class="smoke-group smoke-2" fill="#444" opacity="0.6" 
+                          transform="translate(-2.2, -16) scale(0.85)" 
+                          d="${smokePath}"/>
+                    <path class="smoke-group smoke-3" fill="#555" opacity="0.4" 
+                          transform="translate(-1.8, -14) scale(0.7)" 
+                          d="${smokePath}"/>
+                    
+                    <!-- Zweite Rauchserie - gespiegelt -->
+                    <path class="smoke-group-alt smoke-alt-1" fill="#222" opacity="0.7" 
+                          transform="translate(2.67, -18) scale(-1.0, 1.0)" 
+                          d="${smokePath}"/>
+                    <path class="smoke-group-alt smoke-alt-2" fill="#333" opacity="0.5" 
+                          transform="translate(2.4, -16) scale(-0.9, 1.0)" 
+                          d="${smokePath}"/>
+                    <path class="smoke-group-alt smoke-alt-3" fill="#444" opacity="0.3" 
+                          transform="translate(2.0, -15) scale(-0.75, 1.0)" 
+                          d="${smokePath}"/>
                 `;
                 
+                console.log(`🎨 SVG-Rauch erstellt mit transform="translate(${centerX}, ${centerY})"`);
                 return smokeContainer;
             }
             
@@ -3417,7 +3402,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.32 - Rauch-Fix: Dunkle Farben + Debug-Logs...');
+            console.log('🚀 LED Foundation v0.00.33 - SVG-Rauch-Fix: Reine SVG-Transforms...');
             
             // 1. Circuit Simulation initialisieren
             try {
