@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.61</div>
+                <div class="version-display">v0.00.62</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3543,6 +3543,18 @@
             if (circuit) {
                 circuit.powerStateChanged();
                 
+                // 🔄 BEI AUSSCHALTEN: Alle Komponenten sofort auf OFF setzen
+                if (!systemPower) {
+                    console.log('🔄 HAUPTSCHALTER AUS → Alle Komponenten ausschalten...');
+                    for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
+                        const componentState = circuit.graph.getComponentState(componentId);
+                        if (componentState !== 'broken') {
+                            stateMachine.updateState(0, 0); // Sofort ausschalten
+                            console.log(`💡 Component ${componentId} ausgeschaltet`);
+                        }
+                    }
+                }
+                
                 // 🔄 NEUBERECHNUNG: Bei EINSCHALTEN alle Verbindungen neu analysieren
                 if (systemPower) {
                     console.log('🔄 HAUPTSCHALTER EIN → Vollständige Neuberechnung startet...');
@@ -3605,12 +3617,37 @@
                         }
                     }
                     
-                    // 4. Physik-Update erzwingen
+                    // 4. Alle StateMachines zurücksetzen (für visuelle LEDs)
+                    for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
+                        const componentState = circuit.graph.getComponentState(componentId);
+                        if (componentState !== 'broken') {
+                            console.log(`🔄 StateMachine ${componentId} zurückgesetzt`);
+                            stateMachine.updateState(0, 0); // Spannung und Strom auf 0
+                        } else {
+                            console.log(`🚫 StateMachine ${componentId} bleibt broken`);
+                        }
+                    }
+                    
+                    // 5. Physik-Update erzwingen
                     setTimeout(() => {
                         console.log('🔄 Starte Physik-Berechnung...');
                         circuit.physics.calculateCircuit();
                         
-                        // 5. Status-Report
+                        // 6. Zusätzlich: Alle LED-Kreise wiederherstellen
+                        for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
+                            const element = document.getElementById(componentId);
+                            if (element && ComponentSpecs[stateMachine.type]?.type === 'load') {
+                                // LED-Kreis sichtbar machen falls verschwunden
+                                const ledCircle = element.querySelector('.cls-5, .led24-center');
+                                if (ledCircle) {
+                                    ledCircle.style.display = 'block';
+                                    ledCircle.style.opacity = '1';
+                                    console.log(`💡 LED-Kreis für ${componentId} wiederhergestellt`);
+                                }
+                            }
+                        }
+                        
+                        // 7. Status-Report
                         console.log('📊 NEUBERECHNUNG - STATUS REPORT:');
                         for (const [componentId, state] of circuit.graph.componentStates) {
                             const component = circuit.graph.nodes.get(componentId);
@@ -4418,7 +4455,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.61 - SICHERHEITSFUNKEN: 3 Sekunden Warnzeit, perfekte Lernumgebung...');
+            console.log('🚀 LED Foundation v0.00.62 - NEUBERECHNUNG GEFIXT: LED-Kreise und Ein/Aus-Schaltung funktioniert...');
             
             // 1. Circuit Simulation initialisieren
             try {
