@@ -979,7 +979,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.48d</div>
+                <div class="version-display">v0.00.49</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2613,13 +2613,13 @@
                 console.log(`🚨 DEBUG isCircuitComplete: ${componentId}, componentType="${componentType}"`);
                 
                 // TRAFO: Braucht mindestens phase+neutral Eingang UND mindestens 1 Ausgang
-                if (componentType === 'transformer_12v' || componentType === 'transformer_24v') {
+                if (componentType === 'trafo-12v-40w' || componentType === 'trafo-24v-60w') {
                     console.log(`🔍 isCircuitComplete: Prüfe TRAFO ${componentId}...`);
                     return this.hasRequiredTransformerConnections(componentId);
                 }
                 
                 // LED: Braucht plus UND minus Anschluss
-                if (componentType === 'led_12v' || componentType === 'led_24v') {
+                if (componentType === 'led-12v-1.2w' || componentType === 'led-24v-5w') {
                     console.log(`🔍 isCircuitComplete: Prüfe LED ${componentId}...`);
                     const result = this.hasRequiredLEDConnections(componentId);
                     console.log(`🔍 isCircuitComplete: LED ${componentId} → ${result}`);
@@ -3759,7 +3759,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.48c-CACHE-BUST - Erzwungenes Update mit Debug-Logs...');
+            console.log('🚀 LED Foundation v0.00.49 - CRITICAL BUGFIX: Korrekte ComponentType Validierung...');
             
             // 1. Circuit Simulation initialisieren
             try {
