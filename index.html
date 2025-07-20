@@ -666,7 +666,33 @@
             font-size: 6px; 
         }
 
-        /* Component States */
+
+
+        /* Info Box */
+        .info-box {
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background: var(--color-light);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--color-border);
+        }
+
+        .info-box h4 {
+            margin-top: 0;
+            color: var(--color-primary);
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-h2);
+        }
+
+        .info-box p {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* LED States */
         .state-off .cls-5, 
         .state-off .led24-center {
             fill: #ddd !important;
@@ -704,30 +730,6 @@
         @keyframes flicker {
             0%, 50%, 100% { opacity: 1; }
             25%, 75% { opacity: 0.3; }
-        }
-
-        /* Info Box */
-        .info-box {
-            margin-top: var(--spacing-lg);
-            padding: var(--spacing-lg);
-            background: var(--color-light);
-            border-radius: var(--border-radius);
-            border: 1px solid var(--color-border);
-        }
-
-        .info-box h4 {
-            margin-top: 0;
-            color: var(--color-primary);
-            font-size: var(--font-size-h2);
-            font-weight: var(--font-weight-h2);
-        }
-
-        .info-box p {
-            margin-bottom: var(--spacing-sm);
-        }
-
-        .info-box p:last-child {
-            margin-bottom: 0;
         }
 
         /* Connection States */
@@ -988,7 +990,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.23</div>
+                <div class="version-display">v0.00.24</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1125,19 +1127,19 @@
             [ComponentTypes.LED_12V_1_2W]: {
                 ratedVoltage: 12,
                 power: 1.2,
-                tolerance: 0.2,
+                tolerance: 1.1,
                 type: 'load'
             },
             [ComponentTypes.LED_12V]: {
                 ratedVoltage: 12,
                 power: 3.5,
-                tolerance: 0.2,
+                tolerance: 1.1,
                 type: 'load'
             },
             [ComponentTypes.LED_24V]: {
                 ratedVoltage: 24,
                 power: 5,
-                tolerance: 0.2,
+                tolerance: 1.1,
                 type: 'load'
             }
         };
@@ -3079,7 +3081,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.23 - LED Visual Feedback: CSS States funktional...');
+            console.log('🚀 LED Foundation v0.00.24 - Toleranz 110%: 24V LED blinkt bei falscher Spannung...');
             
             // 1. Circuit Simulation initialisieren
             try {
