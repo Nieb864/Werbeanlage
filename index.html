@@ -1014,7 +1014,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.53</div>
+                <div class="version-display">v0.00.54</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1249,7 +1249,7 @@
                 const maxBlink = ratedVoltage * (tolerance * 2);   // 12V * 2.2 = 26.4V  
                 const minVoltage = ratedVoltage * 0.8;             // 12V * 0.8 = 9.6V (20% unter Nennspannung)
                 
-                console.log(`🔍 LED State Calc: ${voltage}V für ${ratedVoltage}V LED`);
+                debugLog(`🔍 LED State Calc: ${voltage}V für ${ratedVoltage}V LED`);
                 console.log(`📊 Grenzen: ON>${minVoltage}V, BLINK>${maxNormal}V, BROKEN>${maxBlink}V`);
                 
                 if (voltage > maxBlink) {
@@ -1406,7 +1406,7 @@
             
             createSmokeOverlay() {
                 const element = document.getElementById(this.elementId);
-                console.log(`🔍 createSmokeOverlay: Element=${!!element}, Type=${this.specs.type}`);
+                debugLog(`🔍 createSmokeOverlay: Element=${!!element}, Type=${this.specs.type}`);
                 if (!element || this.specs.type !== 'load' || this.smokeOverlay) {
                     console.log(`❌ Rauch-Overlay abgebrochen: Element=${!!element}, Type=${this.specs.type}, Exists=${!!this.smokeOverlay}`);
                     return;
@@ -1648,7 +1648,7 @@
                 // Benutze WorkspaceManager-Validierung wenn verfügbar
                 if (window.workspaceManager && window.workspaceManager.isCircuitComplete) {
                     const result = window.workspaceManager.isCircuitComplete(componentId);
-                    console.log(`🔍 WorkspaceManager.isCircuitComplete(${componentId}): ${result}`);
+                    debugLog(`🔍 WorkspaceManager.isCircuitComplete(${componentId}): ${result}`);
                     return result;
                 }
                 
@@ -1656,7 +1656,7 @@
                 const component = this.graph.nodes.get(componentId);
                 if (!component) return false;
                 
-                console.log(`🔍 Fallback-Prüfung für ${componentId}: ${component.connections.size} Verbindungen`);
+                debugLog(`🔍 Fallback-Prüfung für ${componentId}: ${component.connections.size} Verbindungen`);
                 
                 // Transformer braucht mindestens 2 Verbindungen (Input)
                 if (ComponentSpecs[component.type].type === 'transformer') {
@@ -1686,7 +1686,7 @@
                     const hasOutput = window.workspaceManager.hasActiveConnection(plusOutput) || 
                                      window.workspaceManager.hasActiveConnection(minusOutput);
                     
-                    console.log(`🔍 Trafo ${transformerId}: Input=${hasInput}, Output=${hasOutput}`);
+                    debugLog(`🔍 Trafo ${transformerId}: Input=${hasInput}, Output=${hasOutput}`);
                     return hasInput && hasOutput;
                 }
                 
@@ -1700,7 +1700,7 @@
                 // Nur LEDs können durch gefährliche Verbindungen beschädigt werden
                 if (ComponentSpecs[component.type].type !== 'load') return null;
                 
-                console.log(`🔍 checkForDangerousConditions: Prüfe LED ${componentId} auf Überspannung...`);
+                debugLog(`🔍 checkForDangerousConditions: Prüfe LED ${componentId} auf Überspannung...`);
                 
                 // 🚨 NUR DIREKTE VERBINDUNGEN ZU DIESER LED PRÜFEN
                 // Nicht die gesamte Schaltung, sondern nur was direkt an dieser LED anliegt
@@ -1738,7 +1738,7 @@
                     }
                 }
                 
-                console.log(`🔍 LED ${ledId}: ${connections.length} direkte Verbindungen gefunden`);
+                debugLog(`🔍 LED ${ledId}: ${connections.length} direkte Verbindungen gefunden`);
                 return connections;
             }
             
@@ -1748,7 +1748,7 @@
                 // Nur prüfen wenn diese LED das ZIEL der Verbindung ist
                 if (!isToThisLED) return null;
                 
-                console.log(`🔍 LED ${targetComponentId}: Prüfe Verbindung ${fromData.wireType}(${fromData.voltage}V) → ${toData.wireType}(${toData.voltage}V)`);
+                debugLog(`🔍 LED ${targetComponentId}: Prüfe Verbindung ${fromData.wireType}(${fromData.voltage}V) → ${toData.wireType}(${toData.voltage}V)`);
                 
                 // 1. ÜBERSPANNUNG: 230V an 12V/24V LED
                 if (this.isOvervoltage(fromData, toData, targetComponentId)) {
@@ -1860,7 +1860,7 @@
                 const component = this.graph.nodes.get(ledId);
                 if (!component) return null;
                 
-                console.log(`🔍 findPowerSourceForLED: Analysiere ${ledId}, Verbindungen: ${component.connections.size}`);
+                debugLog(`🔍 findPowerSourceForLED: Analysiere ${ledId}, Verbindungen: ${component.connections.size}`);
                 
                 // Prüfe alle direkten Verbindungen
                 for (const connectedId of component.connections) {
@@ -1951,7 +1951,7 @@
                 const allLEDs = this.getAllLEDsConnectedToTransformer(transformerId);
                 let totalPower = 0;
                 
-                console.log(`🔍 Trafo ${transformerId}: Analysiere ${allLEDs.length} angeschlossene LEDs`);
+                debugLog(`🔍 Trafo ${transformerId}: Analysiere ${allLEDs.length} angeschlossene LEDs`);
                 
                 for (const ledId of allLEDs) {
                     const ledComponent = this.graph.nodes.get(ledId);
@@ -2394,9 +2394,9 @@
             }
             
             updateSmokeForComponent(component) {
-                console.log(`🔍 updateSmokeForComponent aufgerufen für ${component.id}`);
+                debugLog(`🔍 updateSmokeForComponent aufgerufen für ${component.id}`);
                 const stateMachine = window.circuitGraph?.stateMachines?.get(component.id);
-                console.log(`🔍 StateMachine gefunden: ${!!stateMachine}, SmokeOverlay: ${!!stateMachine?.smokeOverlay}`);
+                debugLog(`🔍 StateMachine gefunden: ${!!stateMachine}, SmokeOverlay: ${!!stateMachine?.smokeOverlay}`);
                 if (stateMachine && stateMachine.smokeOverlay) {
                     stateMachine.updateSmokePosition();
                     console.log(`💨 Rauch-Position synchronisiert für ${component.id}`);
@@ -2799,23 +2799,23 @@
                 if (!component) return false;
                 
                 const componentType = component.dataset.componentType;
-                console.log(`🚨 DEBUG isCircuitComplete: ${componentId}, componentType="${componentType}"`);
+                debugLog(`�� DEBUG isCircuitComplete: ${componentId}, componentType="${componentType}"`);
                 
                 // TRAFO: Braucht mindestens phase+neutral Eingang UND mindestens 1 Ausgang
                 if (componentType === 'trafo-12v-40w' || componentType === 'trafo-24v-60w' || componentType === 'trafo-12v-3w') {
-                    console.log(`🔍 isCircuitComplete: Prüfe TRAFO ${componentId}...`);
+                    debugLog(`🔍 isCircuitComplete: Prüfe TRAFO ${componentId}...`);
                     return this.hasRequiredTransformerConnections(componentId);
                 }
                 
                 // LED: Braucht plus UND minus Anschluss
                 if (componentType === 'led-12v-1.2w' || componentType === 'led-24v-5w') {
-                    console.log(`🔍 isCircuitComplete: Prüfe LED ${componentId}...`);
+                    debugLog(`🔍 isCircuitComplete: Prüfe LED ${componentId}...`);
                     const result = this.hasRequiredLEDConnections(componentId);
-                    console.log(`🔍 isCircuitComplete: LED ${componentId} → ${result}`);
+                    debugLog(`🔍 isCircuitComplete: LED ${componentId} → ${result}`);
                     return result;
                 }
                 
-                console.log(`🔍 isCircuitComplete: ${componentId} ist ANDERER TYP → true`);
+                debugLog(`🔍 isCircuitComplete: ${componentId} ist ANDERER TYP → true`);
                 return true; // Andere Komponenten haben keine speziellen Anforderungen
             }
             
@@ -2830,13 +2830,13 @@
                 const hasPhaseConnection = this.hasActiveConnection(phaseInput);
                 const hasNeutralConnection = this.hasActiveConnection(neutralInput);
                 
-                console.log(`🔍 Trafo ${transformerId}: Phase=${hasPhaseConnection}, Neutral=${hasNeutralConnection}`);
+                debugLog(`🔍 Trafo ${transformerId}: Phase=${hasPhaseConnection}, Neutral=${hasNeutralConnection}`);
                 
                 return hasPhaseConnection && hasNeutralConnection;
             }
             
             hasRequiredLEDConnections(ledId) {
-                console.log(`🚨 DEBUGGING hasRequiredLEDConnections für ${ledId}`);
+                debugLog(`�� DEBUGGING hasRequiredLEDConnections für ${ledId}`);
                 
                 const led = document.getElementById(ledId);
                 if (!led) {
@@ -2848,17 +2848,17 @@
                 const plusInput = led.querySelector('[data-connection-id="in-plus"]');
                 const minusInput = led.querySelector('[data-connection-id="in-minus"]');
                 
-                console.log(`🔍 LED ${ledId}: plusInput=${!!plusInput}, minusInput=${!!minusInput}`);
+                debugLog(`🔍 LED ${ledId}: plusInput=${!!plusInput}, minusInput=${!!minusInput}`);
                 
                 const hasPlusConnection = this.hasActiveConnection(plusInput);
                 const hasMinusConnection = this.hasActiveConnection(minusInput);
                 
-                console.log(`🔍 LED ${ledId}: hasPlusConnection=${hasPlusConnection}, hasMinusConnection=${hasMinusConnection}`);
+                debugLog(`🔍 LED ${ledId}: hasPlusConnection=${hasPlusConnection}, hasMinusConnection=${hasMinusConnection}`);
                 
                 // ZUSÄTZLICH: Prüfe ob Polarität korrekt ist
                 const hasCorrectPolarity = this.hasCorrectLEDPolarity(ledId);
                 
-                console.log(`🔍 LED ${ledId}: hasCorrectPolarity=${hasCorrectPolarity}`);
+                debugLog(`🔍 LED ${ledId}: hasCorrectPolarity=${hasCorrectPolarity}`);
                 
                 const isComplete = hasPlusConnection && hasMinusConnection && hasCorrectPolarity;
                 
@@ -2880,7 +2880,7 @@
                     return false;
                 }
                 
-                console.log(`🔍 LED ${ledId}: Prüfe ${window.workspaceManager.connections.size} Verbindungen auf Polarität`);
+                debugLog(`🔍 LED ${ledId}: Prüfe ${window.workspaceManager.connections.size} Verbindungen auf Polarität`);
                 
                 // Prüfe alle Verbindungen zu diesem LED
                 for (const [connId, connectionData] of window.workspaceManager.connections) {
@@ -2888,7 +2888,7 @@
                         const fromData = window.workspaceManager.getConnectionData(connectionData.from);
                         const toData = window.workspaceManager.getConnectionData(connectionData.to);
                         
-                        console.log(`🔍 LED ${ledId}: Verbindung ${fromData.wireType} → ${toData.wireType}`);
+                        debugLog(`🔍 LED ${ledId}: Verbindung ${fromData.wireType} → ${toData.wireType}`);
                         
                         // Plus-Ausgang sollte zu Plus-Eingang
                         if (fromData.wireType === 'plus' && toData.wireType === 'minus') {
@@ -4105,7 +4105,7 @@
         }
         
         function getPowerInfoForTrafo(trafoId) {
-            console.log(`🔍 getPowerInfoForTrafo: ${trafoId}`);
+            debugLog(`🔍 getPowerInfoForTrafo: ${trafoId}`);
             
             if (!window.circuit || !window.circuit.physics) {
                 console.log(`❌ circuit oder physics nicht verfügbar`);
@@ -4119,7 +4119,7 @@
             }
             
             const componentType = trafoElement.dataset.componentType;
-            console.log(`🔍 componentType: ${componentType}`);
+            debugLog(`🔍 componentType: ${componentType}`);
             
             const trafoSpecs = ComponentSpecs[componentType];
             if (!trafoSpecs) {
@@ -4127,10 +4127,10 @@
                 return null;
             }
             
-            console.log(`🔍 trafoSpecs:`, trafoSpecs);
+            debugLog(`🔍 trafoSpecs:`, trafoSpecs);
             
             const totalPower = window.circuit.physics.calculateTotalLoadOnTransformer(trafoId);
-            console.log(`🔍 totalPower: ${totalPower}`);
+            debugLog(`🔍 totalPower: ${totalPower}`);
             
             return {
                 used: totalPower,
@@ -4138,9 +4138,16 @@
             };
         }
 
+        // ===== DEBUG-MODUS =====
+        const DEBUG_MODE = false; // 🔇 AUS für saubere Console!
+        
+        function debugLog(message) {
+            if (DEBUG_MODE) console.log(message);
+        }
+
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.53 - HOTFIX: Mini-Trafo Anschlusspunkte repariert...');
+            console.log('🚀 LED Foundation v0.00.54 - HOTFIX: Debug-Spam reduziert...');
             
             // 1. Circuit Simulation initialisieren
             try {
