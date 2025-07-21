@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.90-INTEGER-PIXELS -->
+<!-- CACHE-BUST: v0.00.91-TEXT-SPACE -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.90</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.91</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -639,7 +639,7 @@
         /* LED Module */
         .led-module-svg {
             width: auto;
-            height: 28px;
+            height: 30px;
         }
 
         /* Transformer Module */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.90</div>
+                <div class="version-display">v0.00.91</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3893,7 +3893,7 @@
         // ===== LED-MODUL 12V 1,2W =====
         function createLEDModuleSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 137.29 28');
+            svg.setAttribute('viewBox', '0 0 137.29 30');
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-12v-1.2w');
             
@@ -3983,7 +3983,7 @@
                         data-connection-id="in-minus"
                         data-wire-type="minus"
                         data-voltage="12"
-                        data-bezier-end-x="19" data-bezier-end-y="9.7"
+                        data-bezier-end-x="19" data-bezier-end-y="10.4"
                         data-bezier-direction="-20,0,0,0"/>
                         
                 <circle class="connection-socket" 
@@ -4275,7 +4275,7 @@
         // ===== LED-MODUL 24V =====
         function createLED24VSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 137.29 28');
+            svg.setAttribute('viewBox', '0 0 137.29 30');
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-24v-5w');
             
@@ -4599,7 +4599,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.90 - INTEGER-PIXELS: ViewBox 28px = CSS 28px (Integer-Pixel für perfekte Browser-Darstellung)...');
+                            console.log('🚀 LED Foundation v0.00.91 - TEXT-SPACE: ViewBox 30px für rotierte Text-Elemente (y=20.61 + font-size brauchten mehr Platz)...');
             
             // 1. Circuit Simulation initialisieren
             try {
