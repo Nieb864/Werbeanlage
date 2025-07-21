@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.32-KLEMME-KABEL-FIX -->
+<!-- CACHE-BUST: v0.01.33-KLEMME-EVENT-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.32</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.33</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.32</div>
+                <div class="version-display">v0.01.33</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3110,7 +3110,8 @@
             
             handleConnectionMouseUp(e) {
                 if (e.target.classList.contains('connection-socket') && 
-                    e.target.dataset.connectionType === 'input-socket') {
+                    (e.target.dataset.connectionType === 'input-socket' || 
+                     e.target.dataset.connectionType === 'terminal-socket')) {
                     
                     this.completeConnection(e.target);
                 } else {
@@ -5243,32 +5244,32 @@
                     <rect class="klemme-orange" x="7.93" y="0.5" width="3.64" height="12.28" rx="1.82" ry="1.82"/>
                     <rect class="klemme-orange" x="13.57" y="0.5" width="3.64" height="12.28" rx="1.82" ry="1.82"/>
                 </g>
-                <!-- Anschlusspunkte als Buchsen (15px über dem Bauteil) -->
+                <!-- Anschlusspunkte als Buchsen (10px über dem Bauteil) -->
                 <circle class="connection-socket" 
-                        cx="5.67" cy="20" r="3" 
+                        cx="5.67" cy="25" r="3" 
                         data-connection-type="terminal-socket"
                         data-connection-id="terminal-1"
                         data-wire-type="universal"
                         data-voltage="400"
-                        data-bezier-end-x="5.67" data-bezier-end-y="25"
+                        data-bezier-end-x="5.67" data-bezier-end-y="30"
                         data-bezier-direction="0,20,0,0"/>
                         
                 <circle class="connection-socket" 
-                        cx="14.615" cy="20" r="3" 
+                        cx="14.615" cy="25" r="3" 
                         data-connection-type="terminal-socket"
                         data-connection-id="terminal-2"
                         data-wire-type="universal"
                         data-voltage="400"
-                        data-bezier-end-x="14.615" data-bezier-end-y="25"
+                        data-bezier-end-x="14.615" data-bezier-end-y="30"
                         data-bezier-direction="0,20,0,0"/>
                         
                 <circle class="connection-socket" 
-                        cx="23.56" cy="20" r="3" 
+                        cx="23.56" cy="25" r="3" 
                         data-connection-type="terminal-socket"
                         data-connection-id="terminal-3"
                         data-wire-type="universal"
                         data-voltage="400"
-                        data-bezier-end-x="23.56" data-bezier-end-y="25"
+                        data-bezier-end-x="23.56" data-bezier-end-y="30"
                         data-bezier-direction="0,20,0,0"/>
             `;
             
@@ -5480,7 +5481,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.32 - KLEMME-KABEL-FIX: Position korrigiert und universal wire-type + Spannungskompatibilität...');
+                            console.log('🚀 LED Foundation v0.01.33 - KLEMME-EVENT-FIX: Position 5px tiefer und terminal-socket Event-Handler hinzugefügt...');
             
             // 1. Circuit Simulation initialisieren
             try {
