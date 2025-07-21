@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.00-BEZIER-COORDS-FIXED -->
+<!-- CACHE-BUST: v0.01.02-CONNECTIONS-FOREGROUND -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.00</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.02</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -784,7 +784,7 @@
         .std-hairline { stroke-width: 0.5; }
         .std-thin { stroke-width: 1; }
         .std-cable { stroke-width: 3; }
-        .std-connection { stroke-width: 3; }
+        .std-connection { stroke-width: 4; }
         .std-thick { stroke-width: 5; }
 
         /* Standard Text */
@@ -1131,7 +1131,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.00</div>
+                <div class="version-display">v0.01.02</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1220,7 +1220,7 @@
                     </svg>
                 </div>
                 
-                <svg id="connectionSvg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                <svg id="connectionSvg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1500;">
                 </svg>
             </div>
         </div>
@@ -2882,7 +2882,7 @@
                 
                 this.tempConnectionLine.setAttribute('class', 'temp-connection');
                 this.tempConnectionLine.setAttribute('stroke', this.getWireColor(this.activeConnection.outputData.wireType));
-                this.tempConnectionLine.setAttribute('stroke-width', '3');
+                this.tempConnectionLine.setAttribute('stroke-width', '4');
                 this.tempConnectionLine.setAttribute('stroke-dasharray', '5,5');
                 this.tempConnectionLine.setAttribute('opacity', '0.8');
                 
@@ -4607,7 +4607,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.00 - BEZIER-COORDS-FIXED: Alle Bezier-Koordinaten um +10px korrigiert für erweiterte ViewBox...');
+                            console.log('🚀 LED Foundation v0.01.02 - CONNECTIONS-FOREGROUND: Bezier-Linien z-index:1500 + stroke-width:4 für bessere Sichtbarkeit...');
             
             // 1. Circuit Simulation initialisieren
             try {
