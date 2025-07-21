@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.02-CONNECTIONS-FOREGROUND -->
+<!-- CACHE-BUST: v0.01.03-VISUAL-CABLE-HIDING -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.02</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.03</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -784,7 +784,7 @@
         .std-hairline { stroke-width: 0.5; }
         .std-thin { stroke-width: 1; }
         .std-cable { stroke-width: 3; }
-        .std-connection { stroke-width: 4; }
+        .std-connection { stroke-width: 3; }
         .std-thick { stroke-width: 5; }
 
         /* Standard Text */
@@ -792,6 +792,14 @@
         .std-text-small { font-size: 6px; }
         .std-text-medium { font-size: 8px; }
         .std-text-large { font-size: 10px; }
+        
+        /* Visual Cable Hiding */
+        .visual-cable {
+            transition: opacity 0.3s ease;
+        }
+        .component.connected .visual-cable {
+            opacity: 0;
+        }
 
         /* Connection Line Hover Effects */
         .connection-line {
@@ -1131,7 +1139,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.02</div>
+                <div class="version-display">v0.01.03</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2882,7 +2890,7 @@
                 
                 this.tempConnectionLine.setAttribute('class', 'temp-connection');
                 this.tempConnectionLine.setAttribute('stroke', this.getWireColor(this.activeConnection.outputData.wireType));
-                this.tempConnectionLine.setAttribute('stroke-width', '4');
+                this.tempConnectionLine.setAttribute('stroke-width', '3');
                 this.tempConnectionLine.setAttribute('stroke-dasharray', '5,5');
                 this.tempConnectionLine.setAttribute('opacity', '0.8');
                 
@@ -3004,7 +3012,25 @@
                 outputLine.classList.add('connected');
                 inputSocket.classList.add('connected');
                 
+                // Parent Components für Visual Cable Hiding markieren
+                const fromComponent = outputLine.closest('.component');
+                const toComponent = inputSocket.closest('.component');
+                if (fromComponent) fromComponent.classList.add('connected');
+                if (toComponent) toComponent.classList.add('connected');
+                
                 console.log('🔗 Bezier-Verbindung erstellt:', connectionId);
+            }
+            
+            hasOtherConnections(component) {
+                // Prüft ob eine Komponente noch andere aktive Verbindungen hat
+                for (let connection of this.connections.values()) {
+                    const fromComp = connection.from.closest('.component');
+                    const toComp = connection.to.closest('.component');
+                    if (fromComp === component || toComp === component) {
+                        return true;
+                    }
+                }
+                return false;
             }
             
             deleteConnection(path) {
@@ -3021,6 +3047,18 @@
                 if (connection) {
                     connection.from.classList.remove('connected');
                     connection.to.classList.remove('connected');
+                    
+                    // Parent Components für Visual Cable Showing prüfen
+                    const fromComponent = connection.from.closest('.component');
+                    const toComponent = connection.to.closest('.component');
+                    
+                    // Nur .connected entfernen wenn keine anderen Connections existieren
+                    if (fromComponent && !this.hasOtherConnections(fromComponent)) {
+                        fromComponent.classList.remove('connected');
+                    }
+                    if (toComponent && !this.hasOtherConnections(toComponent)) {
+                        toComponent.classList.remove('connected');
+                    }
                 }
                 
                 path.remove();
@@ -3981,8 +4019,8 @@
                 </g>
                 
                 <!-- Anschlusskabel Links -->
-                <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
-                <line stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
+                <line class="visual-cable visual-cable-minus" stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
+                <line class="visual-cable visual-cable-plus" stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                 
                 <!-- Connection Points Links (Eingangsbuchsen) -->
                 <circle class="connection-socket" 
@@ -4363,8 +4401,8 @@
                 </g>
                 
                 <!-- Anschlusskabel Links -->
-                <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
-                <line stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
+                <line class="visual-cable visual-cable-minus" stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
+                <line class="visual-cable visual-cable-plus" stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                 
                 <!-- Connection Points Links (Eingangsbuchsen) -->
                 <circle class="connection-socket" 
@@ -4607,7 +4645,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.02 - CONNECTIONS-FOREGROUND: Bezier-Linien z-index:1500 + stroke-width:4 für bessere Sichtbarkeit...');
+                            console.log('🚀 LED Foundation v0.01.03 - VISUAL-CABLE-HIDING: Visueller Trick - Anschlusskabel verschwinden bei aktiven Verbindungen...');
             
             // 1. Circuit Simulation initialisieren
             try {
