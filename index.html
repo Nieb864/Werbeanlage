@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.65</div>
+                <div class="version-display">v0.00.66</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2086,7 +2086,14 @@
                             // 🚨 SICHERHEITSCHECK: Keine gefährlichen Spannungen weiterleiten!
                             if (otherLEDPower.sourceType === 'stromquelle') {
                                 console.log(`🚫 LED ${ledId}: Andere LED ${connectedId} hat gefährliche 230V-Quelle - NICHT weiterleiten!`);
-                                continue; // Suche nach sicheren Alternativen
+                                
+                                // 🔧 ABER: Wenn die andere LED kaputt ist, suche weiter nach sicheren Quellen
+                                if (otherLEDState === 'broken') {
+                                    console.log(`🔍 LED ${ledId}: Kaputte LED ${connectedId} könnte sichere Quellen dahinter haben - suche weiter`);
+                                    continue; // Suche nach weiteren Verbindungen
+                                } else {
+                                    continue; // Gesunde LED mit gefährlicher Quelle - nicht nutzen
+                                }
                             }
                             
                             // Nur sichere Trafo-Quellen weiterleiten
@@ -2098,6 +2105,79 @@
                                 }
                                 return otherLEDPower;
                             }
+                        } else if (otherLEDState === 'broken') {
+                            // 🔧 WICHTIG: Auch wenn kaputte LED keine eigene Quelle hat, kann sie andere Quellen weiterleiten
+                            console.log(`🔍 LED ${ledId}: Kaputte LED ${connectedId} hat keine eigene Quelle, aber Kontakte leiten möglicherweise weiter`);
+                            // Die Suche wird automatisch bei anderen Verbindungen fortgesetzt
+                        }
+                    }
+                }
+                
+                // 🔧 ERWEITERTE SUCHE: Wenn keine direkte Quelle gefunden, suche durch kaputte LEDs hindurch
+                console.log(`🔍 LED ${ledId}: Keine direkte Quelle gefunden - suche durch kaputte LEDs hindurch`);
+                return this.findPowerSourceThroughBrokenLEDs(ledId, visited);
+            }
+            
+            findPowerSourceThroughBrokenLEDs(ledId, visited = new Set()) {
+                if (visited.has(ledId)) return null;
+                visited.add(ledId);
+                
+                const component = this.graph.nodes.get(ledId);
+                if (!component) return null;
+                
+                console.log(`🔍 findPowerSourceThroughBrokenLEDs: Suche für ${ledId} durch kaputte LEDs`);
+                
+                // Gehe durch alle Verbindungen
+                for (const connectedId of component.connections) {
+                    const connectedComponent = this.graph.nodes.get(connectedId);
+                    if (!connectedComponent) continue;
+                    
+                    // Überspringe nicht-LEDs
+                    if (ComponentSpecs[connectedComponent.type].type !== 'load') continue;
+                    
+                    const connectedState = this.graph.getComponentState(connectedId);
+                    
+                    // Nur durch kaputte LEDs suchen (die funktionieren als Leiter)
+                    if (connectedState === 'broken') {
+                        console.log(`🔍 LED ${ledId}: Suche durch kaputte LED ${connectedId} hindurch`);
+                        
+                        // Rekursiv durch die kaputte LED hindurch suchen
+                        const powerThroughBroken = this.findPowerSourceThroughBrokenLEDs(connectedId, visited);
+                        if (powerThroughBroken && powerThroughBroken.sourceType === 'trafo') {
+                            console.log(`⚡ LED ${ledId}: Gefunden! Sichere ${powerThroughBroken.voltage}V durch kaputte LED ${connectedId}`);
+                            return powerThroughBroken;
+                        }
+                        
+                        // Auch direkte Trafo-Verbindungen der kaputten LED prüfen
+                        const directPower = this.findDirectTrafoConnection(connectedId);
+                        if (directPower) {
+                            console.log(`⚡ LED ${ledId}: Direkter Trafo durch kaputte LED ${connectedId} gefunden`);
+                            return directPower;
+                        }
+                    }
+                }
+                
+                return null;
+            }
+            
+            findDirectTrafoConnection(ledId) {
+                const component = this.graph.nodes.get(ledId);
+                if (!component) return null;
+                
+                for (const connectedId of component.connections) {
+                    const connectedComponent = this.graph.nodes.get(connectedId);
+                    if (!connectedComponent) continue;
+                    
+                    // Direkte Trafo-Verbindung
+                    if (ComponentSpecs[connectedComponent.type].type === 'transformer') {
+                        const trafoState = this.graph.getComponentState(connectedId);
+                        if (this.hasValidTransformerConnections(connectedId) && trafoState !== 'broken') {
+                            const specs = ComponentSpecs[connectedComponent.type];
+                            return {
+                                voltage: specs.outputVoltage,
+                                sourceType: 'trafo',
+                                sourceId: connectedId
+                            };
                         }
                     }
                 }
@@ -4497,7 +4577,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.65 - KAPUTTE LEDs BLEIBEN KAPUTT: Permanent defekte LEDs funktionieren nie wieder...');
+            console.log('🚀 LED Foundation v0.00.66 - STROMLEITUNG DURCH KAPUTTE LEDs: Defekte LEDs leiten Strom weiter...');
             
             // 1. Circuit Simulation initialisieren
             try {
