@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.85-ROLLBACK-FIX -->
+<!-- CACHE-BUST: v0.00.86-POSITION-INDEPENDENT -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.85</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.86</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.85</div>
+                <div class="version-display">v0.00.86</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3253,16 +3253,16 @@
                 if (component && component.id !== 'power-source-svg') {
                     const svg = component.querySelector('svg');
                     if (svg) {
-                        const rect = svg.getBoundingClientRect();
+                        const svgStyle = window.getComputedStyle(svg);
                         const viewBox = svg.getAttribute('viewBox');
                         if (viewBox) {
                             const viewBoxValues = viewBox.split(' ');
                             const viewBoxWidth = parseFloat(viewBoxValues[2]);
                             const viewBoxHeight = parseFloat(viewBoxValues[3]);
                             
-                            // Skalierungsfaktoren mit echten DOM-Maßen
-                            const scaleX = rect.width / viewBoxWidth;
-                            const scaleY = rect.height / viewBoxHeight;
+                            // Skalierungsfaktoren mit CSS-Dimensionen (unabhängig von Position)
+                            const scaleX = parseFloat(svgStyle.width) / viewBoxWidth;
+                            const scaleY = parseFloat(svgStyle.height) / viewBoxHeight;
                             
                             // ViewBox → DOM skalieren
                             x = x * scaleX;
@@ -3278,12 +3278,12 @@
                         // DOM-Element-Dimensionen verwenden (wie CSS Transform-Origin)
                         const svg = component.querySelector('svg');
                         if (svg) {
-                            // Echte DOM-Maße verwenden (wie CSS transform-origin)
-                            const rect = svg.getBoundingClientRect();
+                            // CSS-Dimensionen verwenden (unabhängig von Position)
+                            const svgStyle = window.getComputedStyle(svg);
                             
                             // DOM-Zentrum berechnen (entspricht CSS transform-origin: center center)
-                            const centerX = rect.width / 2;
-                            const centerY = rect.height / 2;
+                            const centerX = parseFloat(svgStyle.width) / 2;
+                            const centerY = parseFloat(svgStyle.height) / 2;
                             
                             // Koordinaten relativ zum DOM-Zentrum machen (x,y sind bereits DOM-Koordinaten)
                             const relativeX = x - centerX;
@@ -4599,7 +4599,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.85 - ROLLBACK-FIX: Zurück zu v0.00.83 Zustand - die reine ViewBox-Lösung hatte einen Fehler...');
+                            console.log('🚀 LED Foundation v0.00.86 - POSITION-INDEPENDENT: getComputedStyle() statt getBoundingClientRect() - verhindert Koordinaten-Drift beim Bewegen...');
             
             // 1. Circuit Simulation initialisieren
             try {
