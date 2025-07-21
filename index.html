@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.21-CLEAN-KATEGORIEN -->
+<!-- CACHE-BUST: v0.01.22-BUTTON-KATEGORIEN -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.21</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.22</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -385,31 +385,30 @@
         .category-header {
             display: flex;
             align-items: center;
-            padding: 8px 12px;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            user-select: none;
+            justify-content: space-between;
+            padding: 8px 0;
             margin-bottom: 8px;
         }
         
-        .category-header:hover {
-            background: linear-gradient(135deg, #e8e8e8 0%, #ddd 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .category-toggle {
+            background: var(--color-light);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-small);
+            color: var(--color-secondary);
+            min-width: 40px;
+            text-align: center;
         }
         
-
-        
-        .category-arrow {
-            font-size: 12px;
-            transition: transform 0.3s ease;
-            color: #666;
+        .category-toggle:hover {
+            border-color: var(--color-hover-border);
+            background: var(--color-hover);
         }
         
-        .category-arrow.collapsed {
+        .category-toggle.collapsed {
             transform: rotate(-90deg);
         }
         
@@ -1083,9 +1082,9 @@
                 
                 <div class="components-list">
                     <div class="component-category">
-                        <div class="category-header" onclick="toggleCategory('schutzschalter')">
+                        <div class="category-header">
                             <span class="category-title text-h2">Schutzschalter</span>
-                            <span class="category-arrow" id="arrow-schutzschalter">▼</span>
+                            <button class="category-toggle" onclick="toggleCategory('schutzschalter')" id="toggle-schutzschalter">▼</button>
                         </div>
                         <div class="category-content" id="category-schutzschalter">
                         <div class="component-item" data-component-type="fi-schalter">
@@ -1106,9 +1105,9 @@
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-header" onclick="toggleCategory('steuerungen')">
+                        <div class="category-header">
                             <span class="category-title text-h2">Steuerungen</span>
-                            <span class="category-arrow" id="arrow-steuerungen">▼</span>
+                            <button class="category-toggle" onclick="toggleCategory('steuerungen')" id="toggle-steuerungen">▼</button>
                         </div>
                         <div class="category-content" id="category-steuerungen">
                         <div class="component-item" data-component-type="zeitschaltuhr">
@@ -1129,9 +1128,9 @@
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-header" onclick="toggleCategory('transformatoren')">
+                        <div class="category-header">
                             <span class="category-title text-h2">Transformatoren</span>
-                            <span class="category-arrow" id="arrow-transformatoren">▼</span>
+                            <button class="category-toggle" onclick="toggleCategory('transformatoren')" id="toggle-transformatoren">▼</button>
                         </div>
                         <div class="category-content" id="category-transformatoren">
                         <div class="component-item" data-component-type="trafo-12v-40w">
@@ -1159,9 +1158,9 @@
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-header" onclick="toggleCategory('kabel')">
+                        <div class="category-header">
                             <span class="category-title text-h2">Kabel</span>
-                            <span class="category-arrow" id="arrow-kabel">▼</span>
+                            <button class="category-toggle" onclick="toggleCategory('kabel')" id="toggle-kabel">▼</button>
                         </div>
                         <div class="category-content" id="category-kabel">
                         <div class="component-item" data-component-type="kabel-flexibel-sw">
@@ -1175,9 +1174,9 @@
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-header" onclick="toggleCategory('kabelverbindungen')">
+                        <div class="category-header">
                             <span class="category-title text-h2">Kabelverbindungen</span>
-                            <span class="category-arrow" id="arrow-kabelverbindungen">▼</span>
+                            <button class="category-toggle" onclick="toggleCategory('kabelverbindungen')" id="toggle-kabelverbindungen">▼</button>
                         </div>
                         <div class="category-content" id="category-kabelverbindungen">
                         <div class="component-item" data-component-type="klemme-mobil-3l">
@@ -1191,9 +1190,9 @@
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-header" onclick="toggleCategory('entwickler')">
+                        <div class="category-header">
                             <span class="category-title text-h2">Entwickler</span>
-                            <span class="category-arrow" id="arrow-entwickler">▼</span>
+                            <button class="category-toggle" onclick="toggleCategory('entwickler')" id="toggle-entwickler">▼</button>
                         </div>
                         <div class="category-content" id="category-entwickler">
                         <div class="component-item" data-component-type="dev-placeholder">
@@ -1207,9 +1206,9 @@
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-header" onclick="toggleCategory('led-module')">
+                        <div class="category-header">
                             <span class="category-title text-h2">LED-Module</span>
-                            <span class="category-arrow" id="arrow-led-module">▼</span>
+                            <button class="category-toggle" onclick="toggleCategory('led-module')" id="toggle-led-module">▼</button>
                         </div>
                         <div class="category-content" id="category-led-module">
                         <div class="component-item" data-component-type="led-12v-1.2w">
@@ -1298,7 +1297,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.21</div>
+                <div class="version-display">v0.01.22</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5241,20 +5240,22 @@
         // ===== KATEGORIE TOGGLE SYSTEM =====
         function toggleCategory(categoryId) {
             const content = document.getElementById(`category-${categoryId}`);
-            const arrow = document.getElementById(`arrow-${categoryId}`);
+            const toggle = document.getElementById(`toggle-${categoryId}`);
             
-            if (content && arrow) {
+            if (content && toggle) {
                 // Toggle collapsed state
                 const isCollapsed = content.classList.contains('collapsed');
                 
                 if (isCollapsed) {
                     // Öffnen
                     content.classList.remove('collapsed');
-                    arrow.classList.remove('collapsed');
+                    toggle.classList.remove('collapsed');
+                    toggle.textContent = '▼';
                 } else {
                     // Schließen
                     content.classList.add('collapsed');
-                    arrow.classList.add('collapsed');
+                    toggle.classList.add('collapsed');
+                    toggle.textContent = '►';
                 }
                 
                 // Status in localStorage speichern
@@ -5275,11 +5276,12 @@
                 
                 if (!shouldBeOpen) {
                     const content = document.getElementById(`category-${categoryId}`);
-                    const arrow = document.getElementById(`arrow-${categoryId}`);
+                    const toggle = document.getElementById(`toggle-${categoryId}`);
                     
-                    if (content && arrow) {
+                    if (content && toggle) {
                         content.classList.add('collapsed');
-                        arrow.classList.add('collapsed');
+                        toggle.classList.add('collapsed');
+                        toggle.textContent = '►';
                     }
                 }
             });
@@ -5390,7 +5392,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.21 - CLEAN-KATEGORIEN: Icons entfernt, cleaner Text-only Look...');
+                            console.log('🚀 LED Foundation v0.01.22 - BUTTON-KATEGORIEN: Toggle-Buttons wie beim Datenblatt, konsistentes Design...');
             
             // 1. Circuit Simulation initialisieren
             try {
