@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LED & EVG Drag-and-Drop Werkbank v0.00.61</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.67</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.66</div>
+                <div class="version-display">v0.00.67</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2075,9 +2075,13 @@
                         // 🔧 WICHTIG: Prüfe ob die andere LED kaputt ist
                         const otherLEDState = this.graph.getComponentState(connectedId);
                         if (otherLEDState === 'broken') {
-                            console.log(`💀 LED ${connectedId} ist kaputt - aber Kontakte sind noch verbunden, suche alternative Stromquelle`);
-                            // Kaputte LEDs blockieren nicht die Parallelschaltung - Kontakte sind ja noch da!
-                            // Suche rekursiv weiter nach anderen Stromquellen über diese kaputte LED
+                            console.log(`💀 LED ${connectedId} ist kaputt - aber Kontakte sind noch verbunden, suche durch sie hindurch`);
+                            // 🔧 SOFORT durch kaputte LED hindurch nach sicheren Quellen suchen!
+                            const powerThroughBroken = this.findPowerSourceThroughBrokenLEDs(connectedId, visited);
+                            if (powerThroughBroken && powerThroughBroken.sourceType === 'trafo') {
+                                console.log(`⚡ LED ${ledId}: DURCHBRUCH! Sichere ${powerThroughBroken.voltage}V durch kaputte LED ${connectedId}`);
+                                return powerThroughBroken;
+                            }
                         }
                         
                         // Prüfe ob die andere LED eine gültige UND SICHERE Spannungsquelle hat
@@ -4577,7 +4581,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.66 - STROMLEITUNG DURCH KAPUTTE LEDs: Defekte LEDs leiten Strom weiter...');
+            console.log('🚀 LED Foundation v0.00.67 - SOFORTIGE DURCHLEITUNG: Kaputte LEDs werden sofort als Leiter erkannt...');
             
             // 1. Circuit Simulation initialisieren
             try {
