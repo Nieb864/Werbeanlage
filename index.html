@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.13-FI-SCHUTZSCHALTER -->
+<!-- CACHE-BUST: v0.01.14-LS-SCHUTZSCHALTER -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.13</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.14</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1181,7 +1181,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.13</div>
+                <div class="version-display">v0.01.14</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4593,6 +4593,8 @@
                         placeholder.innerHTML = getTrafoSchematic(componentType);
                     } else if (componentType.includes('fi')) {
                         placeholder.innerHTML = getFISchematic();
+                    } else if (componentType.includes('ls')) {
+                        placeholder.innerHTML = getLSSchematic();
                     }
                 }
             }, 100);
@@ -4833,6 +4835,25 @@
                 </svg>
             `;
         }
+        
+        function getLSSchematic() {
+            return `
+                <svg viewBox="0 0 9.78 86.6" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; max-height: 120px;">
+                    <g>
+                        <!-- LS-Schalter -->
+                        <g>
+                            <line class="schematic-line" x1="6.29" y1="12.38" x2="6.29" y2="31.54"/>
+                            <line class="schematic-line" x1="2.77" y1="31.54" x2="9.78" y2="31.54"/>
+                            <polyline class="schematic-line" points="0.43 33.82 6.29 43.86 6.29 75.34"/>
+                        </g>
+                        
+                        <!-- Beschriftung -->
+                        <text class="schematic-text" x="2.59" y="83.6">L</text>
+                        <text class="schematic-text" x="3.36" y="10.04">L</text>
+                    </g>
+                </svg>
+            `;
+        }
 
         // ===== POWER TOOLTIP SYSTEM =====
         function setupPowerTooltips() {
@@ -4939,7 +4960,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.13 - FI-SCHUTZSCHALTER: FI-Schutzschalter Schaltskizze mit 4-poligem Schalter hinzugefügt...');
+                            console.log('🚀 LED Foundation v0.01.14 - LS-SCHUTZSCHALTER: LS-Schutzschalter (Leitungsschutzschalter) Schaltskizze hinzugefügt...');
             
             // 1. Circuit Simulation initialisieren
             try {
