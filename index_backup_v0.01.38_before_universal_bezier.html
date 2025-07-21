@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.39-UNIVERSAL-BEZIER-SYSTEM -->
+<!-- CACHE-BUST: v0.01.38-KLEMME-ENDPUNKT-KORR -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.39</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.38</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -3627,7 +3627,7 @@
                 // Basis-Offset für Kontrollpunkte
                 const baseOffset = 60;
                 
-                // Start-Kontrollpunkt mit universeller Richtungs-Detection
+                // Start-Kontrollpunkt
                 let cp1X, cp1Y;
                 const fromRotation = this.componentRotations.get(fromComponent) || 0;
                 
@@ -3636,33 +3636,21 @@
                     cp1X = startPos.x;
                     cp1Y = startPos.y + baseOffset;
                 } else {
-                    // Universelle Richtungs-Detection für Start-Punkt
-                    const fromDirection = this.getBezierDirection(fromElement, 'from');
+                    // Rotiertes Bauteil: Berechne Richtung basierend auf Rotation
                     const fromRad = (fromRotation * Math.PI) / 180;
+                    const outputSide = fromElement.dataset.connectionId?.includes('out-') ? 'right' : 'left';
                     
-                    switch(fromDirection) {
-                        case 'up':
-                            cp1X = startPos.x + baseOffset * Math.sin(-fromRad);
-                            cp1Y = startPos.y - baseOffset * Math.cos(fromRad);
-                            break;
-                        case 'down':
-                            cp1X = startPos.x - baseOffset * Math.sin(-fromRad);
-                            cp1Y = startPos.y + baseOffset * Math.cos(fromRad);
-                            break;
-                        case 'left':
-                            const leftDirection = fromRad + Math.PI;
-                            cp1X = startPos.x + baseOffset * Math.cos(leftDirection);
-                            cp1Y = startPos.y + baseOffset * Math.sin(leftDirection);
-                            break;
-                        case 'right':
-                        default:
-                            cp1X = startPos.x + baseOffset * Math.cos(fromRad);
-                            cp1Y = startPos.y + baseOffset * Math.sin(fromRad);
-                            break;
+                    if (outputSide === 'right') {
+                        cp1X = startPos.x + baseOffset * Math.cos(fromRad);
+                        cp1Y = startPos.y + baseOffset * Math.sin(fromRad);
+                    } else {
+                        const leftDirection = fromRad + Math.PI;
+                        cp1X = startPos.x + baseOffset * Math.cos(leftDirection);
+                        cp1Y = startPos.y + baseOffset * Math.sin(leftDirection);
                     }
                 }
                 
-                // End-Kontrollpunkt mit universeller Richtungs-Detection
+                // End-Kontrollpunkt
                 let cp2X, cp2Y;
                 const toRotation = this.componentRotations.get(toComponent) || 0;
                 
@@ -3671,59 +3659,21 @@
                     cp2X = endPos.x;
                     cp2Y = endPos.y - baseOffset;
                 } else {
-                    // Universelle Richtungs-Detection für End-Punkt
-                    const toDirection = this.getBezierDirection(toElement, 'to');
+                    // Rotiertes Bauteil: Berechne Richtung basierend auf Rotation
                     const toRad = (toRotation * Math.PI) / 180;
-                    const endOffset = baseOffset * 0.5;
+                    const inputSide = toElement.dataset.connectionId?.includes('in-') ? 'left' : 'right';
                     
-                    switch(toDirection) {
-                        case 'up':
-                            cp2X = endPos.x - endOffset * Math.sin(-toRad);
-                            cp2Y = endPos.y + endOffset * Math.cos(toRad);
-                            break;
-                        case 'down':
-                            cp2X = endPos.x + endOffset * Math.sin(-toRad);
-                            cp2Y = endPos.y - endOffset * Math.cos(toRad);
-                            break;
-                        case 'left':
-                            const leftDirection = toRad + Math.PI;
-                            cp2X = endPos.x + endOffset * Math.cos(leftDirection);
-                            cp2Y = endPos.y + endOffset * Math.sin(leftDirection);
-                            break;
-                        case 'right':
-                        default:
-                            cp2X = endPos.x + endOffset * Math.cos(toRad);
-                            cp2Y = endPos.y + endOffset * Math.sin(toRad);
-                            break;
+                    if (inputSide === 'left') {
+                        const leftDirection = toRad + Math.PI;
+                        cp2X = endPos.x + (baseOffset * 0.5) * Math.cos(leftDirection);
+                        cp2Y = endPos.y + (baseOffset * 0.5) * Math.sin(leftDirection);
+                    } else {
+                        cp2X = endPos.x + (baseOffset * 0.5) * Math.cos(toRad);
+                        cp2Y = endPos.y + (baseOffset * 0.5) * Math.sin(toRad);
                     }
                 }
                 
                 return { cp1X, cp1Y, cp2X, cp2Y };
-            }
-            
-            // Neue Hilfsfunktion: Universelle Richtungs-Detection
-            getBezierDirection(element, connectionType) {
-                // 1. Priorität: Explizite data-bezier-direction
-                if (element.dataset.bezierDirection) {
-                    const [x1, y1] = element.dataset.bezierDirection.split(',').map(Number);
-                    
-                    if (Math.abs(x1) > Math.abs(y1)) {
-                        return x1 > 0 ? 'right' : 'left';
-                    } else {
-                        return y1 > 0 ? 'down' : 'up';
-                    }
-                }
-                
-                // 2. Fallback: Legacy-Logic basierend auf Connection-ID
-                if (connectionType === 'from') {
-                    // Start-Punkt: out- = rechts, sonst links
-                    return element.dataset.connectionId?.includes('out-') ? 'right' : 'left';
-                } else {
-                    // End-Punkt: in- = links, terminal- = oben, sonst rechts
-                    if (element.dataset.connectionId?.includes('in-')) return 'left';
-                    if (element.dataset.connectionId?.includes('terminal-')) return 'up';
-                    return 'right';
-                }
             }
         }
 
