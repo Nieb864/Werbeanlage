@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: 2024-12-20-21:55:00-BEZIER-SANFT-v73 -->
+<!-- CACHE-BUST: v0.00.81-DOM-CENTER-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.80</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.81</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.80</div>
+                <div class="version-display">v0.00.81</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3253,31 +3253,44 @@
                 if (component && component.id !== 'power-source-svg') {
                     const rotation = this.componentRotations.get(component) || 0;
                     if (rotation !== 0) {
-                        // SVG-Dimensionen dynamisch auslesen
+                        // DOM-Element-Dimensionen verwenden (wie CSS Transform-Origin)
                         const svg = component.querySelector('svg');
                         if (svg) {
+                            // Tatsächliche gerenderte Größe des DOM-Elements
+                            const rect = svg.getBoundingClientRect();
+                            const svgStyle = window.getComputedStyle(svg);
+                            
+                            // DOM-Zentrum berechnen (entspricht CSS transform-origin: center center)
+                            const centerX = parseFloat(svgStyle.width) / 2;
+                            const centerY = parseFloat(svgStyle.height) / 2;
+                            
+                            // ViewBox-zu-DOM Skalierung berechnen
                             const viewBox = svg.getAttribute('viewBox');
                             if (viewBox) {
                                 const viewBoxValues = viewBox.split(' ');
-                                const svgWidth = parseFloat(viewBoxValues[2]);
-                                const svgHeight = parseFloat(viewBoxValues[3]);
+                                const viewBoxWidth = parseFloat(viewBoxValues[2]);
+                                const viewBoxHeight = parseFloat(viewBoxValues[3]);
                                 
-                                // Dynamisches Zentrum berechnen
-                                const centerX = svgWidth / 2;
-                                const centerY = svgHeight / 2;
+                                // Skalierungsfaktoren
+                                const scaleX = parseFloat(svgStyle.width) / viewBoxWidth;
+                                const scaleY = parseFloat(svgStyle.height) / viewBoxHeight;
                                 
-                                // Koordinaten relativ zum Zentrum machen
-                                const relativeX = x - centerX;
-                                const relativeY = y - centerY;
+                                // Bezier-Koordinaten auf DOM-Größe skalieren
+                                const scaledX = x * scaleX;
+                                const scaledY = y * scaleY;
                                 
-                                // Rotieren um das Zentrum
+                                // Koordinaten relativ zum DOM-Zentrum machen
+                                const relativeX = scaledX - centerX;
+                                const relativeY = scaledY - centerY;
+                                
+                                // Rotieren um das DOM-Zentrum
                                 const rad = (rotation * Math.PI) / 180;
                                 const rotatedX = relativeX * Math.cos(rad) - relativeY * Math.sin(rad);
                                 const rotatedY = relativeX * Math.sin(rad) + relativeY * Math.cos(rad);
                                 
-                                // Zurück zu absoluten Koordinaten
-                                x = rotatedX + centerX;
-                                y = rotatedY + centerY;
+                                // Zurück zu DOM-Koordinaten und zurück-skalieren für absolute Position
+                                x = (rotatedX + centerX) / scaleX;
+                                y = (rotatedY + centerY) / scaleY;
                             }
                         }
                     }
@@ -4581,7 +4594,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.80 - ROLLBACK: Zurück zu den ursprünglichen, funktionierenden Kabeln...');
+                            console.log('🚀 LED Foundation v0.00.81 - DOM-CENTER-FIX: Bezier-Punkte rotieren nun um das echte DOM-Zentrum (wie CSS transform-origin)...');
             
             // 1. Circuit Simulation initialisieren
             try {
