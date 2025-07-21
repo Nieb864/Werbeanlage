@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.23-KLEMME-SCHALTSKIZZE -->
+<!-- CACHE-BUST: v0.01.24-KLEMME-GROESSE-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.23</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.24</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1297,7 +1297,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.23</div>
+                <div class="version-display">v0.01.24</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5241,7 +5241,7 @@
         
         function getKlemmeSchematic() {
             return `
-                <svg viewBox="0 0 26.54 12.86" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; max-height: 120px;">
+                <svg viewBox="0 0 26.54 12.86" xmlns="http://www.w3.org/2000/svg" style="width: 33%; height: auto; max-height: 40px;">
                     <defs>
                         <style>
                             .cls-1 { fill: #1d1d1b; }
@@ -5251,7 +5251,7 @@
                     <g>
                         <line class="cls-2" x1="13.27" y1="1.1" x2="13.27" y2="12.36"/>
                         <path class="cls-2" d="M.97.97v11.39h24.6V.97"/>
-                        <circle class="cls-1" cx="25.57" cy=".97" r=".97"/>
+                        <circle class="cls-1" cx="25.1" cy=".97" r=".97"/>
                         <circle class="cls-1" cx=".97" cy=".97" r=".97"/>
                         <circle class="cls-1" cx="13.27" cy=".97" r=".97"/>
                     </g>
@@ -5414,7 +5414,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.23 - KLEMME-SCHALTSKIZZE: Mobile Klemme 3L SVG-Schaltskizze hinzugefügt...');
+                            console.log('🚀 LED Foundation v0.01.24 - KLEMME-GROESSE-FIX: Schaltskizze-Größe reduziert, schwarze Kreise korrigiert...');
             
             // 1. Circuit Simulation initialisieren
             try {
