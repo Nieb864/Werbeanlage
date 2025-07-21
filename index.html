@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.95-OUTLINE-INSTEAD-BORDER -->
+<!-- CACHE-BUST: v0.00.96-LINE-HEIGHT-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.95</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.96</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -466,6 +466,8 @@
             border: 0px solid transparent; /* KEIN Border im Normalzustand */
             display: inline-block; /* Container passt sich an SVG-Größe an */
             box-sizing: border-box; /* Border ist in der Größe enthalten */
+            line-height: 0; /* Verhindert line-height Einfluss auf inline-block */
+            vertical-align: top; /* Verhindert baseline Alignment */
         }
 
         .component:hover {
@@ -1129,7 +1131,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.95</div>
+                <div class="version-display">v0.00.96</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4605,7 +4607,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.95 - OUTLINE-INSTEAD-BORDER: Outline statt Border für perfekte Container=SVG-Größe...');
+                            console.log('🚀 LED Foundation v0.00.96 - LINE-HEIGHT-FIX: line-height:0 + vertical-align:top für perfekte inline-block-Größe...');
             
             // 1. Circuit Simulation initialisieren
             try {
