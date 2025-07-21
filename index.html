@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.06-OUTPUT-ONLY-VISUAL-CABLES -->
+<!-- CACHE-BUST: v0.01.07-INPUT-VISUAL-CABLES -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.06</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.07</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1136,7 +1136,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.06</div>
+                <div class="version-display">v0.01.07</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3017,9 +3017,9 @@
             }
             
             updateVisualCables(connectionPoint) {
-                // Visual Cables nur bei OUTPUT-Lines verstecken, nicht bei INPUT-Sockets
+                // Visual Cables nur bei INPUT-Sockets verstecken, nicht bei OUTPUT-Lines
                 const connectionType = connectionPoint.getAttribute('data-connection-type');
-                if (connectionType !== 'output-line') return;  // Nur Output-Lines haben Visual Cables
+                if (connectionType !== 'input-socket') return;  // Nur Input-Sockets brauchen Visual Cable Hiding
                 
                 const component = connectionPoint.closest('.component');
                 if (!component) return;
@@ -4642,7 +4642,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.06 - OUTPUT-ONLY-VISUAL-CABLES: Visual Cables nur bei Output-Lines verstecken...');
+                            console.log('🚀 LED Foundation v0.01.07 - INPUT-VISUAL-CABLES: Visual Cables korrekt bei Input-Sockets verstecken...');
             
             // 1. Circuit Simulation initialisieren
             try {
