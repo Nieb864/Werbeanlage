@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.11-ORIGINAL-LED-SCHEMATIC -->
+<!-- CACHE-BUST: v0.01.12-TRAFO-SCHEMATICS -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.11</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.12</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -818,6 +818,12 @@
             margin: 10px 0;
             text-align: center;
         }
+        .schematic-text {
+            fill: #1d1d1b;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+        }
         .schematic-fill-black { 
             fill: #1d1d1b; 
         }
@@ -1172,7 +1178,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.11</div>
+                <div class="version-display">v0.01.12</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4577,8 +4583,12 @@
             // Schaltskizze nachträglich einfügen
             setTimeout(() => {
                 const placeholder = document.getElementById('schematic-placeholder');
-                if (placeholder && componentType.includes('led')) {
-                    placeholder.innerHTML = getLEDSchematic();
+                if (placeholder) {
+                    if (componentType.includes('led')) {
+                        placeholder.innerHTML = getLEDSchematic();
+                    } else if (componentType.includes('trafo')) {
+                        placeholder.innerHTML = getTrafoSchematic(componentType);
+                    }
                 }
             }, 100);
         }
@@ -4680,6 +4690,55 @@
                         <!-- Minus-Anschluss Linien -->
                         <line class="schematic-line" x1="206.02" y1="65.57" x2="211.47" y2="65.57"/>
                         <line class="schematic-line" x1="1.61" y1="65.57" x2="7.07" y2="65.57"/>
+                    </g>
+                </svg>
+            `;
+        }
+        
+        function getTrafoSchematic(componentType) {
+            // Bestimme Ausgangsspannung basierend auf Component-Type
+            const isTrafo24V = componentType.includes('24v');
+            const outputVoltage = isTrafo24V ? '24' : '12';
+            
+            return `
+                <svg viewBox="0 0 155.08 75.96" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; max-height: 120px;">
+                    <g>
+                        <!-- Primärspule (230V) -->
+                        <g>
+                            <path class="schematic-line" d="M68.24,23.1c2.63,0,4.79-2.16,4.79-4.79s-2.16-4.79-4.79-4.79v-6.99H11.74"/>
+                            <path class="schematic-line" d="M68.24,51.86c2.63,0,4.79,2.16,4.79,4.79s-2.16,4.79-4.79,4.79v6.99H11.74"/>
+                            <path class="schematic-line" d="M68.24,23.1c2.63,0,4.79,2.16,4.79,4.79s-2.16,4.79-4.79,4.79"/>
+                            <path class="schematic-line" d="M68.24,32.69c2.63,0,4.79,2.16,4.79,4.79s-2.16,4.79-4.79,4.79"/>
+                            <path class="schematic-line" d="M68.24,42.27c2.63,0,4.79,2.16,4.79,4.79s-2.16,4.79-4.79,4.79"/>
+                        </g>
+                        
+                        <!-- Sekundärspule -->
+                        <g>
+                            <path class="schematic-line" d="M86.84,23.1c-2.63,0-4.79-2.16-4.79-4.79s2.16-4.79,4.79-4.79v-6.99h56.5"/>
+                            <path class="schematic-line" d="M86.84,51.86c-2.63,0-4.79,2.16-4.79,4.79s2.16,4.79,4.79,4.79v6.99s56.5,0,56.5,0"/>
+                            <path class="schematic-line" d="M86.84,23.1c-2.63,0-4.79,2.16-4.79,4.79s2.16,4.79,4.79,4.79"/>
+                            <path class="schematic-line" d="M86.84,32.69c-2.63,0-4.79,2.16-4.79,4.79s2.16,4.79,4.79,4.79"/>
+                            <path class="schematic-line" d="M86.84,42.27c-2.63,0-4.79,2.16-4.79,4.79s2.16,4.79,4.79,4.79"/>
+                        </g>
+                        
+                        <!-- Kern -->
+                        <line class="schematic-line" x1="77.1" y1="12.88" x2="77.1" y2="62.08"/>
+                        
+                        <!-- Anschlüsse -->
+                        <circle class="schematic-fill-white" cx="6.12" cy="6.52" r="5.62"/>
+                        <circle class="schematic-fill-white" cx="6.12" cy="68.43" r="5.62"/>
+                        <circle class="schematic-fill-white" cx="148.96" cy="6.52" r="5.62"/>
+                        <circle class="schematic-fill-white" cx="148.96" cy="68.43" r="5.62"/>
+                        
+                        <!-- Beschriftung Eingänge -->
+                        <text class="schematic-text" x="3.64" y="11.04">P</text>
+                        <text class="schematic-text" x="2.4" y="72.96">N</text>
+                        <text class="schematic-text" x="23.8" y="42.27">230 V</text>
+                        
+                        <!-- Beschriftung Ausgänge -->
+                        <text class="schematic-text" x="145.39" y="10.04">+</text>
+                        <text class="schematic-text" x="147.12" y="71.96">-</text>
+                        <text class="schematic-text" x="105.8" y="42.27">${outputVoltage} V</text>
                     </g>
                 </svg>
             `;
@@ -4790,7 +4849,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.11 - ORIGINAL-LED-SCHEMATIC: Original SVG-Schaltskizze mit 3 LEDs und dickeren Linien...');
+                            console.log('🚀 LED Foundation v0.01.12 - TRAFO-SCHEMATICS: Trafo-Schaltskizzen für 12V und 24V hinzugefügt...');
             
             // 1. Circuit Simulation initialisieren
             try {
