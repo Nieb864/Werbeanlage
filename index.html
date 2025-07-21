@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.89-PROPORTIONS-FIX -->
+<!-- CACHE-BUST: v0.00.90-INTEGER-PIXELS -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.89</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.90</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -639,7 +639,7 @@
         /* LED Module */
         .led-module-svg {
             width: auto;
-            height: 27.54px;
+            height: 28px;
         }
 
         /* Transformer Module */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.89</div>
+                <div class="version-display">v0.00.90</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3893,7 +3893,7 @@
         // ===== LED-MODUL 12V 1,2W =====
         function createLEDModuleSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 137.29 27.54');
+            svg.setAttribute('viewBox', '0 0 137.29 28');
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-12v-1.2w');
             
@@ -3983,7 +3983,7 @@
                         data-connection-id="in-minus"
                         data-wire-type="minus"
                         data-voltage="12"
-                        data-bezier-end-x="19" data-bezier-end-y="9.5"
+                        data-bezier-end-x="19" data-bezier-end-y="9.7"
                         data-bezier-direction="-20,0,0,0"/>
                         
                 <circle class="connection-socket" 
@@ -3992,7 +3992,7 @@
                         data-connection-id="in-plus"
                         data-wire-type="plus"
                         data-voltage="12"
-                        data-bezier-end-x="19" data-bezier-end-y="18.5"
+                        data-bezier-end-x="19" data-bezier-end-y="18.8"
                         data-bezier-direction="-20,0,0,0"/>
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
@@ -4003,7 +4003,7 @@
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="12"
-                      data-bezier-start-x="120" data-bezier-start-y="9.5"
+                      data-bezier-start-x="120" data-bezier-start-y="9.7"
                       data-bezier-direction="20,0,0,0"/>
                       
                 <line class="connection-line" 
@@ -4013,7 +4013,7 @@
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="12"
-                      data-bezier-start-x="120" data-bezier-start-y="18.5"
+                      data-bezier-start-x="120" data-bezier-start-y="18.8"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -4275,7 +4275,7 @@
         // ===== LED-MODUL 24V =====
         function createLED24VSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 137.29 27.54');
+            svg.setAttribute('viewBox', '0 0 137.29 28');
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-24v-5w');
             
@@ -4365,7 +4365,7 @@
                         data-connection-id="in-minus"
                         data-wire-type="minus"
                         data-voltage="24"
-                        data-bezier-end-x="19" data-bezier-end-y="9.5"
+                        data-bezier-end-x="19" data-bezier-end-y="9.7"
                         data-bezier-direction="-20,0,0,0"/>
                         
                 <circle class="connection-socket" 
@@ -4374,7 +4374,7 @@
                         data-connection-id="in-plus"
                         data-wire-type="plus"
                         data-voltage="24"
-                        data-bezier-end-x="19" data-bezier-end-y="18.5"
+                        data-bezier-end-x="19" data-bezier-end-y="18.8"
                         data-bezier-direction="-20,0,0,0"/>
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
@@ -4385,7 +4385,7 @@
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="24"
-                                              data-bezier-start-x="120" data-bezier-start-y="9.5"
+                                              data-bezier-start-x="120" data-bezier-start-y="9.7"
                       data-bezier-direction="20,0,0,0"/>
                       
                 <line class="connection-line" 
@@ -4395,7 +4395,7 @@
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="24"
-                                              data-bezier-start-x="120" data-bezier-start-y="18.5"
+                                              data-bezier-start-x="120" data-bezier-start-y="18.8"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -4599,7 +4599,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.89 - PROPORTIONS-FIX: ViewBox und CSS auf exakt gleiche Proportionen - sollte beide Probleme lösen!');
+                            console.log('🚀 LED Foundation v0.00.90 - INTEGER-PIXELS: ViewBox 28px = CSS 28px (Integer-Pixel für perfekte Browser-Darstellung)...');
             
             // 1. Circuit Simulation initialisieren
             try {
