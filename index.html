@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.09-SIMPLE-LED-SCHEMATICS -->
+<!-- CACHE-BUST: v0.01.10-THREE-LEDS-THICK-LINES -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.09</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.10</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -802,7 +802,7 @@
         .schematic-line { 
             fill: none; 
             stroke: #1d1d1b; 
-            stroke-width: 1; 
+            stroke-width: 2; 
             stroke-miterlimit: 10; 
         }
         .schematic-fill-black { 
@@ -811,20 +811,12 @@
         .schematic-fill-white { 
             fill: #fff; 
             stroke: #1d1d1b; 
-            stroke-width: 1; 
+            stroke-width: 2; 
             stroke-miterlimit: 10; 
         }
         .schematic-container {
             margin: 10px 0;
             text-align: center;
-        }
-        
-        /* Schaltskizze Standards */
-        .schematic-line { 
-            fill: none; 
-            stroke: #1d1d1b; 
-            stroke-width: 1; 
-            stroke-miterlimit: 10; 
         }
         .schematic-fill-black { 
             fill: #1d1d1b; 
@@ -1180,7 +1172,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.09</div>
+                <div class="version-display">v0.01.10</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4596,66 +4588,118 @@
                 <svg viewBox="0 0 426 140" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; max-height: 120px;">
                     <g>
                         <!-- Obere Leitung -->
-                        <line class="schematic-line" x1="417.94" y1="8.52" x2="8.1" y2="8.52"/>
+                        <line class="schematic-line" x1="417.94" y1="20" x2="8.1" y2="20"/>
                         
                         <!-- Plus-Anschluss oben rechts -->
                         <g>
-                            <circle class="schematic-fill-white" cx="417.52" cy="8.52" r="7.52"/>
-                            <path class="schematic-fill-black" d="M417.52,0c-4.7,0-8.52,3.82-8.52,8.52s3.82,8.52,8.52,8.52,8.52-3.82,8.52-8.52-3.82-8.52-8.52-8.52ZM417.52,15.04c-3.6,0-6.52-2.92-6.52-6.52s2.92-6.52,6.52-6.52,6.52,2.92,6.52,6.52-2.92,6.52-6.52,6.52Z"/>
-                            <line class="schematic-line" x1="412.04" y1="8.52" x2="422.96" y2="8.52"/>
-                            <line class="schematic-line" x1="417.5" y1="3.06" x2="417.5" y2="13.98"/>
+                            <circle class="schematic-fill-white" cx="417.52" cy="20" r="7.52"/>
+                            <path class="schematic-fill-black" d="M417.52,11.48c-4.7,0-8.52,3.82-8.52,8.52s3.82,8.52,8.52,8.52,8.52-3.82,8.52-8.52-3.82-8.52-8.52-8.52ZM417.52,26.52c-3.6,0-6.52-2.92-6.52-6.52s2.92-6.52,6.52-6.52,6.52,2.92,6.52,6.52-2.92,6.52-6.52,6.52Z"/>
+                            <line class="schematic-line" x1="412.04" y1="20" x2="422.96" y2="20"/>
+                            <line class="schematic-line" x1="417.5" y1="14.54" x2="417.5" y2="25.46"/>
                         </g>
                         
                         <!-- Plus-Anschluss oben links -->
                         <g>
-                            <circle class="schematic-fill-white" cx="8.52" cy="8.52" r="7.52"/>
-                            <path class="schematic-fill-black" d="M8.52,0c4.7,0,8.52,3.82,8.52,8.52s-3.82,8.52-8.52,8.52S0,13.22,0,8.52,3.82,0,8.52,0ZM8.52,15.04c3.6,0,6.52-2.92,6.52-6.52s-2.92-6.52-6.52-6.52-6.52,2.92-6.52,6.52,2.92,6.52,6.52,6.52Z"/>
-                            <line class="schematic-line" x1="2.96" y1="8.52" x2="13.88" y2="8.52"/>
-                            <line class="schematic-line" x1="8.42" y1="3.06" x2="8.42" y2="13.98"/>
-                        </g>
-                        
-                        <!-- Vertikalleitung links -->
-                        <polyline class="schematic-line" points="28.8,8.52 28.8,48.2 397.92,49.76 397.92,131.14"/>
-                        
-                        <!-- LED 1 -->
-                        <g>
-                            <polyline class="schematic-line" points="136.56,49.76 136.56,99.92 204.54,99.92 204.54,49.82"/>
-                            <line class="schematic-line" x1="162.52" y1="86.26" x2="162.52" y2="113.58"/>
-                            <polygon class="schematic-fill-white" points="163.1,99.88 184.76,88.08 184.76,111.68 163.1,99.88"/>
-                            <!-- LED Symbol -->
-                            <g>
-                                <line class="schematic-line" x1="186.58" y1="31.48" x2="186.58" y2="68.18"/>
-                                <polygon class="schematic-fill-white" points="185.84,49.76 158.4,33.92 158.4,65.6 185.84,49.76"/>
-                                <!-- Lichtstrahlen -->
-                                <g>
-                                    <line class="schematic-line" x1="175.96" y1="21.98" x2="168.54" y2="34.62"/>
-                                    <polygon class="schematic-fill-black" points="171.72,22.48 175.38,22.96 177.6,25.92 178.74,17.24 171.72,22.48"/>
-                                </g>
-                                <g>
-                                    <line class="schematic-line" x1="183.2" y1="26.32" x2="175.78" y2="38.96"/>
-                                    <polygon class="schematic-fill-black" points="178.96,26.82 182.62,27.3 184.84,30.28 185.98,21.58 178.96,26.82"/>
-                                </g>
-                            </g>
+                            <circle class="schematic-fill-white" cx="8.52" cy="20" r="7.52"/>
+                            <path class="schematic-fill-black" d="M8.52,11.48c4.7,0,8.52,3.82,8.52,8.52s-3.82,8.52-8.52,8.52S0,24.7,0,20,3.82,11.48,8.52,11.48ZM8.52,26.52c3.6,0,6.52-2.92,6.52-6.52s-2.92-6.52-6.52-6.52-6.52,2.92-6.52,6.52,2.92,6.52,6.52,6.52Z"/>
+                            <line class="schematic-line" x1="2.96" y1="20" x2="13.88" y2="20"/>
+                            <line class="schematic-line" x1="8.42" y1="14.54" x2="8.42" y2="25.46"/>
                         </g>
                         
                         <!-- Anschlussklemme -->
-                        <rect class="schematic-fill-white" x="50.06" y="39.66" width="55.96" height="17.5"/>
+                        <rect class="schematic-fill-white" x="30" y="35" width="60" height="20"/>
+                        
+                        <!-- Hauptverteilung von Anschlussklemme -->
+                        <line class="schematic-line" x1="60" y1="20" x2="60" y2="35"/>
+                        <line class="schematic-line" x1="60" y1="55" x2="60" y2="80"/>
+                        
+                        <!-- LED 1 -->
+                        <g>
+                            <!-- Parallelleitung LED 1 -->
+                            <line class="schematic-line" x1="60" y1="80" x2="140" y2="80"/>
+                            <line class="schematic-line" x1="140" y1="80" x2="140" y2="65"/>
+                            <line class="schematic-line" x1="140" y1="95" x2="140" y2="110"/>
+                            <!-- LED Symbol 1 -->
+                            <line class="schematic-line" x1="130" y1="65" x2="150" y2="65"/>
+                            <line class="schematic-line" x1="130" y1="95" x2="150" y2="95"/>
+                            <polygon class="schematic-fill-white" points="135,65 135,95 145,85 145,75 135,65"/>
+                            <polygon class="schematic-fill-white" points="145,75 155,70 155,90 145,85 145,75"/>
+                            <!-- Lichtstrahlen 1 -->
+                            <line class="schematic-line" x1="152" y1="72" x2="162" y2="67"/>
+                            <polygon class="schematic-fill-black" points="160,68 162,66 165,69 162,71 160,68"/>
+                            <line class="schematic-line" x1="152" y1="78" x2="162" y2="73"/>
+                            <polygon class="schematic-fill-black" points="160,74 162,72 165,75 162,77 160,74"/>
+                        </g>
+                        
+                        <!-- LED 2 -->
+                        <g>
+                            <!-- Parallelleitung LED 2 -->
+                            <line class="schematic-line" x1="180" y1="80" x2="260" y2="80"/>
+                            <line class="schematic-line" x1="220" y1="80" x2="220" y2="65"/>
+                            <line class="schematic-line" x1="220" y1="95" x2="220" y2="110"/>
+                            <!-- LED Symbol 2 -->
+                            <line class="schematic-line" x1="210" y1="65" x2="230" y2="65"/>
+                            <line class="schematic-line" x1="210" y1="95" x2="230" y2="95"/>
+                            <polygon class="schematic-fill-white" points="215,65 215,95 225,85 225,75 215,65"/>
+                            <polygon class="schematic-fill-white" points="225,75 235,70 235,90 225,85 225,75"/>
+                            <!-- Lichtstrahlen 2 -->
+                            <line class="schematic-line" x1="232" y1="72" x2="242" y2="67"/>
+                            <polygon class="schematic-fill-black" points="240,68 242,66 245,69 242,71 240,68"/>
+                            <line class="schematic-line" x1="232" y1="78" x2="242" y2="73"/>
+                            <polygon class="schematic-fill-black" points="240,74 242,72 245,75 242,77 240,74"/>
+                        </g>
+                        
+                        <!-- LED 3 -->
+                        <g>
+                            <!-- Parallelleitung LED 3 -->
+                            <line class="schematic-line" x1="280" y1="80" x2="360" y2="80"/>
+                            <line class="schematic-line" x1="320" y1="80" x2="320" y2="65"/>
+                            <line class="schematic-line" x1="320" y1="95" x2="320" y2="110"/>
+                            <!-- LED Symbol 3 -->
+                            <line class="schematic-line" x1="310" y1="65" x2="330" y2="65"/>
+                            <line class="schematic-line" x1="310" y1="95" x2="330" y2="95"/>
+                            <polygon class="schematic-fill-white" points="315,65 315,95 325,85 325,75 315,65"/>
+                            <polygon class="schematic-fill-white" points="325,75 335,70 335,90 325,85 325,75"/>
+                            <!-- Lichtstrahlen 3 -->
+                            <line class="schematic-line" x1="332" y1="72" x2="342" y2="67"/>
+                            <polygon class="schematic-fill-black" points="340,68 342,66 345,69 342,71 340,68"/>
+                            <line class="schematic-line" x1="332" y1="78" x2="342" y2="73"/>
+                            <polygon class="schematic-fill-black" points="340,74 342,72 345,75 342,77 340,74"/>
+                        </g>
+                        
+                        <!-- Parallelverbindungen -->
+                        <line class="schematic-line" x1="140" y1="80" x2="180" y2="80"/>
+                        <line class="schematic-line" x1="260" y1="80" x2="280" y2="80"/>
+                        <line class="schematic-line" x1="360" y1="80" x2="380" y2="80"/>
+                        
+                        <!-- Rückleitungen -->
+                        <line class="schematic-line" x1="140" y1="110" x2="180" y2="110"/>
+                        <line class="schematic-line" x1="180" y1="110" x2="220" y2="110"/>
+                        <line class="schematic-line" x1="220" y1="110" x2="260" y2="110"/>
+                        <line class="schematic-line" x1="260" y1="110" x2="320" y2="110"/>
+                        <line class="schematic-line" x1="320" y1="110" x2="360" y2="110"/>
+                        <line class="schematic-line" x1="360" y1="110" x2="380" y2="110"/>
+                        <line class="schematic-line" x1="380" y1="80" x2="380" y2="110"/>
+                        <line class="schematic-line" x1="380" y1="110" x2="380" y2="120"/>
                         
                         <!-- Untere Leitung -->
-                        <line class="schematic-line" x1="417.94" y1="131.14" x2="8.1" y2="131.14"/>
+                        <line class="schematic-line" x1="417.94" y1="120" x2="60" y2="120"/>
+                        <line class="schematic-line" x1="60" y1="110" x2="60" y2="120"/>
+                        <line class="schematic-line" x1="8.1" y1="120" x2="60" y2="120"/>
+                        <line class="schematic-line" x1="380" y1="120" x2="417.94" y2="120"/>
                         
                         <!-- Minus-Anschluss unten rechts -->
                         <g>
-                            <circle class="schematic-fill-white" cx="417.52" cy="131.14" r="7.52"/>
-                            <path class="schematic-fill-black" d="M417.52,122.62c-4.7,0-8.52,3.82-8.52,8.52s3.82,8.52,8.52,8.52,8.52-3.82,8.52-8.52-3.82-8.52-8.52-8.52ZM417.52,138.66c-3.6,0-6.52-2.92-6.52-6.52s2.92-6.52,6.52-6.52,6.52,2.92,6.52,6.52-2.92,6.52-6.52,6.52Z"/>
-                            <line class="schematic-line" x1="412.04" y1="131.14" x2="422.94" y2="131.14"/>
+                            <circle class="schematic-fill-white" cx="417.52" cy="120" r="7.52"/>
+                            <path class="schematic-fill-black" d="M417.52,111.48c-4.7,0-8.52,3.82-8.52,8.52s3.82,8.52,8.52,8.52,8.52-3.82,8.52-8.52-3.82-8.52-8.52-8.52ZM417.52,127.52c-3.6,0-6.52-2.92-6.52-6.52s2.92-6.52,6.52-6.52,6.52,2.92,6.52,6.52-2.92,6.52-6.52,6.52Z"/>
+                            <line class="schematic-line" x1="412.04" y1="120" x2="422.94" y2="120"/>
                         </g>
                         
                         <!-- Minus-Anschluss unten links -->
                         <g>
-                            <circle class="schematic-fill-white" cx="8.52" cy="131.14" r="7.52"/>
-                            <path class="schematic-fill-black" d="M8.52,122.62c4.7,0,8.52,3.82,8.52,8.52s-3.82,8.52-8.52,8.52-8.52-3.82-8.52-8.52,3.82-8.52,8.52-8.52ZM8.52,138.66c3.6,0,6.52-2.92,6.52-6.52s-2.92-6.52-6.52-6.52-6.52,2.92-6.52,6.52,2.92,6.52,6.52,6.52Z"/>
-                            <line class="schematic-line" x1="3.22" y1="131.14" x2="14.14" y2="131.14"/>
+                            <circle class="schematic-fill-white" cx="8.52" cy="120" r="7.52"/>
+                            <path class="schematic-fill-black" d="M8.52,111.48c4.7,0,8.52,3.82,8.52,8.52s-3.82,8.52-8.52,8.52-8.52-3.82-8.52-8.52,3.82-8.52,8.52-8.52ZM8.52,127.52c3.6,0,6.52-2.92,6.52-6.52s-2.92-6.52-6.52-6.52-6.52,2.92-6.52,6.52,2.92,6.52,6.52,6.52Z"/>
+                            <line class="schematic-line" x1="3.22" y1="120" x2="14.14" y2="120"/>
                         </g>
                     </g>
                 </svg>
@@ -4767,7 +4811,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.09 - SIMPLE-LED-SCHEMATICS: Einfache LED-Schaltskizzen via setTimeout eingefügt...');
+                            console.log('🚀 LED Foundation v0.01.10 - THREE-LEDS-THICK-LINES: Drei LEDs in Parallelschaltung mit dickeren Linien...');
             
             // 1. Circuit Simulation initialisieren
             try {
