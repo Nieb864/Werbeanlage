@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.84-PURE-VIEWBOX -->
+<!-- CACHE-BUST: v0.00.85-ROLLBACK-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.84</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.85</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.84</div>
+                <div class="version-display">v0.00.85</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3249,35 +3249,54 @@
                 let x = parseFloat(element.dataset.bezierStartX) || parseFloat(element.dataset.bezierEndX) || 0;
                 let y = parseFloat(element.dataset.bezierStartY) || parseFloat(element.dataset.bezierEndY) || 0;
                 
-                // Rotation anwenden falls Bauteil rotiert ist (REIN in ViewBox-Koordinaten)
+                // ViewBox-Koordinaten zu DOM-Koordinaten skalieren (auch für nicht-rotierte Bauteile)
+                if (component && component.id !== 'power-source-svg') {
+                    const svg = component.querySelector('svg');
+                    if (svg) {
+                        const rect = svg.getBoundingClientRect();
+                        const viewBox = svg.getAttribute('viewBox');
+                        if (viewBox) {
+                            const viewBoxValues = viewBox.split(' ');
+                            const viewBoxWidth = parseFloat(viewBoxValues[2]);
+                            const viewBoxHeight = parseFloat(viewBoxValues[3]);
+                            
+                            // Skalierungsfaktoren mit echten DOM-Maßen
+                            const scaleX = rect.width / viewBoxWidth;
+                            const scaleY = rect.height / viewBoxHeight;
+                            
+                            // ViewBox → DOM skalieren
+                            x = x * scaleX;
+                            y = y * scaleY;
+                        }
+                    }
+                }
+                
+                // Rotation anwenden falls Bauteil rotiert ist
                 if (component && component.id !== 'power-source-svg') {
                     const rotation = this.componentRotations.get(component) || 0;
                     if (rotation !== 0) {
+                        // DOM-Element-Dimensionen verwenden (wie CSS Transform-Origin)
                         const svg = component.querySelector('svg');
                         if (svg) {
-                            const viewBox = svg.getAttribute('viewBox');
-                            if (viewBox) {
-                                const viewBoxValues = viewBox.split(' ');
-                                const viewBoxWidth = parseFloat(viewBoxValues[2]);
-                                const viewBoxHeight = parseFloat(viewBoxValues[3]);
-                                
-                                // ViewBox-Zentrum berechnen (entspricht CSS transform-origin: center center)
-                                const centerX = viewBoxWidth / 2;
-                                const centerY = viewBoxHeight / 2;
-                                
-                                // Koordinaten relativ zum ViewBox-Zentrum machen
-                                const relativeX = x - centerX;
-                                const relativeY = y - centerY;
-                                
-                                // Rotieren um das ViewBox-Zentrum
-                                const rad = (rotation * Math.PI) / 180;
-                                const rotatedX = relativeX * Math.cos(rad) - relativeY * Math.sin(rad);
-                                const rotatedY = relativeX * Math.sin(rad) + relativeY * Math.cos(rad);
-                                
-                                // Zurück zu absoluten ViewBox-Koordinaten
-                                x = rotatedX + centerX;
-                                y = rotatedY + centerY;
-                            }
+                            // Echte DOM-Maße verwenden (wie CSS transform-origin)
+                            const rect = svg.getBoundingClientRect();
+                            
+                            // DOM-Zentrum berechnen (entspricht CSS transform-origin: center center)
+                            const centerX = rect.width / 2;
+                            const centerY = rect.height / 2;
+                            
+                            // Koordinaten relativ zum DOM-Zentrum machen (x,y sind bereits DOM-Koordinaten)
+                            const relativeX = x - centerX;
+                            const relativeY = y - centerY;
+                            
+                            // Rotieren um das DOM-Zentrum
+                            const rad = (rotation * Math.PI) / 180;
+                            const rotatedX = relativeX * Math.cos(rad) - relativeY * Math.sin(rad);
+                            const rotatedY = relativeX * Math.sin(rad) + relativeY * Math.cos(rad);
+                            
+                            // Zurück zu absoluten DOM-Koordinaten
+                            x = rotatedX + centerX;
+                            y = rotatedY + centerY;
                         }
                     }
                 }
@@ -3287,33 +3306,9 @@
                     const left = parseFloat(component.style.left) || 0;
                     const top = parseFloat(component.style.top) || 0;
                     
-                    // ViewBox-Koordinaten zu DOM-Koordinaten umrechnen (nur hier, am Ende)
-                    let finalX = x;
-                    let finalY = y;
-                    
-                    if (component.id !== 'power-source-svg') {
-                        const svg = component.querySelector('svg');
-                        if (svg) {
-                            const rect = svg.getBoundingClientRect();
-                            const viewBox = svg.getAttribute('viewBox');
-                            if (viewBox) {
-                                const viewBoxValues = viewBox.split(' ');
-                                const viewBoxWidth = parseFloat(viewBoxValues[2]);
-                                const viewBoxHeight = parseFloat(viewBoxValues[3]);
-                                
-                                // Skalierung nur am Ende für finale Position
-                                const scaleX = rect.width / viewBoxWidth;
-                                const scaleY = rect.height / viewBoxHeight;
-                                
-                                finalX = x * scaleX;
-                                finalY = y * scaleY;
-                            }
-                        }
-                    }
-                    
                     return {
-                        x: left + finalX,
-                        y: top + finalY
+                        x: left + x,
+                        y: top + y
                     };
                 }
                 
@@ -4604,7 +4599,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.84 - PURE-VIEWBOX: Rotation rein in ViewBox-Koordinaten, Skalierung nur am Ende für absolute Position...');
+                            console.log('🚀 LED Foundation v0.00.85 - ROLLBACK-FIX: Zurück zu v0.00.83 Zustand - die reine ViewBox-Lösung hatte einen Fehler...');
             
             // 1. Circuit Simulation initialisieren
             try {
