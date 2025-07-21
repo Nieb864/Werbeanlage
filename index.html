@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.20-KOLLAPSIBLE-KATEGORIEN -->
+<!-- CACHE-BUST: v0.01.21-CLEAN-KATEGORIEN -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.20</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.21</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -401,10 +401,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        .category-icon {
-            font-size: 16px;
-            margin-right: 8px;
-        }
+
         
         .category-arrow {
             font-size: 12px;
@@ -1087,7 +1084,6 @@
                 <div class="components-list">
                     <div class="component-category">
                         <div class="category-header" onclick="toggleCategory('schutzschalter')">
-                            <span class="category-icon">🛡️</span>
                             <span class="category-title text-h2">Schutzschalter</span>
                             <span class="category-arrow" id="arrow-schutzschalter">▼</span>
                         </div>
@@ -1111,7 +1107,6 @@
                     
                     <div class="component-category">
                         <div class="category-header" onclick="toggleCategory('steuerungen')">
-                            <span class="category-icon">🎛️</span>
                             <span class="category-title text-h2">Steuerungen</span>
                             <span class="category-arrow" id="arrow-steuerungen">▼</span>
                         </div>
@@ -1135,7 +1130,6 @@
                     
                     <div class="component-category">
                         <div class="category-header" onclick="toggleCategory('transformatoren')">
-                            <span class="category-icon">🔄</span>
                             <span class="category-title text-h2">Transformatoren</span>
                             <span class="category-arrow" id="arrow-transformatoren">▼</span>
                         </div>
@@ -1166,7 +1160,6 @@
                     
                     <div class="component-category">
                         <div class="category-header" onclick="toggleCategory('kabel')">
-                            <span class="category-icon">📦</span>
                             <span class="category-title text-h2">Kabel</span>
                             <span class="category-arrow" id="arrow-kabel">▼</span>
                         </div>
@@ -1183,7 +1176,6 @@
                     
                     <div class="component-category">
                         <div class="category-header" onclick="toggleCategory('kabelverbindungen')">
-                            <span class="category-icon">🔗</span>
                             <span class="category-title text-h2">Kabelverbindungen</span>
                             <span class="category-arrow" id="arrow-kabelverbindungen">▼</span>
                         </div>
@@ -1200,7 +1192,6 @@
                     
                     <div class="component-category">
                         <div class="category-header" onclick="toggleCategory('entwickler')">
-                            <span class="category-icon">⚙️</span>
                             <span class="category-title text-h2">Entwickler</span>
                             <span class="category-arrow" id="arrow-entwickler">▼</span>
                         </div>
@@ -1217,7 +1208,6 @@
                     
                     <div class="component-category">
                         <div class="category-header" onclick="toggleCategory('led-module')">
-                            <span class="category-icon">💡</span>
                             <span class="category-title text-h2">LED-Module</span>
                             <span class="category-arrow" id="arrow-led-module">▼</span>
                         </div>
@@ -1308,7 +1298,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.20</div>
+                <div class="version-display">v0.01.21</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5400,7 +5390,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.20 - KOLLAPSIBLE-KATEGORIEN: Kategorien mit Icons, Toggle-Funktion und localStorage-Status...');
+                            console.log('🚀 LED Foundation v0.01.21 - CLEAN-KATEGORIEN: Icons entfernt, cleaner Text-only Look...');
             
             // 1. Circuit Simulation initialisieren
             try {
