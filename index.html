@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.75</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.76</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.75</div>
+                <div class="version-display">v0.00.76</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3875,7 +3875,7 @@
         // ===== LED-MODUL 12V 1,2W =====
         function createLEDModuleSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 133.29 27.54');
+            svg.setAttribute('viewBox', '0 0 137.29 27.54');
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-12v-1.2w');
             
@@ -3979,7 +3979,7 @@
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
                 <line class="connection-line" 
-                      x1="113" y1="9.225" x2="123.29" y2="9.225" 
+                      x1="117" y1="9.225" x2="127.29" y2="9.225" 
                       stroke="#1d1d1b" 
                       data-connection-type="output-line"
                       data-connection-id="out-minus"
@@ -3989,7 +3989,7 @@
                       data-bezier-direction="20,0,0,0"/>
                       
                 <line class="connection-line" 
-                      x1="113" y1="18.315" x2="123.29" y2="18.315" 
+                      x1="117" y1="18.315" x2="127.29" y2="18.315" 
                       stroke="#e30613" 
                       data-connection-type="output-line"
                       data-connection-id="out-plus"
@@ -4257,7 +4257,7 @@
         // ===== LED-MODUL 24V =====
         function createLED24VSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 133.29 27.54');
+            svg.setAttribute('viewBox', '0 0 137.29 27.54');
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-24v-5w');
             
@@ -4361,7 +4361,7 @@
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
                 <line class="connection-line" 
-                      x1="113" y1="9.225" x2="123.29" y2="9.225" 
+                      x1="117" y1="9.225" x2="127.29" y2="9.225" 
                       stroke="#1d1d1b" 
                       data-connection-type="output-line"
                       data-connection-id="out-minus"
@@ -4371,7 +4371,7 @@
                       data-bezier-direction="20,0,0,0"/>
                       
                 <line class="connection-line" 
-                      x1="113" y1="18.315" x2="123.29" y2="18.315" 
+                      x1="117" y1="18.315" x2="127.29" y2="18.315" 
                       stroke="#e30613" 
                       data-connection-type="output-line"
                       data-connection-id="out-plus"
@@ -4581,7 +4581,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.75 - PERFEKT: Rechte Ausgänge final positioniert (130px)...');
+            console.log('🚀 LED Foundation v0.00.76 - ANSCHLUSSPUNKTE: Rechte Lines +4px nach rechts verschoben...');
             
             // 1. Circuit Simulation initialisieren
             try {
