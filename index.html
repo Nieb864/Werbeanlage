@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.15-TIMER-ZEITSCHALTUHR -->
+<!-- CACHE-BUST: v0.01.16-ZEITSCHALTUHR-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.15</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.16</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1187,7 +1187,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.15</div>
+                <div class="version-display">v0.01.16</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4601,7 +4601,7 @@
                         placeholder.innerHTML = getFISchematic();
                     } else if (componentType.includes('ls')) {
                         placeholder.innerHTML = getLSSchematic();
-                    } else if (componentType.includes('timer')) {
+                    } else if (componentType.includes('zeitschaltuhr')) {
                         placeholder.innerHTML = getTimerSchematic();
                     }
                 }
@@ -5040,7 +5040,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.15 - TIMER-ZEITSCHALTUHR: Timer/Zeitschaltuhr Schaltskizze mit NO/NC/COM Kontakten...');
+                            console.log('🚀 LED Foundation v0.01.16 - ZEITSCHALTUHR-FIX: Component-Type Erkennung für Zeitschaltuhr korrigiert...');
             
             // 1. Circuit Simulation initialisieren
             try {
