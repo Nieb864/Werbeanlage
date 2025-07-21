@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.17-DÄMMERUNGSSCHALTER -->
+<!-- CACHE-BUST: v0.01.18-DAEMMERUNGSSCHALTER-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.17</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.18</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1187,7 +1187,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.17</div>
+                <div class="version-display">v0.01.18</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4603,7 +4603,7 @@
                         placeholder.innerHTML = getLSSchematic();
                     } else if (componentType.includes('zeitschaltuhr')) {
                         placeholder.innerHTML = getTimerSchematic();
-                    } else if (componentType.includes('dämmerung')) {
+                    } else if (componentType.includes('daemmerungsschalter')) {
                         placeholder.innerHTML = getDämmerungsSchematic();
                     }
                 }
@@ -5110,7 +5110,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.17 - DÄMMERUNGSSCHALTER: Dämmerungsschalter Schaltskizze mit Photoelement und Lichtstrahlen...');
+                            console.log('🚀 LED Foundation v0.01.18 - DAEMMERUNGSSCHALTER-FIX: Component-Type Erkennung für Dämmerungsschalter korrigiert...');
             
             // 1. Circuit Simulation initialisieren
             try {
