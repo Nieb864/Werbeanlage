@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.00-BEZIER-COORDS-FIXED -->
+<!-- CACHE-BUST: v0.01.01-SYMMETRIC-LONG-CURVES -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.00</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.01</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1131,7 +1131,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.00</div>
+                <div class="version-display">v0.01.01</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3991,8 +3991,8 @@
                         data-connection-id="in-minus"
                         data-wire-type="minus"
                         data-voltage="12"
-                        data-bezier-end-x="28" data-bezier-end-y="10.4"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-end-x="35" data-bezier-end-y="10.4"
+                        data-bezier-direction="-25,0,0,0"/>
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
@@ -4000,8 +4000,8 @@
                         data-connection-id="in-plus"
                         data-wire-type="plus"
                         data-voltage="12"
-                        data-bezier-end-x="28" data-bezier-end-y="18.8"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-end-x="35" data-bezier-end-y="18.8"
+                        data-bezier-direction="-25,0,0,0"/>
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
                 <line class="connection-line" 
@@ -4011,8 +4011,8 @@
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="12"
-                      data-bezier-start-x="127" data-bezier-start-y="9.7"
-                      data-bezier-direction="20,0,0,0"/>
+                      data-bezier-start-x="120" data-bezier-start-y="9.7"
+                      data-bezier-direction="25,0,0,0"/>
                       
                 <line class="connection-line" 
                       x1="117" y1="18.315" x2="127.29" y2="18.315" 
@@ -4021,8 +4021,8 @@
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="12"
-                      data-bezier-start-x="127" data-bezier-start-y="18.8"
-                      data-bezier-direction="20,0,0,0"/>
+                      data-bezier-start-x="120" data-bezier-start-y="18.8"
+                      data-bezier-direction="25,0,0,0"/>
             `;
             
             return svg;
@@ -4373,8 +4373,8 @@
                         data-connection-id="in-minus"
                         data-wire-type="minus"
                         data-voltage="24"
-                        data-bezier-end-x="28" data-bezier-end-y="9.7"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-end-x="35" data-bezier-end-y="9.7"
+                        data-bezier-direction="-25,0,0,0"/>
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
@@ -4382,8 +4382,8 @@
                         data-connection-id="in-plus"
                         data-wire-type="plus"
                         data-voltage="24"
-                        data-bezier-end-x="28" data-bezier-end-y="18.8"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-end-x="35" data-bezier-end-y="18.8"
+                        data-bezier-direction="-25,0,0,0"/>
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
                 <line class="connection-line" 
@@ -4393,8 +4393,8 @@
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="24"
-                                              data-bezier-start-x="127" data-bezier-start-y="9.7"
-                      data-bezier-direction="20,0,0,0"/>
+                                              data-bezier-start-x="120" data-bezier-start-y="9.7"
+                      data-bezier-direction="25,0,0,0"/>
                       
                 <line class="connection-line" 
                       x1="117" y1="18.315" x2="127.29" y2="18.315" 
@@ -4403,8 +4403,8 @@
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="24"
-                                              data-bezier-start-x="127" data-bezier-start-y="18.8"
-                      data-bezier-direction="20,0,0,0"/>
+                                              data-bezier-start-x="120" data-bezier-start-y="18.8"
+                      data-bezier-direction="25,0,0,0"/>
             `;
             
             return svg;
@@ -4607,7 +4607,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.00 - BEZIER-COORDS-FIXED: Alle Bezier-Koordinaten um +10px korrigiert für erweiterte ViewBox...');
+                            console.log('🚀 LED Foundation v0.01.01 - SYMMETRIC-LONG-CURVES: Symmetrische 25px-Bezier-Kurven für schöne Verbindungen...');
             
             // 1. Circuit Simulation initialisieren
             try {
