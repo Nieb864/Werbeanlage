@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.14-LS-SCHUTZSCHALTER -->
+<!-- CACHE-BUST: v0.01.15-TIMER-ZEITSCHALTUHR -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.14</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.15</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -824,6 +824,12 @@
             font-size: 12px;
             font-weight: normal;
         }
+        .schematic-text-small {
+            fill: #1d1d1b;
+            font-family: Arial, sans-serif;
+            font-size: 9px;
+            font-weight: normal;
+        }
         .schematic-dashed {
             stroke-dasharray: 2 2;
         }
@@ -1181,7 +1187,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.14</div>
+                <div class="version-display">v0.01.15</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4595,6 +4601,8 @@
                         placeholder.innerHTML = getFISchematic();
                     } else if (componentType.includes('ls')) {
                         placeholder.innerHTML = getLSSchematic();
+                    } else if (componentType.includes('timer')) {
+                        placeholder.innerHTML = getTimerSchematic();
                     }
                 }
             }, 100);
@@ -4854,6 +4862,78 @@
                 </svg>
             `;
         }
+        
+        function getTimerSchematic() {
+            return `
+                <svg viewBox="0 0 54.28 78.55" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; max-height: 120px;">
+                    <g>
+                        <!-- Ausgangsklemmleiste -->
+                        <rect class="schematic-fill-white" x="0.5" y="0.5" width="52.14" height="21.72"/>
+                        <line class="schematic-line" x1="21.33" y1="0.58" x2="21.33" y2="22.03"/>
+                        <line class="schematic-line" x1="31.75" y1="0.58" x2="31.75" y2="22.03"/>
+                        <line class="schematic-line" x1="10.9" y1="0.58" x2="10.9" y2="22.03"/>
+                        <line class="schematic-line" x1="42.18" y1="0.58" x2="42.18" y2="22.03"/>
+                        
+                        <!-- Eingangsklemmleiste -->
+                        <rect class="schematic-fill-white" x="0.5" y="42.24" width="52.14" height="13.68"/>
+                        <line class="schematic-line" x1="21.33" y1="42.29" x2="21.33" y2="55.8"/>
+                        <line class="schematic-line" x1="31.75" y1="42.29" x2="31.75" y2="55.8"/>
+                        <line class="schematic-line" x1="10.9" y1="42.29" x2="10.9" y2="55.8"/>
+                        <line class="schematic-line" x1="42.18" y1="42.29" x2="42.18" y2="55.8"/>
+                        
+                        <!-- Eingangsbeschriftung -->
+                        <text class="schematic-text-small" x="23.32" y="51.77">N</text>
+                        <text class="schematic-text-small" x="45.16" y="51.77">L</text>
+                        
+                        <!-- Eingangspunkte -->
+                        <circle class="schematic-fill-black" cx="36.88" cy="48.95" r="0.5"/>
+                        <circle class="schematic-fill-black" cx="16.1" cy="48.96" r="0.5"/>
+                        <circle class="schematic-fill-black" cx="5.25" cy="48.96" r="0.5"/>
+                        
+                        <!-- Versorgungsleitung -->
+                        <line class="schematic-line" x1="26.29" y1="56.02" x2="26.29" y2="63.44"/>
+                        <line class="schematic-line" x1="47.35" y1="56.02" x2="47.35" y2="63.17"/>
+                        <line class="schematic-line" x1="25.8" y1="63.44" x2="47.89" y2="63.44"/>
+                        
+                        <!-- Timer-Motor -->
+                        <circle class="schematic-fill-white" cx="36.84" cy="63.55" r="4.02"/>
+                        <text class="schematic-text" x="33.39" y="67.1">~</text>
+                        
+                        <!-- Spannungsangabe -->
+                        <text class="schematic-text-small" x="21.33" y="76.3">230 V AC</text>
+                        
+                        <!-- Ausgangsschalter Beschriftung -->
+                        <text class="schematic-text-small" transform="translate(29.49 20.12) rotate(-90)">NO</text>
+                        <text class="schematic-text-small" transform="translate(50.44 20.21) rotate(-90)">NC</text>
+                        <text class="schematic-text-small" transform="translate(40.09 20.53) rotate(-90)">COM</text>
+                        
+                        <!-- Schalterkontakte -->
+                        <line class="schematic-line" x1="36.49" y1="22.28" x2="36.49" y2="30.89"/>
+                        <line class="schematic-line" x1="26.19" y1="22.41" x2="26.19" y2="36.14"/>
+                        <line class="schematic-line" x1="43.35" y1="35.59" x2="25.68" y2="35.62"/>
+                        <line class="schematic-line" x1="47.36" y1="22.26" x2="47.36" y2="26.55"/>
+                        <line class="schematic-line" x1="42.45" y1="26.46" x2="47.86" y2="26.46"/>
+                        <line class="schematic-line" x1="36.12" y1="30.37" x2="39.46" y2="30.37"/>
+                        
+                        <!-- Schalter-Kontaktpunkte -->
+                        <circle class="schematic-fill-black" cx="43.76" cy="35.6" r="0.97"/>
+                        <circle class="schematic-fill-black" cx="39.78" cy="30.39" r="0.97"/>
+                        <circle class="schematic-fill-black" cx="42.45" cy="26.46" r="0.97"/>
+                        
+                        <!-- Schalterbewegung -->
+                        <line class="schematic-line" x1="39.78" y1="30.39" x2="43.57" y2="27.35"/>
+                        
+                        <!-- Ein-/Ausgang-Beschriftung -->
+                        <text class="schematic-text-small" x="0.27" y="65.44">IN</text>
+                        <text class="schematic-text-small" x="0.27" y="30.89">OUT</text>
+                        
+                        <!-- Ausgangspunkte -->
+                        <circle class="schematic-fill-black" cx="16.04" cy="11.71" r="0.5"/>
+                        <circle class="schematic-fill-black" cx="5.19" cy="11.72" r="0.5"/>
+                    </g>
+                </svg>
+            `;
+        }
 
         // ===== POWER TOOLTIP SYSTEM =====
         function setupPowerTooltips() {
@@ -4960,7 +5040,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.14 - LS-SCHUTZSCHALTER: LS-Schutzschalter (Leitungsschutzschalter) Schaltskizze hinzugefügt...');
+                            console.log('🚀 LED Foundation v0.01.15 - TIMER-ZEITSCHALTUHR: Timer/Zeitschaltuhr Schaltskizze mit NO/NC/COM Kontakten...');
             
             // 1. Circuit Simulation initialisieren
             try {
