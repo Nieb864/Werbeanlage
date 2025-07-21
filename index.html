@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.05-TARGETED-VISUAL-CABLES -->
+<!-- CACHE-BUST: v0.01.06-OUTPUT-ONLY-VISUAL-CABLES -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.05</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.06</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1136,7 +1136,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.05</div>
+                <div class="version-display">v0.01.06</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3017,7 +3017,10 @@
             }
             
             updateVisualCables(connectionPoint) {
-                // Findet das entsprechende Visual Cable für diesen Connection Point
+                // Visual Cables nur bei OUTPUT-Lines verstecken, nicht bei INPUT-Sockets
+                const connectionType = connectionPoint.getAttribute('data-connection-type');
+                if (connectionType !== 'output-line') return;  // Nur Output-Lines haben Visual Cables
+                
                 const component = connectionPoint.closest('.component');
                 if (!component) return;
                 
@@ -4639,7 +4642,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.05 - TARGETED-VISUAL-CABLES: Spezifische Visual Cable Steuerung per JavaScript...');
+                            console.log('🚀 LED Foundation v0.01.06 - OUTPUT-ONLY-VISUAL-CABLES: Visual Cables nur bei Output-Lines verstecken...');
             
             // 1. Circuit Simulation initialisieren
             try {
