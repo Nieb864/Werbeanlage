@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.98-ALL-BEZIER-1PX-LEFT -->
+<!-- CACHE-BUST: v0.00.99-VIEWBOX-EXTENDED -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.98</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.99</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1131,7 +1131,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.98</div>
+                <div class="version-display">v0.00.99</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3901,7 +3901,7 @@
         // ===== LED-MODUL 12V 1,2W =====
         function createLEDModuleSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 137.29 30');
+            svg.setAttribute('viewBox', '-10 0 157.29 30');
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-12v-1.2w');
             
@@ -4283,7 +4283,7 @@
         // ===== LED-MODUL 24V =====
         function createLED24VSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 137.29 30');
+            svg.setAttribute('viewBox', '-10 0 157.29 30');
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-24v-5w');
             
@@ -4607,7 +4607,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.98 - ALL-BEZIER-1PX-LEFT: Alle Bezier-Punkte (links+rechts) um 1px nach links...');
+                            console.log('🚀 LED Foundation v0.00.99 - VIEWBOX-EXTENDED: ViewBox von 137.29 auf 157.29 erweitert für längere Bezier-Kurven...');
             
             // 1. Circuit Simulation initialisieren
             try {
