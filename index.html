@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.19-NEUE-KATEGORIEN -->
+<!-- CACHE-BUST: v0.01.20-KOLLAPSIBLE-KATEGORIEN -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.19</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.20</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -380,6 +380,52 @@
             border-bottom: var(--border-width) solid #eee;
             padding-bottom: var(--spacing-md);
             margin-bottom: var(--spacing-lg);
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            margin-bottom: 8px;
+        }
+        
+        .category-header:hover {
+            background: linear-gradient(135deg, #e8e8e8 0%, #ddd 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .category-icon {
+            font-size: 16px;
+            margin-right: 8px;
+        }
+        
+        .category-arrow {
+            font-size: 12px;
+            transition: transform 0.3s ease;
+            color: #666;
+        }
+        
+        .category-arrow.collapsed {
+            transform: rotate(-90deg);
+        }
+        
+        .category-content {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0;
+        }
+        
+        .category-content.collapsed {
+            max-height: 0;
+            padding: 0;
         }
 
         .category-title {
@@ -1040,7 +1086,12 @@
                 
                 <div class="components-list">
                     <div class="component-category">
-                        <div class="category-title text-h2">Schutzschalter</div>
+                        <div class="category-header" onclick="toggleCategory('schutzschalter')">
+                            <span class="category-icon">🛡️</span>
+                            <span class="category-title text-h2">Schutzschalter</span>
+                            <span class="category-arrow" id="arrow-schutzschalter">▼</span>
+                        </div>
+                        <div class="category-content" id="category-schutzschalter">
                         <div class="component-item" data-component-type="fi-schalter">
                             <div class="component-name text-h2">FI-Schutzschalter</div>
                             <div class="component-specs text-small">
@@ -1055,10 +1106,16 @@
                                 Charakteristik B
                             </div>
                         </div>
+                        </div>
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-title text-h2">Steuerungen</div>
+                        <div class="category-header" onclick="toggleCategory('steuerungen')">
+                            <span class="category-icon">🎛️</span>
+                            <span class="category-title text-h2">Steuerungen</span>
+                            <span class="category-arrow" id="arrow-steuerungen">▼</span>
+                        </div>
+                        <div class="category-content" id="category-steuerungen">
                         <div class="component-item" data-component-type="zeitschaltuhr">
                             <div class="component-name text-h2">Zeitschaltuhr</div>
                             <div class="component-specs text-small">
@@ -1073,10 +1130,16 @@
                                 2-200 Lux
                             </div>
                         </div>
+                        </div>
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-title text-h2">Transformatoren</div>
+                        <div class="category-header" onclick="toggleCategory('transformatoren')">
+                            <span class="category-icon">🔄</span>
+                            <span class="category-title text-h2">Transformatoren</span>
+                            <span class="category-arrow" id="arrow-transformatoren">▼</span>
+                        </div>
+                        <div class="category-content" id="category-transformatoren">
                         <div class="component-item" data-component-type="trafo-12v-40w">
                             <div class="component-name text-h2">Trafo 12V</div>
                             <div class="component-specs text-small">
@@ -1098,10 +1161,16 @@
                                 Ausgang: 12V DC, <strong style="color: #ff6b6b;">3W</strong>
                             </div>
                         </div>
+                        </div>
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-title text-h2">Kabel</div>
+                        <div class="category-header" onclick="toggleCategory('kabel')">
+                            <span class="category-icon">📦</span>
+                            <span class="category-title text-h2">Kabel</span>
+                            <span class="category-arrow" id="arrow-kabel">▼</span>
+                        </div>
+                        <div class="category-content" id="category-kabel">
                         <div class="component-item" data-component-type="kabel-flexibel-sw">
                             <div class="component-name text-h2">Flexibles Kabel sw</div>
                             <div class="component-specs text-small">
@@ -1109,10 +1178,16 @@
                                 bis 24V, 100W
                             </div>
                         </div>
+                        </div>
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-title text-h2">Kabelverbindungen</div>
+                        <div class="category-header" onclick="toggleCategory('kabelverbindungen')">
+                            <span class="category-icon">🔗</span>
+                            <span class="category-title text-h2">Kabelverbindungen</span>
+                            <span class="category-arrow" id="arrow-kabelverbindungen">▼</span>
+                        </div>
+                        <div class="category-content" id="category-kabelverbindungen">
                         <div class="component-item" data-component-type="klemme-mobil-3l">
                             <div class="component-name text-h2">Mobile Klemme 3L</div>
                             <div class="component-specs text-small">
@@ -1120,10 +1195,16 @@
                                 400V, 32A
                             </div>
                         </div>
+                        </div>
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-title text-h2">Entwickler</div>
+                        <div class="category-header" onclick="toggleCategory('entwickler')">
+                            <span class="category-icon">⚙️</span>
+                            <span class="category-title text-h2">Entwickler</span>
+                            <span class="category-arrow" id="arrow-entwickler">▼</span>
+                        </div>
+                        <div class="category-content" id="category-entwickler">
                         <div class="component-item" data-component-type="dev-placeholder">
                             <div class="component-name text-h2" style="color: #888;">Platzhalter</div>
                             <div class="component-specs text-small">
@@ -1131,10 +1212,16 @@
                                 Entwicklungen
                             </div>
                         </div>
+                        </div>
                     </div>
                     
                     <div class="component-category">
-                        <div class="category-title text-h2">LED-Module</div>
+                        <div class="category-header" onclick="toggleCategory('led-module')">
+                            <span class="category-icon">💡</span>
+                            <span class="category-title text-h2">LED-Module</span>
+                            <span class="category-arrow" id="arrow-led-module">▼</span>
+                        </div>
+                        <div class="category-content" id="category-led-module">
                         <div class="component-item" data-component-type="led-12v-1.2w">
                             <div class="component-name text-h2">LED-Modul 12V-1,2W-WW</div>
                             <div class="component-specs text-small">
@@ -1148,6 +1235,7 @@
                                 5W, Warmweiß<br>
                                 24V DC
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -1220,7 +1308,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.19</div>
+                <div class="version-display">v0.01.20</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5159,6 +5247,53 @@
             svg.appendChild(text);
             return svg;
         }
+        
+        // ===== KATEGORIE TOGGLE SYSTEM =====
+        function toggleCategory(categoryId) {
+            const content = document.getElementById(`category-${categoryId}`);
+            const arrow = document.getElementById(`arrow-${categoryId}`);
+            
+            if (content && arrow) {
+                // Toggle collapsed state
+                const isCollapsed = content.classList.contains('collapsed');
+                
+                if (isCollapsed) {
+                    // Öffnen
+                    content.classList.remove('collapsed');
+                    arrow.classList.remove('collapsed');
+                } else {
+                    // Schließen
+                    content.classList.add('collapsed');
+                    arrow.classList.add('collapsed');
+                }
+                
+                // Status in localStorage speichern
+                localStorage.setItem(`category-${categoryId}`, isCollapsed ? 'open' : 'closed');
+            }
+        }
+        
+        // Kategorien-Status beim Laden wiederherstellen
+        function restoreCategoryStates() {
+            const categories = ['schutzschalter', 'steuerungen', 'transformatoren', 'kabel', 'kabelverbindungen', 'entwickler', 'led-module'];
+            
+            categories.forEach(categoryId => {
+                const savedState = localStorage.getItem(`category-${categoryId}`);
+                
+                // Standard: Alle Kategorien offen, nur Entwickler geschlossen
+                const defaultOpen = categoryId !== 'entwickler';
+                const shouldBeOpen = savedState ? (savedState === 'open') : defaultOpen;
+                
+                if (!shouldBeOpen) {
+                    const content = document.getElementById(`category-${categoryId}`);
+                    const arrow = document.getElementById(`arrow-${categoryId}`);
+                    
+                    if (content && arrow) {
+                        content.classList.add('collapsed');
+                        arrow.classList.add('collapsed');
+                    }
+                }
+            });
+        }
 
         // ===== POWER TOOLTIP SYSTEM =====
         function setupPowerTooltips() {
@@ -5265,7 +5400,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.19 - NEUE-KATEGORIEN: Drei neue Bauteil-Kategorien hinzugefügt (Kabel, Kabelverbindungen, Entwickler)...');
+                            console.log('🚀 LED Foundation v0.01.20 - KOLLAPSIBLE-KATEGORIEN: Kategorien mit Icons, Toggle-Funktion und localStorage-Status...');
             
             // 1. Circuit Simulation initialisieren
             try {
@@ -5324,6 +5459,10 @@
             }
             
             console.log('🎉 LED-Lernspiel vollständig initialisiert!');
+            
+            // Kategorien-Status wiederherstellen
+            restoreCategoryStates();
+            console.log('📂 Kategorien-Status wiederhergestellt');
             
             // 🚨 CACHE-BUST TEST: Prüfe ob neue hasRequiredLEDConnections da ist
             if (window.workspaceManager && window.workspaceManager.hasRequiredLEDConnections) {
