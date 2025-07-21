@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.96-LINE-HEIGHT-FIX -->
+<!-- CACHE-BUST: v0.00.97-RIGHT-BEZIER-ADJUST -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.96</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.97</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1131,7 +1131,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.96</div>
+                <div class="version-display">v0.00.97</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4011,7 +4011,7 @@
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="12"
-                      data-bezier-start-x="120" data-bezier-start-y="9.7"
+                      data-bezier-start-x="118" data-bezier-start-y="9.7"
                       data-bezier-direction="20,0,0,0"/>
                       
                 <line class="connection-line" 
@@ -4021,7 +4021,7 @@
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="12"
-                      data-bezier-start-x="120" data-bezier-start-y="18.8"
+                      data-bezier-start-x="118" data-bezier-start-y="18.8"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -4393,7 +4393,7 @@
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="24"
-                                              data-bezier-start-x="120" data-bezier-start-y="9.7"
+                                              data-bezier-start-x="118" data-bezier-start-y="9.7"
                       data-bezier-direction="20,0,0,0"/>
                       
                 <line class="connection-line" 
@@ -4403,7 +4403,7 @@
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="24"
-                                              data-bezier-start-x="120" data-bezier-start-y="18.8"
+                                              data-bezier-start-x="118" data-bezier-start-y="18.8"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -4607,7 +4607,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.96 - LINE-HEIGHT-FIX: line-height:0 + vertical-align:top für perfekte inline-block-Größe...');
+                            console.log('🚀 LED Foundation v0.00.97 - RIGHT-BEZIER-ADJUST: Rechte Bezier-Startpunkte um 2px nach links verschoben...');
             
             // 1. Circuit Simulation initialisieren
             try {
