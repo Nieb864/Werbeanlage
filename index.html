@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.12-TRAFO-SCHEMATICS -->
+<!-- CACHE-BUST: v0.01.13-FI-SCHUTZSCHALTER -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.12</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.13</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -824,6 +824,9 @@
             font-size: 12px;
             font-weight: normal;
         }
+        .schematic-dashed {
+            stroke-dasharray: 2 2;
+        }
         .schematic-fill-black { 
             fill: #1d1d1b; 
         }
@@ -1178,7 +1181,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.12</div>
+                <div class="version-display">v0.01.13</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4588,6 +4591,8 @@
                         placeholder.innerHTML = getLEDSchematic();
                     } else if (componentType.includes('trafo')) {
                         placeholder.innerHTML = getTrafoSchematic(componentType);
+                    } else if (componentType.includes('fi')) {
+                        placeholder.innerHTML = getFISchematic();
                     }
                 }
             }, 100);
@@ -4743,6 +4748,91 @@
                 </svg>
             `;
         }
+        
+        function getFISchematic() {
+            return `
+                <svg viewBox="0 0 142.16 87.61" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; max-height: 120px;">
+                    <g>
+                        <!-- Hauptschalter L3 -->
+                        <g>
+                            <line class="schematic-line" x1="74.24" y1="42.86" x2="74.24" y2="74.34"/>
+                            <line class="schematic-line" x1="74.24" y1="11.38" x2="74.24" y2="30.54"/>
+                            <line class="schematic-line" x1="70.72" y1="30.54" x2="77.73" y2="30.54"/>
+                            <line class="schematic-line" x1="74.24" y1="42.86" x2="68.39" y2="32.82"/>
+                        </g>
+                        
+                        <!-- Hauptschalter L1 -->
+                        <g>
+                            <line class="schematic-line" x1="92.98" y1="42.86" x2="92.98" y2="74.34"/>
+                            <line class="schematic-line" x1="92.98" y1="11.38" x2="92.98" y2="30.54"/>
+                            <line class="schematic-line" x1="89.46" y1="30.54" x2="96.47" y2="30.54"/>
+                            <line class="schematic-line" x1="92.98" y1="42.86" x2="87.13" y2="32.82"/>
+                        </g>
+                        
+                        <!-- Hauptschalter N -->
+                        <g>
+                            <line class="schematic-line" x1="111.72" y1="42.86" x2="111.72" y2="74.34"/>
+                            <line class="schematic-line" x1="111.72" y1="11.38" x2="111.72" y2="30.54"/>
+                            <line class="schematic-line" x1="108.21" y1="30.54" x2="115.22" y2="30.54"/>
+                            <line class="schematic-line" x1="111.72" y1="42.86" x2="105.87" y2="32.82"/>
+                        </g>
+                        
+                        <!-- Hauptschalter L2 -->
+                        <g>
+                            <line class="schematic-line" x1="55.5" y1="42.86" x2="55.5" y2="74.34"/>
+                            <line class="schematic-line" x1="55.5" y1="11.38" x2="55.5" y2="30.54"/>
+                            <line class="schematic-line" x1="51.98" y1="30.54" x2="58.99" y2="30.54"/>
+                            <line class="schematic-line" x1="55.5" y1="42.86" x2="49.64" y2="32.82"/>
+                        </g>
+                        
+                        <!-- Mechanische Kopplung (gestrichelt) -->
+                        <line class="schematic-line schematic-dashed" x1="127.06" y1="37.84" x2="27.45" y2="37.84"/>
+                        
+                        <!-- FI-Kern (Ellipse) -->
+                        <ellipse class="schematic-line" cx="77.86" cy="60.83" rx="43.16" ry="4.56"/>
+                        
+                        <!-- Prüftaster -->
+                        <rect class="schematic-fill-white" x="127.06" y="30.54" width="7.3" height="7.3"/>
+                        <rect class="schematic-fill-white" x="134.36" y="37.84" width="7.3" height="7.3"/>
+                        <rect class="schematic-fill-white" x="134.36" y="30.54" width="7.3" height="7.3"/>
+                        <rect class="schematic-fill-white" x="127.06" y="37.84" width="7.3" height="7.3"/>
+                        
+                        <!-- Erdungsleitung -->
+                        <line class="schematic-line" x1="111.72" y1="71.36" x2="11.65" y2="71.36"/>
+                        <rect class="schematic-fill-white" x="9.44" y="52.04" width="4.42" height="13.35"/>
+                        <line class="schematic-line" x1="11.65" y1="65.39" x2="11.65" y2="71.36"/>
+                        
+                        <!-- FI-Auslösung -->
+                        <line class="schematic-line" x1="111.71" y1="49.17" x2="31.27" y2="49.17"/>
+                        <line class="schematic-line" x1="31.27" y1="44.16" x2="31.27" y2="49.17"/>
+                        <line class="schematic-line" x1="31.27" y1="44.16" x2="25.42" y2="34.13"/>
+                        <polyline class="schematic-line" points="27.45 34.19 27.45 16.01 7.65 16.01 7.65 34.19"/>
+                        <line class="schematic-line" x1="11.65" y1="44.16" x2="11.65" y2="52.04"/>
+                        <line class="schematic-line" x1="11.37" y1="44.16" x2="5.52" y2="34.13"/>
+                        <line class="schematic-line" x1="8.44" y1="39.15" x2=".5" y2="39.15"/>
+                        <line class="schematic-line" x1=".5" y1="34.19" x2=".5" y2="42.86"/>
+                        
+                        <!-- FI-Elektronik -->
+                        <rect class="schematic-fill-white" x="127.33" y="57.27" width="12.78" height="7.46"/>
+                        <line class="schematic-line schematic-dashed" x1="134.36" y1="45.14" x2="134.36" y2="57.27"/>
+                        <polyline class="schematic-line" points="127.06 59.03 124.54 59.03 124.54 56.27 120.17 56.27 117.36 59.08"/>
+                        <polyline class="schematic-line" points="127.33 62.37 124.8 62.37 124.8 65.13 120.44 65.13 117.63 62.32"/>
+                        
+                        <!-- Beschriftung unten -->
+                        <text class="schematic-text" x="109.74" y="84.61">N</text>
+                        <text class="schematic-text" x="90.34" y="84.61">L1</text>
+                        <text class="schematic-text" x="71.49" y="84.61">L2</text>
+                        <text class="schematic-text" x="52.8" y="84.61">L3</text>
+                        
+                        <!-- Beschriftung oben -->
+                        <text class="schematic-text" x="109.51" y="10.04">N</text>
+                        <text class="schematic-text" x="90.1" y="10.04">L1</text>
+                        <text class="schematic-text" x="71.26" y="10.04">L2</text>
+                        <text class="schematic-text" x="52.57" y="10.04">L3</text>
+                    </g>
+                </svg>
+            `;
+        }
 
         // ===== POWER TOOLTIP SYSTEM =====
         function setupPowerTooltips() {
@@ -4849,7 +4939,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.12 - TRAFO-SCHEMATICS: Trafo-Schaltskizzen für 12V und 24V hinzugefügt...');
+                            console.log('🚀 LED Foundation v0.01.13 - FI-SCHUTZSCHALTER: FI-Schutzschalter Schaltskizze mit 4-poligem Schalter hinzugefügt...');
             
             // 1. Circuit Simulation initialisieren
             try {
