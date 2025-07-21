@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.93-CLICK-DEBUG -->
+<!-- CACHE-BUST: v0.00.94-BOX-SIZING-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.93</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.94</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -464,6 +464,8 @@
             user-select: none;
             transition: border 0.3s ease;
             border: var(--border-width) solid transparent;
+            display: inline-block; /* Container passt sich an SVG-Größe an */
+            box-sizing: border-box; /* Border ist in der Größe enthalten */
         }
 
         .component:hover {
@@ -1123,7 +1125,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.93</div>
+                <div class="version-display">v0.00.94</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4599,7 +4601,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.93 - CLICK-DEBUG: Debug triggert beim Klick auf Component...');
+                            console.log('🚀 LED Foundation v0.00.94 - BOX-SIZING-FIX: inline-block + box-sizing:border-box für Container-SVG-Synchronisation...');
             
             // 1. Circuit Simulation initialisieren
             try {
