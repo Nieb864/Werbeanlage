@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.27-DRAG-BUG-FIX -->
+<!-- CACHE-BUST: v0.01.28-KLEMME-PHYSICS -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.27</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.28</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1298,7 +1298,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.27</div>
+                <div class="version-display">v0.01.28</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1411,7 +1411,8 @@
             LED_12V: 'led-12v-3.5w',
             LED_24V: 'led-24v-5w',
             FI_SWITCH: 'fi-schalter',
-            LS_SWITCH: 'ls-schalter'
+            LS_SWITCH: 'ls-schalter',
+            MOBILE_TERMINAL_3L: 'klemme-mobil-3l'
         };
 
         // Technische Spezifikationen
@@ -1456,6 +1457,13 @@
                 power: 5,
                 tolerance: 1.1,
                 type: 'load'
+            },
+            [ComponentTypes.MOBILE_TERMINAL_3L]: {
+                ratedVoltage: 400,
+                power: 0,
+                maxCurrent: 32,
+                type: 'connector',
+                terminals: 3
             }
         };
 
@@ -1517,6 +1525,9 @@
                     this.state = this.calculateLEDState(voltage);
                 } else if (this.specs.type === 'transformer') {
                     this.state = this.calculateTransformerState();
+                } else if (this.specs.type === 'connector') {
+                    // Klemmen sind immer passiv - leiten Strom nur durch
+                    this.state = ComponentStates.ON;
                 }
                 
                 if (previousState !== this.state) {
@@ -5431,7 +5442,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.27 - DRAG-BUG-FIX: Verbesserte Drag-Drop-Zustandsverwaltung mit Force-Reset und Backup-Events...');
+                            console.log('🚀 LED Foundation v0.01.28 - KLEMME-PHYSICS: Mobile Klemme 3L in Physics Engine mit ComponentType und ComponentSpecs...');
             
             // 1. Circuit Simulation initialisieren
             try {
