@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.28-KLEMME-PHYSICS -->
+<!-- CACHE-BUST: v0.01.29-KLEMME-FARBEN-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.28</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.29</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1298,7 +1298,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.28</div>
+                <div class="version-display">v0.01.29</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5215,8 +5215,8 @@
             svg.innerHTML = `
                 <defs>
                     <style>
-                        .klemme-grau { fill: var(--metal-light); stroke: #1d1d1b; stroke-miterlimit: 10; }
-                        .klemme-orange { fill: var(--orange); stroke: #1d1d1b; stroke-miterlimit: 10; }
+                        .klemme-grau { fill: #878787; stroke: #1d1d1b; stroke-miterlimit: 10; }
+                        .klemme-orange { fill: #f39200; stroke: #1d1d1b; stroke-miterlimit: 10; }
                         .connection-point { fill: #1d1d1b; r: 3; }
                     </style>
                 </defs>
@@ -5442,7 +5442,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.28 - KLEMME-PHYSICS: Mobile Klemme 3L in Physics Engine mit ComponentType und ComponentSpecs...');
+                            console.log('🚀 LED Foundation v0.01.29 - KLEMME-FARBEN-FIX: CSS-Variablen durch Hex-Werte ersetzt für SVG-innerHTML...');
             
             // 1. Circuit Simulation initialisieren
             try {
