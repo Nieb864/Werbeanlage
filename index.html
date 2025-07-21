@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: 2024-12-20-21:50:00-ROLLBACK-ORIGINAL-CONNECTIONS-v72 -->
+<!-- CACHE-BUST: 2024-12-20-21:55:00-BEZIER-SANFT-v73 -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.72</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.73</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.72</div>
+                <div class="version-display">v0.00.73</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3965,7 +3965,7 @@
                         data-connection-id="in-minus"
                         data-wire-type="minus"
                         data-voltage="12"
-                        data-bezier-end-x="8" data-bezier-end-y="9.225"
+                        data-bezier-end-x="18" data-bezier-end-y="12.225"
                         data-bezier-direction="-20,0,0,0"/>
                         
                 <circle class="connection-socket" 
@@ -3974,7 +3974,7 @@
                         data-connection-id="in-plus"
                         data-wire-type="plus"
                         data-voltage="12"
-                        data-bezier-end-x="8" data-bezier-end-y="18.315"
+                        data-bezier-end-x="18" data-bezier-end-y="21.315"
                         data-bezier-direction="-20,0,0,0"/>
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
@@ -3985,7 +3985,7 @@
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="12"
-                      data-bezier-start-x="123" data-bezier-start-y="9.225"
+                      data-bezier-start-x="133" data-bezier-start-y="12.225"
                       data-bezier-direction="20,0,0,0"/>
                       
                 <line class="connection-line" 
@@ -3995,7 +3995,7 @@
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="12"
-                      data-bezier-start-x="123" data-bezier-start-y="18.315"
+                      data-bezier-start-x="133" data-bezier-start-y="21.315"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -4347,7 +4347,7 @@
                         data-connection-id="in-minus"
                         data-wire-type="minus"
                         data-voltage="24"
-                        data-bezier-end-x="8" data-bezier-end-y="9.225"
+                        data-bezier-end-x="18" data-bezier-end-y="12.225"
                         data-bezier-direction="-20,0,0,0"/>
                         
                 <circle class="connection-socket" 
@@ -4356,7 +4356,7 @@
                         data-connection-id="in-plus"
                         data-wire-type="plus"
                         data-voltage="24"
-                        data-bezier-end-x="8" data-bezier-end-y="18.315"
+                        data-bezier-end-x="18" data-bezier-end-y="21.315"
                         data-bezier-direction="-20,0,0,0"/>
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
@@ -4367,7 +4367,7 @@
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="24"
-                      data-bezier-start-x="123" data-bezier-start-y="9.225"
+                      data-bezier-start-x="133" data-bezier-start-y="12.225"
                       data-bezier-direction="20,0,0,0"/>
                       
                 <line class="connection-line" 
@@ -4377,7 +4377,7 @@
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="24"
-                      data-bezier-start-x="123" data-bezier-start-y="18.315"
+                      data-bezier-start-x="133" data-bezier-start-y="21.315"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -4581,7 +4581,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.72 - ROLLBACK: Zurück zu originalen Anschlusspunkten...');
+            console.log('🚀 LED Foundation v0.00.73 - BEZIER SANFT: Startpunkte +10px rechts +3px unten...');
             
             // 1. Circuit Simulation initialisieren
             try {
