@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.92-SIZE-DEBUG -->
+<!-- CACHE-BUST: v0.00.93-CLICK-DEBUG -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.92</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.93</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.92</div>
+                <div class="version-display">v0.00.93</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4599,7 +4599,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.92 - SIZE-DEBUG: Temporäre Debug-Logs für Container vs SVG Größen-Analyse...');
+                            console.log('🚀 LED Foundation v0.00.93 - CLICK-DEBUG: Debug triggert beim Klick auf Component...');
             
             // 1. Circuit Simulation initialisieren
             try {
@@ -4888,11 +4888,16 @@
 
         // ===== TEMPORARY DEBUG: COMPONENT SIZE ANALYSIS =====
         function debugComponentSizes() {
-            setTimeout(() => {
-                const components = document.querySelectorAll('.component');
-                components.forEach((component, index) => {
-                    const svg = component.querySelector('svg');
-                    if (svg && svg.classList.contains('led-module-svg')) {
+            const components = document.querySelectorAll('.component');
+            console.log('🔍 Found', components.length, 'components');
+            
+            components.forEach((component, index) => {
+                const svg = component.querySelector('svg');
+                if (svg) {
+                    const isLED = svg.classList.contains('led-module-svg');
+                    console.log('🔍 Component #' + index + ':', svg.classList.toString(), 'isLED:', isLED);
+                    
+                    if (isLED) {
                         const containerRect = component.getBoundingClientRect();
                         const svgRect = svg.getBoundingClientRect();
                         const svgStyle = window.getComputedStyle(svg);
@@ -4904,12 +4909,16 @@
                         console.log('   ViewBox:', svg.getAttribute('viewBox'));
                         console.log('   Difference Y:', containerRect.height - svgRect.height);
                     }
-                });
-            }, 1000);
+                }
+            });
         }
 
-        // Debug aktivieren
-        debugComponentSizes();
+        // Debug beim Component-Drop aktivieren
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.component')) {
+                setTimeout(debugComponentSizes, 100);
+            }
+        });
     </script>
 </body>
 </html>
