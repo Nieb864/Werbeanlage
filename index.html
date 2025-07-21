@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.18-DAEMMERUNGSSCHALTER-FIX -->
+<!-- CACHE-BUST: v0.01.19-NEUE-KATEGORIEN -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.18</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.19</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1101,6 +1101,39 @@
                     </div>
                     
                     <div class="component-category">
+                        <div class="category-title text-h2">Kabel</div>
+                        <div class="component-item" data-component-type="kabel-flexibel-sw">
+                            <div class="component-name text-h2">Flexibles Kabel sw</div>
+                            <div class="component-specs text-small">
+                                1 mm², schwarz<br>
+                                bis 24V, 100W
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-category">
+                        <div class="category-title text-h2">Kabelverbindungen</div>
+                        <div class="component-item" data-component-type="klemme-mobil-3l">
+                            <div class="component-name text-h2">Mobile Klemme 3L</div>
+                            <div class="component-specs text-small">
+                                0,08-2,5 mm²<br>
+                                400V, 32A
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-category">
+                        <div class="category-title text-h2">Entwickler</div>
+                        <div class="component-item" data-component-type="dev-placeholder">
+                            <div class="component-name text-h2" style="color: #888;">Platzhalter</div>
+                            <div class="component-specs text-small">
+                                Für zukünftige<br>
+                                Entwicklungen
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-category">
                         <div class="category-title text-h2">LED-Module</div>
                         <div class="component-item" data-component-type="led-12v-1.2w">
                             <div class="component-name text-h2">LED-Modul 12V-1,2W-WW</div>
@@ -1187,7 +1220,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.18</div>
+                <div class="version-display">v0.01.19</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2449,6 +2482,21 @@
                 name: 'Dämmerungsschalter',
                 specs: 'Spannung: 230V AC<br>Schaltleistung: 10A<br>Einstellbereich: 2-200 Lux<br>Verzögerung: 30s',
                 description: 'Automatischer Schalter basierend auf Umgebungshelligkeit.'
+            },
+            'kabel-flexibel-sw': {
+                name: 'Flexibles Kabel sw',
+                specs: 'Kabelquerschnitt: 1 mm²<br>Maximalleistung: 100 W<br>Spannung: bis 24V<br>Farbe: Schwarz',
+                description: 'Flexibles schwarzes Kabel für LED Installationen bis 24V.'
+            },
+            'klemme-mobil-3l': {
+                name: 'Mobile Klemme 3L',
+                specs: 'Leiterquerschnitt: 0,08-2,5 mm²<br>Bemessungsspannung: 400 V<br>Bemessungsstrom: 32 A<br>Leiterarten: alle',
+                description: '3-Leiterverbindungsklemme mit Betätigungshebeln.'
+            },
+            'dev-placeholder': {
+                name: 'Entwickler-Platzhalter',
+                specs: 'Status: In Entwicklung<br>Typ: Noch nicht definiert<br>Funktion: Platzhalter<br>Verfügbarkeit: Zukünftig',
+                description: 'Platzhalter für zukünftige Bauteile und Entwicklungen.'
             }
         };
 
@@ -3976,6 +4024,12 @@
                     return createTimerSwitchSVG();
                 case 'daemmerungsschalter':
                     return createDuskSwitchSVG();
+                case 'kabel-flexibel-sw':
+                    return createKabelFlexibelSVG();
+                case 'klemme-mobil-3l':
+                    return createKlemmeMobilSVG();
+                case 'dev-placeholder':
+                    return createDevPlaceholderSVG();
                 case 'led-24v-5w':
                     return createLED24VSVG();
                 default:
@@ -5004,6 +5058,107 @@
                 </svg>
             `;
         }
+        
+        // ===== KABEL FLEXIBEL =====
+        function createKabelFlexibelSVG() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 80 30');
+            svg.setAttribute('class', 'component-svg');
+            svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
+            
+            // Platzhalter für Kabel (wird später durch dein SVG ersetzt)
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', '5');
+            rect.setAttribute('y', '10');
+            rect.setAttribute('width', '70');
+            rect.setAttribute('height', '10');
+            rect.setAttribute('fill', '#333');
+            rect.setAttribute('stroke', '#000');
+            rect.setAttribute('stroke-width', '2');
+            rect.setAttribute('rx', '5');
+            
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', '40');
+            text.setAttribute('y', '18');
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('fill', '#fff');
+            text.setAttribute('font-size', '8');
+            text.textContent = 'KABEL';
+            
+            svg.appendChild(rect);
+            svg.appendChild(text);
+            return svg;
+        }
+        
+        // ===== MOBILE KLEMME =====
+        function createKlemmeMobilSVG() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 60 40');
+            svg.setAttribute('class', 'component-svg');
+            svg.setAttribute('data-component-type', 'klemme-mobil-3l');
+            
+            // Platzhalter für Klemme (wird später durch dein SVG ersetzt)
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', '10');
+            rect.setAttribute('y', '5');
+            rect.setAttribute('width', '40');
+            rect.setAttribute('height', '30');
+            rect.setAttribute('fill', '#e8e8e8');
+            rect.setAttribute('stroke', '#333');
+            rect.setAttribute('stroke-width', '2');
+            
+            // 3 Klemmpunkte
+            for (let i = 0; i < 3; i++) {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', 20 + i * 10);
+                circle.setAttribute('cy', '20');
+                circle.setAttribute('r', '3');
+                circle.setAttribute('fill', '#666');
+                svg.appendChild(circle);
+            }
+            
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', '30');
+            text.setAttribute('y', '15');
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('fill', '#333');
+            text.setAttribute('font-size', '6');
+            text.textContent = '3L';
+            
+            svg.appendChild(rect);
+            svg.appendChild(text);
+            return svg;
+        }
+        
+        // ===== ENTWICKLER PLATZHALTER =====
+        function createDevPlaceholderSVG() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 60 30');
+            svg.setAttribute('class', 'component-svg');
+            svg.setAttribute('data-component-type', 'dev-placeholder');
+            
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', '5');
+            rect.setAttribute('y', '5');
+            rect.setAttribute('width', '50');
+            rect.setAttribute('height', '20');
+            rect.setAttribute('fill', 'none');
+            rect.setAttribute('stroke', '#888');
+            rect.setAttribute('stroke-width', '2');
+            rect.setAttribute('stroke-dasharray', '5,5');
+            
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', '30');
+            text.setAttribute('y', '18');
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('fill', '#888');
+            text.setAttribute('font-size', '8');
+            text.textContent = 'DEV';
+            
+            svg.appendChild(rect);
+            svg.appendChild(text);
+            return svg;
+        }
 
         // ===== POWER TOOLTIP SYSTEM =====
         function setupPowerTooltips() {
@@ -5110,7 +5265,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.18 - DAEMMERUNGSSCHALTER-FIX: Component-Type Erkennung für Dämmerungsschalter korrigiert...');
+                            console.log('🚀 LED Foundation v0.01.19 - NEUE-KATEGORIEN: Drei neue Bauteil-Kategorien hinzugefügt (Kabel, Kabelverbindungen, Entwickler)...');
             
             // 1. Circuit Simulation initialisieren
             try {
