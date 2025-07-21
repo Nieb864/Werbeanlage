@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.91-TEXT-SPACE -->
+<!-- CACHE-BUST: v0.00.92-SIZE-DEBUG -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.91</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.92</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.91</div>
+                <div class="version-display">v0.00.92</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4599,7 +4599,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.91 - TEXT-SPACE: ViewBox 30px für rotierte Text-Elemente (y=20.61 + font-size brauchten mehr Platz)...');
+                            console.log('🚀 LED Foundation v0.00.92 - SIZE-DEBUG: Temporäre Debug-Logs für Container vs SVG Größen-Analyse...');
             
             // 1. Circuit Simulation initialisieren
             try {
@@ -4885,6 +4885,31 @@
                 console.log('🎯 Rotation Debug-Punkte aktiviert! Rote Punkte = CSS Transform');
             }, 2000);
         });
+
+        // ===== TEMPORARY DEBUG: COMPONENT SIZE ANALYSIS =====
+        function debugComponentSizes() {
+            setTimeout(() => {
+                const components = document.querySelectorAll('.component');
+                components.forEach((component, index) => {
+                    const svg = component.querySelector('svg');
+                    if (svg && svg.classList.contains('led-module-svg')) {
+                        const containerRect = component.getBoundingClientRect();
+                        const svgRect = svg.getBoundingClientRect();
+                        const svgStyle = window.getComputedStyle(svg);
+                        
+                        console.log('🔍 COMPONENT SIZE DEBUG #' + index + ':');
+                        console.log('   Container:', containerRect.width, 'x', containerRect.height);
+                        console.log('   SVG Rect:', svgRect.width, 'x', svgRect.height);
+                        console.log('   SVG CSS:', svgStyle.width, 'x', svgStyle.height);
+                        console.log('   ViewBox:', svg.getAttribute('viewBox'));
+                        console.log('   Difference Y:', containerRect.height - svgRect.height);
+                    }
+                });
+            }, 1000);
+        }
+
+        // Debug aktivieren
+        debugComponentSizes();
     </script>
 </body>
 </html>
