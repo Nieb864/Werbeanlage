@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.29-KLEMME-FARBEN-FIX -->
+<!-- CACHE-BUST: v0.01.30-KLEMME-GROESSE-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.29</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.30</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -699,6 +699,12 @@
             height: 45px; /* Trafos sind höher als LEDs */
         }
 
+        /* Mobile Terminal */
+        .mobile-terminal-svg {
+            width: auto;
+            height: 50px; /* Groß genug für Klemme + Anschlusspunkte */
+        }
+
         /* Transformer Styles */
         .trafo-housing { 
             fill: #e8e8e8; 
@@ -1298,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.29</div>
+                <div class="version-display">v0.01.30</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5209,7 +5215,7 @@
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             // Original: 19.49 x 16.88 * 1.5 + 25px oben = 29.24 x 50.32
             svg.setAttribute('viewBox', '0 0 29.24 50.32');
-            svg.setAttribute('class', 'component-svg');
+            svg.setAttribute('class', 'mobile-terminal-svg');
             svg.setAttribute('data-component-type', 'klemme-mobil-3l');
             
             svg.innerHTML = `
@@ -5442,7 +5448,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.29 - KLEMME-FARBEN-FIX: CSS-Variablen durch Hex-Werte ersetzt für SVG-innerHTML...');
+                            console.log('🚀 LED Foundation v0.01.30 - KLEMME-GROESSE-FIX: Mobile Terminal CSS-Klasse und 50px Höhe hinzugefügt...');
             
             // 1. Circuit Simulation initialisieren
             try {
