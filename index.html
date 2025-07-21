@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.07-INPUT-VISUAL-CABLES -->
+<!-- CACHE-BUST: v0.01.09-SIMPLE-LED-SCHEMATICS -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.07</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.09</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -814,6 +814,27 @@
             stroke-width: 1; 
             stroke-miterlimit: 10; 
         }
+        .schematic-container {
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        /* Schaltskizze Standards */
+        .schematic-line { 
+            fill: none; 
+            stroke: #1d1d1b; 
+            stroke-width: 1; 
+            stroke-miterlimit: 10; 
+        }
+        .schematic-fill-black { 
+            fill: #1d1d1b; 
+        }
+        .schematic-fill-white { 
+            fill: #fff; 
+            stroke: #1d1d1b; 
+            stroke-width: 1; 
+            stroke-miterlimit: 10; 
+        }
         .schematic-fill-none { 
             fill: none; 
             stroke: #1d1d1b; 
@@ -1159,7 +1180,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.07</div>
+                <div class="version-display">v0.01.09</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4555,8 +4576,89 @@
                 </div>
                 <div class="info-box">
                     <h4>Schaltskizze</h4>
-                    <p class="text-small"><em>Schaltskizze wird hier als SVG dargestellt</em></p>
+                    <div class="schematic-container" id="schematic-placeholder">
+                        <p class="text-small"><em>Schaltskizze wird geladen...</em></p>
+                    </div>
                 </div>
+            `;
+            
+            // Schaltskizze nachträglich einfügen
+            setTimeout(() => {
+                const placeholder = document.getElementById('schematic-placeholder');
+                if (placeholder && componentType.includes('led')) {
+                    placeholder.innerHTML = getLEDSchematic();
+                }
+            }, 100);
+        }
+        
+        function getLEDSchematic() {
+            return `
+                <svg viewBox="0 0 426 140" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto; max-height: 120px;">
+                    <g>
+                        <!-- Obere Leitung -->
+                        <line class="schematic-line" x1="417.94" y1="8.52" x2="8.1" y2="8.52"/>
+                        
+                        <!-- Plus-Anschluss oben rechts -->
+                        <g>
+                            <circle class="schematic-fill-white" cx="417.52" cy="8.52" r="7.52"/>
+                            <path class="schematic-fill-black" d="M417.52,0c-4.7,0-8.52,3.82-8.52,8.52s3.82,8.52,8.52,8.52,8.52-3.82,8.52-8.52-3.82-8.52-8.52-8.52ZM417.52,15.04c-3.6,0-6.52-2.92-6.52-6.52s2.92-6.52,6.52-6.52,6.52,2.92,6.52,6.52-2.92,6.52-6.52,6.52Z"/>
+                            <line class="schematic-line" x1="412.04" y1="8.52" x2="422.96" y2="8.52"/>
+                            <line class="schematic-line" x1="417.5" y1="3.06" x2="417.5" y2="13.98"/>
+                        </g>
+                        
+                        <!-- Plus-Anschluss oben links -->
+                        <g>
+                            <circle class="schematic-fill-white" cx="8.52" cy="8.52" r="7.52"/>
+                            <path class="schematic-fill-black" d="M8.52,0c4.7,0,8.52,3.82,8.52,8.52s-3.82,8.52-8.52,8.52S0,13.22,0,8.52,3.82,0,8.52,0ZM8.52,15.04c3.6,0,6.52-2.92,6.52-6.52s-2.92-6.52-6.52-6.52-6.52,2.92-6.52,6.52,2.92,6.52,6.52,6.52Z"/>
+                            <line class="schematic-line" x1="2.96" y1="8.52" x2="13.88" y2="8.52"/>
+                            <line class="schematic-line" x1="8.42" y1="3.06" x2="8.42" y2="13.98"/>
+                        </g>
+                        
+                        <!-- Vertikalleitung links -->
+                        <polyline class="schematic-line" points="28.8,8.52 28.8,48.2 397.92,49.76 397.92,131.14"/>
+                        
+                        <!-- LED 1 -->
+                        <g>
+                            <polyline class="schematic-line" points="136.56,49.76 136.56,99.92 204.54,99.92 204.54,49.82"/>
+                            <line class="schematic-line" x1="162.52" y1="86.26" x2="162.52" y2="113.58"/>
+                            <polygon class="schematic-fill-white" points="163.1,99.88 184.76,88.08 184.76,111.68 163.1,99.88"/>
+                            <!-- LED Symbol -->
+                            <g>
+                                <line class="schematic-line" x1="186.58" y1="31.48" x2="186.58" y2="68.18"/>
+                                <polygon class="schematic-fill-white" points="185.84,49.76 158.4,33.92 158.4,65.6 185.84,49.76"/>
+                                <!-- Lichtstrahlen -->
+                                <g>
+                                    <line class="schematic-line" x1="175.96" y1="21.98" x2="168.54" y2="34.62"/>
+                                    <polygon class="schematic-fill-black" points="171.72,22.48 175.38,22.96 177.6,25.92 178.74,17.24 171.72,22.48"/>
+                                </g>
+                                <g>
+                                    <line class="schematic-line" x1="183.2" y1="26.32" x2="175.78" y2="38.96"/>
+                                    <polygon class="schematic-fill-black" points="178.96,26.82 182.62,27.3 184.84,30.28 185.98,21.58 178.96,26.82"/>
+                                </g>
+                            </g>
+                        </g>
+                        
+                        <!-- Anschlussklemme -->
+                        <rect class="schematic-fill-white" x="50.06" y="39.66" width="55.96" height="17.5"/>
+                        
+                        <!-- Untere Leitung -->
+                        <line class="schematic-line" x1="417.94" y1="131.14" x2="8.1" y2="131.14"/>
+                        
+                        <!-- Minus-Anschluss unten rechts -->
+                        <g>
+                            <circle class="schematic-fill-white" cx="417.52" cy="131.14" r="7.52"/>
+                            <path class="schematic-fill-black" d="M417.52,122.62c-4.7,0-8.52,3.82-8.52,8.52s3.82,8.52,8.52,8.52,8.52-3.82,8.52-8.52-3.82-8.52-8.52-8.52ZM417.52,138.66c-3.6,0-6.52-2.92-6.52-6.52s2.92-6.52,6.52-6.52,6.52,2.92,6.52,6.52-2.92,6.52-6.52,6.52Z"/>
+                            <line class="schematic-line" x1="412.04" y1="131.14" x2="422.94" y2="131.14"/>
+                        </g>
+                        
+                        <!-- Minus-Anschluss unten links -->
+                        <g>
+                            <circle class="schematic-fill-white" cx="8.52" cy="131.14" r="7.52"/>
+                            <path class="schematic-fill-black" d="M8.52,122.62c4.7,0,8.52,3.82,8.52,8.52s-3.82,8.52-8.52,8.52-8.52-3.82-8.52-8.52,3.82-8.52,8.52-8.52ZM8.52,138.66c3.6,0,6.52-2.92,6.52-6.52s-2.92-6.52-6.52-6.52-6.52,2.92-6.52,6.52,2.92,6.52,6.52,6.52Z"/>
+                            <line class="schematic-line" x1="3.22" y1="131.14" x2="14.14" y2="131.14"/>
+                        </g>
+                    </g>
+                </svg>
             `;
         }
 
@@ -4665,7 +4767,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.07 - INPUT-VISUAL-CABLES: Visual Cables korrekt bei Input-Sockets verstecken...');
+                            console.log('🚀 LED Foundation v0.01.09 - SIMPLE-LED-SCHEMATICS: Einfache LED-Schaltskizzen via setTimeout eingefügt...');
             
             // 1. Circuit Simulation initialisieren
             try {
