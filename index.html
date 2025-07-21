@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.26-KLEMME-DRAG-SVG -->
+<!-- CACHE-BUST: v0.01.27-DRAG-BUG-FIX -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.26</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.27</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1298,7 +1298,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.26</div>
+                <div class="version-display">v0.01.27</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3664,6 +3664,14 @@
             
             document.addEventListener('mousemove', handleDrag);
             document.addEventListener('mouseup', endDrag);
+            
+            // BACKUP: Globaler mouseup-Event als Notfall-Reset
+            document.addEventListener('mouseup', function(e) {
+                if (isDragging && dragElement) {
+                    console.log('🚨 BACKUP: Globaler mouseup-Reset ausgelöst');
+                    endDrag(e);
+                }
+            });
         }
 
         function startDrag(e) {
@@ -3681,6 +3689,9 @@
             
             if (!svg) {
                 console.log('❌ Kein SVG für Typ erstellt:', componentType);
+                // FORCE-RESET: Bei Fehler Drag-Zustand saubern
+                isDragging = false;
+                dragElement = null;
                 return;
             }
             
@@ -3716,7 +3727,15 @@
         }
 
         function endDrag(e) {
-            if (!isDragging || !dragElement) return;
+            console.log('🎯 endDrag aufgerufen - isDragging:', isDragging, 'dragElement:', !!dragElement);
+            
+            if (!isDragging || !dragElement) {
+                // NOTFALL-RESET: Falls der Zustand inkonsistent ist
+                isDragging = false;
+                dragElement = null;
+                console.log('⚠️ Drag-Zustand zurückgesetzt (inkonsistent)');
+                return;
+            }
             
             const workspace = document.getElementById('workspace');
             const workspaceRect = workspace.getBoundingClientRect();
@@ -3734,12 +3753,16 @@
                 console.log('✅ Bauteil platziert bei:', relativeX, relativeY);
             }
             
+            // CLEANUP: Drag-Element entfernen
             if (dragElement && dragElement.parentNode) {
                 dragElement.parentNode.removeChild(dragElement);
+                console.log('✅ Drag-Element aus DOM entfernt');
             }
             
+            // FORCE-RESET: Zustand zurücksetzen
             isDragging = false;
             dragElement = null;
+            console.log('✅ Drag-Zustand vollständig zurückgesetzt');
         }
 
         function placeComponent(x, y, componentType) {
@@ -5408,7 +5431,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.26 - KLEMME-DRAG-SVG: Mobile Klemme 3L mit originalem SVG, Faktor 1.5, Orange-Farbe und 3 Anschlusspunkten...');
+                            console.log('🚀 LED Foundation v0.01.27 - DRAG-BUG-FIX: Verbesserte Drag-Drop-Zustandsverwaltung mit Force-Reset und Backup-Events...');
             
             // 1. Circuit Simulation initialisieren
             try {
