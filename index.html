@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.37-KLEMME-BEZIER-ENDPUNKT -->
+<!-- CACHE-BUST: v0.01.38-KLEMME-ENDPUNKT-KORR -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.37</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.38</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.37</div>
+                <div class="version-display">v0.01.38</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5251,7 +5251,7 @@
                         data-connection-id="terminal-1"
                         data-wire-type="universal"
                         data-voltage="400"
-                        data-bezier-end-x="5.67" data-bezier-end-y="15"
+                        data-bezier-end-x="5.67" data-bezier-end-y="30"
                         data-bezier-direction="0,-20,0,0"/>
                         
                 <circle class="connection-socket" 
@@ -5260,7 +5260,7 @@
                         data-connection-id="terminal-2"
                         data-wire-type="universal"
                         data-voltage="400"
-                        data-bezier-end-x="14.615" data-bezier-end-y="15"
+                        data-bezier-end-x="14.615" data-bezier-end-y="30"
                         data-bezier-direction="0,-20,0,0"/>
                         
                 <circle class="connection-socket" 
@@ -5269,7 +5269,7 @@
                         data-connection-id="terminal-3"
                         data-wire-type="universal"
                         data-voltage="400"
-                        data-bezier-end-x="23.56" data-bezier-end-y="15"
+                        data-bezier-end-x="23.56" data-bezier-end-y="30"
                         data-bezier-direction="0,-20,0,0"/>
             `;
             
@@ -5481,7 +5481,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.37 - KLEMME-BEZIER-ENDPUNKT: Endpunkt über Klemme (Y=15) und Richtung nach oben...');
+                            console.log('🚀 LED Foundation v0.01.38 - KLEMME-ENDPUNKT-KORR: Bezier-Endpunkt zurück auf Y=30, Richtung bleibt nach oben...');
             
             // 1. Circuit Simulation initialisieren
             try {
