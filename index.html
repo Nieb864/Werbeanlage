@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.82-CLEAN-DOM-COORDS -->
+<!-- CACHE-BUST: v0.00.83-REAL-DOM-RECT -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.82</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.83</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.82</div>
+                <div class="version-display">v0.00.83</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3253,16 +3253,16 @@
                 if (component && component.id !== 'power-source-svg') {
                     const svg = component.querySelector('svg');
                     if (svg) {
-                        const svgStyle = window.getComputedStyle(svg);
+                        const rect = svg.getBoundingClientRect();
                         const viewBox = svg.getAttribute('viewBox');
                         if (viewBox) {
                             const viewBoxValues = viewBox.split(' ');
                             const viewBoxWidth = parseFloat(viewBoxValues[2]);
                             const viewBoxHeight = parseFloat(viewBoxValues[3]);
                             
-                            // Skalierungsfaktoren
-                            const scaleX = parseFloat(svgStyle.width) / viewBoxWidth;
-                            const scaleY = parseFloat(svgStyle.height) / viewBoxHeight;
+                            // Skalierungsfaktoren mit echten DOM-Maßen
+                            const scaleX = rect.width / viewBoxWidth;
+                            const scaleY = rect.height / viewBoxHeight;
                             
                             // ViewBox → DOM skalieren
                             x = x * scaleX;
@@ -3278,11 +3278,12 @@
                         // DOM-Element-Dimensionen verwenden (wie CSS Transform-Origin)
                         const svg = component.querySelector('svg');
                         if (svg) {
-                            const svgStyle = window.getComputedStyle(svg);
+                            // Echte DOM-Maße verwenden (wie CSS transform-origin)
+                            const rect = svg.getBoundingClientRect();
                             
                             // DOM-Zentrum berechnen (entspricht CSS transform-origin: center center)
-                            const centerX = parseFloat(svgStyle.width) / 2;
-                            const centerY = parseFloat(svgStyle.height) / 2;
+                            const centerX = rect.width / 2;
+                            const centerY = rect.height / 2;
                             
                             // Koordinaten relativ zum DOM-Zentrum machen (x,y sind bereits DOM-Koordinaten)
                             const relativeX = x - centerX;
@@ -4598,7 +4599,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.82 - CLEAN-DOM-COORDS: Saubere DOM-Koordinaten - ViewBox wird einmal skaliert, dann konsistent verwendet...');
+                            console.log('🚀 LED Foundation v0.00.83 - REAL-DOM-RECT: Verwende getBoundingClientRect() statt getComputedStyle() für exakte CSS transform-origin Übereinstimmung...');
             
             // 1. Circuit Simulation initialisieren
             try {
@@ -4842,6 +4843,48 @@
         });
 
         console.log('🎯 App.js geladen - Warte auf DOM Ready...');
+
+        // ===== DEBUG: VISUELLER ZENTRUM-VERGLEICH =====
+        function addRotationDebugPoints() {
+            // Alle LED-Module finden
+            const components = document.querySelectorAll('[data-component-type="led-12v-1.2w"]');
+            
+            components.forEach(component => {
+                const svg = component.querySelector('svg');
+                if (!svg) return;
+                
+                // DEBUG-PUNKT 1: CSS-Transform (echte Anschluss-Position)
+                const cssPoint = document.createElement('div');
+                cssPoint.style.position = 'absolute';
+                cssPoint.style.width = '6px';
+                cssPoint.style.height = '6px';
+                cssPoint.style.backgroundColor = 'red';
+                cssPoint.style.borderRadius = '50%';
+                cssPoint.style.zIndex = '1000';
+                cssPoint.style.pointerEvents = 'none';
+                
+                // Position relativ zum SVG (wie echte Anschlusspunkte)
+                cssPoint.style.left = '19px'; // Bezier-Start-X aus data-attribute
+                cssPoint.style.top = '12.225px'; // Bezier-Start-Y aus data-attribute
+                cssPoint.style.transformOrigin = 'center center';
+                
+                // Gleiche Rotation wie Component
+                const rotation = window.workspaceManager?.componentRotations?.get(component) || 0;
+                cssPoint.style.transform = `rotate(${rotation}deg)`;
+                
+                svg.appendChild(cssPoint);
+                
+                console.log('🔴 CSS Debug-Punkt hinzugefügt für Rotation:', rotation);
+            });
+        }
+
+        // DEBUG aktivieren (nach DOM-Load)
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                addRotationDebugPoints();
+                console.log('🎯 Rotation Debug-Punkte aktiviert! Rote Punkte = CSS Transform');
+            }, 2000);
+        });
     </script>
 </body>
 </html>
