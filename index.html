@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.04-CONFLICT-FIXED -->
+<!-- CACHE-BUST: v0.01.05-TARGETED-VISUAL-CABLES -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.04</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.05</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -797,9 +797,6 @@
         .visual-cable {
             transition: opacity 0.3s ease;
         }
-        .component.has-connection .visual-cable {
-            opacity: 0;
-        }
 
         /* Connection Line Hover Effects */
         .connection-line {
@@ -1139,7 +1136,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.04</div>
+                <div class="version-display">v0.01.05</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3012,25 +3009,30 @@
                 outputLine.classList.add('connected');
                 inputSocket.classList.add('connected');
                 
-                // Parent Components für Visual Cable Hiding markieren
-                const fromComponent = outputLine.closest('.component');
-                const toComponent = inputSocket.closest('.component');
-                if (fromComponent) fromComponent.classList.add('has-connection');
-                if (toComponent) toComponent.classList.add('has-connection');
+                // Visual Cable für spezifische Connection Points verstecken
+                this.updateVisualCables(outputLine);
+                this.updateVisualCables(inputSocket);
                 
                 console.log('🔗 Bezier-Verbindung erstellt:', connectionId);
             }
             
-            hasOtherConnections(component) {
-                // Prüft ob eine Komponente noch andere aktive Verbindungen hat
-                for (let connection of this.connections.values()) {
-                    const fromComp = connection.from.closest('.component');
-                    const toComp = connection.to.closest('.component');
-                    if (fromComp === component || toComp === component) {
-                        return true;
+            updateVisualCables(connectionPoint) {
+                // Findet das entsprechende Visual Cable für diesen Connection Point
+                const component = connectionPoint.closest('.component');
+                if (!component) return;
+                
+                const wireType = connectionPoint.getAttribute('data-wire-type');
+                const isConnected = connectionPoint.classList.contains('connected');
+                
+                // Spezifisches Visual Cable finden und steuern
+                const visualCable = component.querySelector(`.visual-cable-${wireType}`);
+                if (visualCable) {
+                    if (isConnected) {
+                        visualCable.style.opacity = '0';
+                    } else {
+                        visualCable.style.opacity = '1';
                     }
                 }
-                return false;
             }
             
             deleteConnection(path) {
@@ -3048,17 +3050,9 @@
                     connection.from.classList.remove('connected');
                     connection.to.classList.remove('connected');
                     
-                    // Parent Components für Visual Cable Showing prüfen
-                    const fromComponent = connection.from.closest('.component');
-                    const toComponent = connection.to.closest('.component');
-                    
-                    // Nur .has-connection entfernen wenn keine anderen Connections existieren
-                    if (fromComponent && !this.hasOtherConnections(fromComponent)) {
-                        fromComponent.classList.remove('has-connection');
-                    }
-                    if (toComponent && !this.hasOtherConnections(toComponent)) {
-                        toComponent.classList.remove('has-connection');
-                    }
+                    // Visual Cable für spezifische Connection Points wieder anzeigen
+                    this.updateVisualCables(connection.from);
+                    this.updateVisualCables(connection.to);
                 }
                 
                 path.remove();
@@ -4645,7 +4639,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.04 - CONFLICT-FIXED: CSS-Klassenkonflikt behoben - has-connection statt connected...');
+                            console.log('🚀 LED Foundation v0.01.05 - TARGETED-VISUAL-CABLES: Spezifische Visual Cable Steuerung per JavaScript...');
             
             // 1. Circuit Simulation initialisieren
             try {
