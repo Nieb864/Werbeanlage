@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.01.03-VISUAL-CABLE-HIDING -->
+<!-- CACHE-BUST: v0.01.04-CONFLICT-FIXED -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.01.03</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.01.04</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -797,7 +797,7 @@
         .visual-cable {
             transition: opacity 0.3s ease;
         }
-        .component.connected .visual-cable {
+        .component.has-connection .visual-cable {
             opacity: 0;
         }
 
@@ -1139,7 +1139,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.03</div>
+                <div class="version-display">v0.01.04</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3015,8 +3015,8 @@
                 // Parent Components für Visual Cable Hiding markieren
                 const fromComponent = outputLine.closest('.component');
                 const toComponent = inputSocket.closest('.component');
-                if (fromComponent) fromComponent.classList.add('connected');
-                if (toComponent) toComponent.classList.add('connected');
+                if (fromComponent) fromComponent.classList.add('has-connection');
+                if (toComponent) toComponent.classList.add('has-connection');
                 
                 console.log('🔗 Bezier-Verbindung erstellt:', connectionId);
             }
@@ -3052,12 +3052,12 @@
                     const fromComponent = connection.from.closest('.component');
                     const toComponent = connection.to.closest('.component');
                     
-                    // Nur .connected entfernen wenn keine anderen Connections existieren
+                    // Nur .has-connection entfernen wenn keine anderen Connections existieren
                     if (fromComponent && !this.hasOtherConnections(fromComponent)) {
-                        fromComponent.classList.remove('connected');
+                        fromComponent.classList.remove('has-connection');
                     }
                     if (toComponent && !this.hasOtherConnections(toComponent)) {
-                        toComponent.classList.remove('connected');
+                        toComponent.classList.remove('has-connection');
                     }
                 }
                 
@@ -4645,7 +4645,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.03 - VISUAL-CABLE-HIDING: Visueller Trick - Anschlusskabel verschwinden bei aktiven Verbindungen...');
+                            console.log('🚀 LED Foundation v0.01.04 - CONFLICT-FIXED: CSS-Klassenkonflikt behoben - has-connection statt connected...');
             
             // 1. Circuit Simulation initialisieren
             try {
