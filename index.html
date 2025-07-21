@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.77</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.78</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.77</div>
+                <div class="version-display">v0.00.78</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3928,10 +3928,6 @@
 
                 
                 <g>
-                    <!-- Anschlusskabel Links -->
-                    <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
-                    <line stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
-            
                     <g>
                         <rect class="cls-2" x="16.605" y=".75" width="100.14" height="26.04" rx="8.475" ry="8.475"/>
                         <g>
@@ -3966,7 +3962,10 @@
                         data-wire-type="minus"
                         data-voltage="12"
                         data-bezier-end-x="19" data-bezier-end-y="12.225"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-direction="-20,0,0,0">
+                    <!-- Visuelles Anschlusskabel MINUS -->
+                    <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
+                </circle>
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
@@ -3975,7 +3974,10 @@
                         data-wire-type="plus"
                         data-voltage="12"
                         data-bezier-end-x="19" data-bezier-end-y="21.315"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-direction="-20,0,0,0">
+                    <!-- Visuelles Anschlusskabel PLUS -->
+                    <line stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
+                </circle>
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
                 <line class="connection-line" 
@@ -4310,10 +4312,6 @@
 
                 
                 <g>
-                    <!-- Anschlusskabel Links -->
-                    <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
-                    <line stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
-            
                     <g>
                         <rect class="cls-2" x="16.605" y=".75" width="100.14" height="26.04" rx="8.475" ry="8.475"/>
                         <g>
@@ -4348,7 +4346,10 @@
                         data-wire-type="minus"
                         data-voltage="24"
                         data-bezier-end-x="19" data-bezier-end-y="12.225"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-direction="-20,0,0,0">
+                    <!-- Visuelles Anschlusskabel MINUS -->
+                    <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
+                </circle>
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
@@ -4357,7 +4358,10 @@
                         data-wire-type="plus"
                         data-voltage="24"
                         data-bezier-end-x="19" data-bezier-end-y="21.315"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-direction="-20,0,0,0">
+                    <!-- Visuelles Anschlusskabel PLUS -->
+                    <line stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
+                </circle>
                 
                 <!-- Connection Points Rechts (Ausgehende Linien) -->
                 <line class="connection-line" 
@@ -4581,7 +4585,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.77 - FEINTUNING: Linke Bezier-Startpunkte +1px nach rechts...');
+            console.log('🚀 LED Foundation v0.00.78 - KABEL INTEGRIERT: Visuelle Kabel in Kontaktpunkte eingebaut...');
             
             // 1. Circuit Simulation initialisieren
             try {
