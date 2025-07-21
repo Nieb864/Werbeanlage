@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- CACHE-BUST: v0.00.94-BOX-SIZING-FIX -->
+<!-- CACHE-BUST: v0.00.95-OUTLINE-INSTEAD-BORDER -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.94</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.95</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -463,24 +463,27 @@
             cursor: move;
             user-select: none;
             transition: border 0.3s ease;
-            border: var(--border-width) solid transparent;
+            border: 0px solid transparent; /* KEIN Border im Normalzustand */
             display: inline-block; /* Container passt sich an SVG-Größe an */
             box-sizing: border-box; /* Border ist in der Größe enthalten */
         }
 
         .component:hover {
-            border: var(--border-width) solid var(--color-hover-border);
+            outline: var(--border-width) solid var(--color-hover-border);
+            outline-offset: 2px;
             box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
         }
 
         .component.dragging {
             z-index: 1000;
-            border: var(--border-width) solid #FF9800;
+            outline: var(--border-width) solid #FF9800;
+            outline-offset: 2px;
             box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
         }
 
         .component.selected {
-            border: 2px solid #4CAF50 !important;
+            outline: 2px solid #4CAF50 !important;
+            outline-offset: 2px !important;
             box-shadow: 0 0 8px rgba(76, 175, 80, 0.5) !important;
         }
 
@@ -488,7 +491,8 @@
             z-index: 1000 !important;
             opacity: 0.8 !important;
             cursor: grabbing !important;
-            border: 2px solid #FF9800 !important;
+            outline: 2px solid #FF9800 !important;
+            outline-offset: 2px !important;
             box-shadow: 0 0 12px rgba(255, 152, 0, 0.5) !important;
         }
 
@@ -1125,7 +1129,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.94</div>
+                <div class="version-display">v0.00.95</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4601,7 +4605,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.00.94 - BOX-SIZING-FIX: inline-block + box-sizing:border-box für Container-SVG-Synchronisation...');
+                            console.log('🚀 LED Foundation v0.00.95 - OUTLINE-INSTEAD-BORDER: Outline statt Border für perfekte Container=SVG-Größe...');
             
             // 1. Circuit Simulation initialisieren
             try {
