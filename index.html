@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>LED & EVG Drag-and-Drop Werkbank v0.00.79</title>
+            <title>LED & EVG Drag-and-Drop Werkbank v0.00.80</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1123,7 +1123,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.00.79</div>
+                <div class="version-display">v0.00.80</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3954,10 +3954,11 @@
                     </g>
                 </g>
                 
-                <!-- Connection Points Links (Eingangsbuchsen mit visuellen Kabeln) -->
-                <!-- Visuelles Anschlusskabel MINUS -->
-                <line class="connection-socket" stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
+                <!-- Anschlusskabel Links -->
+                <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
+                <line stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                 
+                <!-- Connection Points Links (Eingangsbuchsen) -->
                 <circle class="connection-socket" 
                         cx="8" cy="9.225" r="4" 
                         data-connection-type="input-socket"
@@ -3966,9 +3967,6 @@
                         data-voltage="12"
                         data-bezier-end-x="19" data-bezier-end-y="12.225"
                         data-bezier-direction="-20,0,0,0"/>
-                
-                <!-- Visuelles Anschlusskabel PLUS -->
-                <line class="connection-socket" stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
@@ -4338,10 +4336,11 @@
                     </g>
                 </g>
                 
-                <!-- Connection Points Links (Eingangsbuchsen mit visuellen Kabeln) -->
-                <!-- Visuelles Anschlusskabel MINUS -->
-                <line class="connection-socket" stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
+                <!-- Anschlusskabel Links -->
+                <line stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
+                <line stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                 
+                <!-- Connection Points Links (Eingangsbuchsen) -->
                 <circle class="connection-socket" 
                         cx="8" cy="9.225" r="4" 
                         data-connection-type="input-socket"
@@ -4350,9 +4349,6 @@
                         data-voltage="24"
                         data-bezier-end-x="19" data-bezier-end-y="12.225"
                         data-bezier-direction="-20,0,0,0"/>
-                
-                <!-- Visuelles Anschlusskabel PLUS -->
-                <line class="connection-socket" stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
@@ -4585,7 +4581,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-            console.log('🚀 LED Foundation v0.00.79 - KABEL KORRIGIERT: Visuelle Kabel mit gleicher Klasse wie Kontakte...');
+            console.log('🚀 LED Foundation v0.00.80 - ROLLBACK: Zurück zu den ursprünglichen, funktionierenden Kabeln...');
             
             // 1. Circuit Simulation initialisieren
             try {
