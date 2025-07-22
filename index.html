@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.42c</div>
+                <div class="version-display">v0.01.43</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3400,6 +3400,18 @@
                 // DIREKTE Plus-Minus Verbindung ohne Verbraucher dazwischen  
                 // Aber: Plus-Output zu Minus-Input einer LED ist NORMAL, kein Kurzschluss!
                 // Nur direkte Kabel-zu-Kabel Verbindungen sind Kurzschlüsse
+                
+                // AUSNAHME: Transformator-Eingänge sind KEINE Kurzschlüsse!
+                const inputElement = document.querySelector(`[data-connection-id="${inputData.id}"]`);
+                const inputComponent = inputElement ? inputElement.closest('[data-component-type]') : null;
+                const inputComponentType = inputComponent ? inputComponent.dataset.componentType : '';
+                
+                // Transformatoren, Klemmen und LEDs dürfen Phase/Neutral empfangen
+                if (inputComponentType.includes('trafo') || 
+                    inputComponentType.includes('klemme') || 
+                    inputComponentType.includes('led')) {
+                    return false; // Kein Kurzschluss für Verbraucher/Transformatoren
+                }
                 
                 // Phase zu Neutral ohne Verbraucher = Kurzschluss  
                 if ((outputData.wireType === 'phase' && inputData.wireType === 'neutral') ||
@@ -5592,7 +5604,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.42 - KLEMME PHYSIK: Durchschalt-Logic implementiert - ein Anschluss mit Spannung schaltet alle anderen durch!');
+                            console.log('🚀 LED Foundation v0.01.43 - INTELLIGENTE KURZSCHLUSS-ERKENNUNG: Transformatoren, Klemmen und LEDs sind keine Kurzschlüsse!');
             
             // 1. Circuit Simulation initialisieren
             try {
