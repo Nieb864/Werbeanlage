@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.53</div>
+                <div class="version-display">v0.01.54</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1418,7 +1418,8 @@
             LED_24V: 'led-24v-5w',
             FI_SWITCH: 'fi-schalter',
             LS_SWITCH: 'ls-schalter',
-            MOBILE_TERMINAL_3L: 'klemme-mobil-3l'
+            MOBILE_TERMINAL_3L: 'klemme-mobil-3l',
+            FLEXIBLE_CABLE: 'kabel-flexibel-sw'
         };
 
         // Technische Spezifikationen
@@ -1470,6 +1471,15 @@
                 maxCurrent: 32,
                 type: 'connector',
                 terminals: 3
+            },
+            [ComponentTypes.FLEXIBLE_CABLE]: {
+                ratedVoltage: 24,      // Max 24V DC
+                power: 0,              // Verbraucht nichts
+                maxCurrent: 5,         // Max 5A bei 1mm²
+                resistance: 0.1,       // 0.1 Ohm Widerstand
+                type: 'cable',         // Neue Kabel-Klasse
+                length: 100,           // 100mm Standard-Länge
+                crossSection: 1        // 1mm² Querschnitt
             }
         };
 
@@ -1534,6 +1544,9 @@
                 } else if (this.specs.type === 'connector') {
                     // Klemmen/Verbinder: Durchschalten + Überlastschutz
                     this.state = this.calculateConnectorState(voltage, current);
+                } else if (this.specs.type === 'cable') {
+                    // Kabel: Durchleitung + Überlastschutz + Spannungsabfall
+                    this.state = this.calculateCableState(voltage, current);
                 }
                 
                 if (previousState !== this.state) {
@@ -1624,6 +1637,39 @@
                 }
             }
             
+            calculateCableState(voltage, current) {
+                // Überlastschutz für Kabel
+                const maxCurrent = this.specs.maxCurrent || 5; // Standard 5A
+                const actualCurrent = this.calculateCableCurrent();
+                
+                console.log(`🔌 Kabel ${this.elementId}: ${actualCurrent.toFixed(1)}A / ${maxCurrent}A`);
+                
+                // Kabel überlastet oder durchgebrannt?
+                if (actualCurrent > maxCurrent * 1.5) {
+                    console.log(`💥 Kabel ${this.elementId}: DURCHGEBRANNT! ${actualCurrent.toFixed(1)}A > ${(maxCurrent * 1.5).toFixed(1)}A → BROKEN`);
+                    this.burnOutCable(); // Visueller Effekt
+                    return ComponentStates.BROKEN;
+                }
+                
+                if (actualCurrent > maxCurrent) {
+                    console.log(`🔥 Kabel ${this.elementId}: Überlast ${actualCurrent.toFixed(1)}A > ${maxCurrent}A → OVERLOADED`);
+                    return ComponentStates.OVERLOADED;
+                }
+                
+                // Kabel leitet durch wenn Spannung anliegt
+                if (this.hasCableVoltage()) {
+                    // Berechne Spannungsabfall: U_verlust = I * R
+                    const voltageDrop = actualCurrent * (this.specs.resistance || 0.1);
+                    this.currentVoltage = Math.max(0, voltage - voltageDrop);
+                    
+                    console.log(`⚡ Kabel ${this.elementId}: ${voltage}V → ${this.currentVoltage.toFixed(1)}V (Verlust: ${voltageDrop.toFixed(2)}V) → ON`);
+                    return ComponentStates.ON;
+                } else {
+                    console.log(`⚫ Kabel ${this.elementId}: Keine Spannung → OFF`);
+                    return ComponentStates.OFF;
+                }
+            }
+            
             calculateConnectorCurrent() {
                 // Berechne den Gesamtstrom durch alle Anschlüsse der Klemme
                 if (!window.workspaceManager || !window.workspaceManager.connections) return 0;
@@ -1680,6 +1726,77 @@
                 }
                 
                 return false;
+            }
+            
+            calculateCableCurrent() {
+                // Berechne den Strom durch das Kabel (einfach: eine Verbindung von links nach rechts)
+                if (!window.workspaceManager || !window.workspaceManager.connections) return 0;
+                
+                let current = 0;
+                
+                // Sammle alle Verbindungen zu diesem Kabel
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if (connectionData.toComponent === this.elementId || connectionData.fromComponent === this.elementId) {
+                        // Berechne Strom basierend auf dem Verbraucher am anderen Ende
+                        const otherComponentId = connectionData.toComponent === this.elementId ? 
+                                                connectionData.fromComponent : connectionData.toComponent;
+                        const otherElement = document.getElementById(otherComponentId);
+                        
+                        if (otherElement) {
+                            const otherType = otherElement.dataset.componentType;
+                            const otherSpecs = ComponentSpecs[otherType];
+                            
+                            if (otherSpecs && otherSpecs.type === 'load' && otherSpecs.power) {
+                                // LED/Last-Strom: P = U * I → I = P / U
+                                const voltage = otherSpecs.ratedVoltage || 12;
+                                current = Math.max(current, otherSpecs.power / voltage); // Höchster Strom gewinnt
+                                console.log(`🔌 Kabel ${this.elementId}: ${current.toFixed(2)}A durch ${otherComponentId}`);
+                            }
+                        }
+                    }
+                }
+                
+                return current;
+            }
+            
+            hasCableVoltage() {
+                // Prüfe ob an einem Ende des Kabels Spannung anliegt
+                if (!window.workspaceManager || !window.workspaceManager.connections) return false;
+                
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if (connectionData.toComponent === this.elementId || connectionData.fromComponent === this.elementId) {
+                        const sourceComponentId = connectionData.fromComponent === this.elementId ? 
+                                                 connectionData.toComponent : connectionData.fromComponent;
+                        const sourceElement = document.getElementById(sourceComponentId);
+                        
+                        if (sourceElement) {
+                            const sourceType = sourceElement.dataset.componentType;
+                            const sourceSpecs = ComponentSpecs[sourceType];
+                            
+                            // Prüfe ob Quelle aktiv ist (Trafo, Stromquelle oder andere Kabel)
+                            if (sourceSpecs && (sourceSpecs.type === 'transformer' || sourceSpecs.type === 'source' || sourceSpecs.type === 'cable' || sourceSpecs.type === 'connector')) {
+                                console.log(`⚡ Kabel ${this.elementId}: Spannung von ${sourceComponentId} erkannt`);
+                                return true;
+                            }
+                        }
+                    }
+                }
+                
+                return false;
+            }
+            
+            burnOutCable() {
+                // Visueller Effekt: Kabel wird schwarz/verkohlt
+                const element = document.getElementById(this.elementId);
+                if (element) {
+                    const cableLine = element.querySelector('.cable-line');
+                    if (cableLine) {
+                        cableLine.setAttribute('stroke', '#000');
+                        cableLine.setAttribute('stroke-dasharray', '5,5'); // Unterbrochene Linie
+                        cableLine.setAttribute('opacity', '0.7');
+                        console.log(`💥 Kabel ${this.elementId}: Visuell durchgebrannt`);
+                    }
+                }
             }
             
             animateStateChange() {
@@ -2359,6 +2476,35 @@
                         if (connectorPowerSource) {
                             console.log(`⚡ LED ${ledId}: Bekommt ${connectorPowerSource.voltage}V über Connector ${connectedId} von ${connectorPowerSource.sourceType} ${connectorPowerSource.sourceId}`);
                             return connectorPowerSource;
+                        }
+                    }
+                    
+                    // KABEL-DURCHSCHALTUNG (Flexible Kabel)
+                    if (ComponentSpecs[connectedComponent.type].type === 'cable') {
+                        console.log(`🔌 LED ${ledId}: Verbunden mit Kabel ${connectedId} - prüfe Durchschaltung`);
+                        
+                        // Prüfe ob Kabel funktionsfähig ist
+                        const cableState = this.graph.getComponentState(connectedId);
+                        if (cableState === 'broken') {
+                            console.log(`💥 Kabel ${connectedId} ist durchgebrannt - keine Durchschaltung möglich`);
+                            continue;
+                        }
+                        
+                        // Suche rekursiv über das Kabel nach Spannungsquellen
+                        const cablePowerSource = this.findPowerSourceForLED(connectedId, visited);
+                        if (cablePowerSource) {
+                            // Spannungsabfall durch Kabel berücksichtigen
+                            const cableSpecs = ComponentSpecs[connectedComponent.type];
+                            const current = ComponentSpecs[component.type]?.power / cablePowerSource.voltage || 0.1;
+                            const voltageDrop = current * (cableSpecs.resistance || 0.1);
+                            const finalVoltage = Math.max(0, cablePowerSource.voltage - voltageDrop);
+                            
+                            console.log(`⚡ LED ${ledId}: Bekommt ${finalVoltage.toFixed(1)}V über Kabel ${connectedId} von ${cablePowerSource.sourceType} ${cablePowerSource.sourceId} (Verlust: ${voltageDrop.toFixed(2)}V)`);
+                            return {
+                                voltage: finalVoltage,
+                                sourceType: cablePowerSource.sourceType,
+                                sourceId: cablePowerSource.sourceId
+                            };
                         }
                     }
                     
@@ -5357,31 +5503,60 @@
         // ===== KABEL FLEXIBEL =====
         function createKabelFlexibelSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 80 30');
-            svg.setAttribute('class', 'component-svg');
+            svg.setAttribute('viewBox', '0 0 100 20');
+            svg.setAttribute('class', 'component-svg cable-svg');
             svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
             
-            // Platzhalter für Kabel (wird später durch dein SVG ersetzt)
-            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            rect.setAttribute('x', '5');
-            rect.setAttribute('y', '10');
-            rect.setAttribute('width', '70');
-            rect.setAttribute('height', '10');
-            rect.setAttribute('fill', '#333');
-            rect.setAttribute('stroke', '#000');
-            rect.setAttribute('stroke-width', '2');
-            rect.setAttribute('rx', '5');
+            // Schwarze Kabel-Linie (horizontal)
+            const cableLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            cableLine.setAttribute('x1', '15');
+            cableLine.setAttribute('y1', '10');
+            cableLine.setAttribute('x2', '85');
+            cableLine.setAttribute('y2', '10');
+            cableLine.setAttribute('stroke', '#1d1d1b');
+            cableLine.setAttribute('stroke-width', '4');
+            cableLine.setAttribute('stroke-linecap', 'round');
+            cableLine.setAttribute('class', 'cable-line');
             
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.setAttribute('x', '40');
-            text.setAttribute('y', '18');
-            text.setAttribute('text-anchor', 'middle');
-            text.setAttribute('fill', '#fff');
-            text.setAttribute('font-size', '8');
-            text.textContent = 'KABEL';
+            // Linker Anschlusspunkt (bidirektional)
+            const leftSocket = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            leftSocket.setAttribute('cx', '10');
+            leftSocket.setAttribute('cy', '10');
+            leftSocket.setAttribute('r', '5');
+            leftSocket.setAttribute('fill', '#666');
+            leftSocket.setAttribute('stroke', '#1d1d1b');
+            leftSocket.setAttribute('stroke-width', '2');
+            leftSocket.setAttribute('class', 'connection-socket');
+            leftSocket.setAttribute('data-connection-type', 'bidirectional-socket');
+            leftSocket.setAttribute('data-connection-id', 'left-terminal');
+            leftSocket.setAttribute('data-wire-type', 'universal');
+            leftSocket.setAttribute('data-voltage', '24');
+            leftSocket.setAttribute('data-bezier-end-x', '0');
+            leftSocket.setAttribute('data-bezier-end-y', '10');
+            leftSocket.setAttribute('data-bezier-direction', '-20,0,0,0');
             
-            svg.appendChild(rect);
-            svg.appendChild(text);
+            // Rechter Anschlusspunkt (bidirektional)
+            const rightSocket = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            rightSocket.setAttribute('cx', '90');
+            rightSocket.setAttribute('cy', '10');
+            rightSocket.setAttribute('r', '5');
+            rightSocket.setAttribute('fill', '#666');
+            rightSocket.setAttribute('stroke', '#1d1d1b');
+            rightSocket.setAttribute('stroke-width', '2');
+            rightSocket.setAttribute('class', 'connection-socket');
+            rightSocket.setAttribute('data-connection-type', 'bidirectional-socket');
+            rightSocket.setAttribute('data-connection-id', 'right-terminal');
+            rightSocket.setAttribute('data-wire-type', 'universal');
+            rightSocket.setAttribute('data-voltage', '24');
+            rightSocket.setAttribute('data-bezier-end-x', '100');
+            rightSocket.setAttribute('data-bezier-end-y', '10');
+            rightSocket.setAttribute('data-bezier-direction', '20,0,0,0');
+            
+            // SVG zusammenbauen
+            svg.appendChild(cableLine);
+            svg.appendChild(leftSocket);
+            svg.appendChild(rightSocket);
+            
             return svg;
         }
         
@@ -5646,7 +5821,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.53 - CONNECTOR-KLASSE: Bidirektionale Durchschaltung + Überlastschutz für Klemmen!');
+                            console.log('🚀 LED Foundation v0.01.54 - FLEXIBLES KABEL: Physisches Kabel mit Spannungsabfall + Überlastschutz!');
             
             // 1. Circuit Simulation initialisieren
             try {
