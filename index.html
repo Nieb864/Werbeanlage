@@ -708,8 +708,7 @@
         /* Flexible Cable */
         .cable-svg {
             width: auto;
-            height: 20px; /* Kompakt wie andere Komponenten */
-            min-width: 80px; /* Angepasst an kleinere viewBox */
+            height: 20px;
         }
         
         /* Generic Component SVG Fallback */
@@ -1318,7 +1317,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.59</div>
+                <div class="version-display">v0.01.60</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5521,21 +5520,21 @@
             svg.setAttribute('class', 'component-svg cable-svg');
             svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
             
-            // Schwarze Kabel-Linie (horizontal, mittlere Länge)
+            // Schwarze Kabel-Linie (horizontal, zentriert)
             const cableLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            cableLine.setAttribute('x1', '15');
+            cableLine.setAttribute('x1', '20');
             cableLine.setAttribute('y1', '10');
-            cableLine.setAttribute('x2', '65');
+            cableLine.setAttribute('x2', '60');
             cableLine.setAttribute('y2', '10');
             cableLine.setAttribute('stroke', '#1d1d1b');
             cableLine.setAttribute('stroke-width', '2');
             cableLine.setAttribute('class', 'cable-line');
             
-            // Linker Anschlusspunkt (output-line wie rechts)
+            // Linker Anschlusspunkt (zentriert)
             const leftLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            leftLine.setAttribute('x1', '5');
+            leftLine.setAttribute('x1', '10');
             leftLine.setAttribute('y1', '10');
-            leftLine.setAttribute('x2', '15');
+            leftLine.setAttribute('x2', '20');
             leftLine.setAttribute('y2', '10');
             leftLine.setAttribute('stroke', '#1d1d1b');
             leftLine.setAttribute('stroke-width', '2');
@@ -5544,15 +5543,15 @@
             leftLine.setAttribute('data-connection-id', 'out-left');
             leftLine.setAttribute('data-wire-type', 'universal');
             leftLine.setAttribute('data-voltage', '24');
-            leftLine.setAttribute('data-bezier-start-x', '5');
+            leftLine.setAttribute('data-bezier-start-x', '10');
             leftLine.setAttribute('data-bezier-start-y', '10');
             leftLine.setAttribute('data-bezier-direction', '-20,0,0,0');
             
-            // Rechter Anschlusspunkt (direkt am Kabel)
+            // Rechter Anschlusspunkt (zentriert)
             const rightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            rightLine.setAttribute('x1', '65');
+            rightLine.setAttribute('x1', '60');
             rightLine.setAttribute('y1', '10');
-            rightLine.setAttribute('x2', '75');
+            rightLine.setAttribute('x2', '70');
             rightLine.setAttribute('y2', '10');
             rightLine.setAttribute('stroke', '#1d1d1b');
             rightLine.setAttribute('stroke-width', '2');
@@ -5561,7 +5560,7 @@
             rightLine.setAttribute('data-connection-id', 'out-right');
             rightLine.setAttribute('data-wire-type', 'universal');
             rightLine.setAttribute('data-voltage', '24');
-            rightLine.setAttribute('data-bezier-start-x', '75');
+            rightLine.setAttribute('data-bezier-start-x', '70');
             rightLine.setAttribute('data-bezier-start-y', '10');
             rightLine.setAttribute('data-bezier-direction', '20,0,0,0');
             
@@ -5834,7 +5833,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.59 - KABEL-OPTIMAL: Längeres Kabel + kleinere ViewBox für kompakten Auswahlrahmen!');
+                            console.log('🚀 LED Foundation v0.01.60 - KABEL-ZENTRIERT: Perfekte Zentrierung in ViewBox für gleichmäßige Skalierung!');
             
             // 1. Circuit Simulation initialisieren
             try {
