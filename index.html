@@ -1323,7 +1323,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.67</div>
+                <div class="version-display">v0.01.68</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5522,55 +5522,53 @@
         // ===== KABEL FLEXIBEL =====
         function createKabelFlexibelSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            // Original: 26.46 x 18.24 + 20px für Anschlusspunkte = 46.46 x 18.24
-            svg.setAttribute('viewBox', '0 0 46.46 18.24');
+            // Deine SVG bereits in richtiger Größe + 20px für Anschlusspunkte = 59.68 x 27.86
+            svg.setAttribute('viewBox', '0 0 59.68 27.86');
             svg.setAttribute('class', 'component-svg cable-svg');
             svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
             
             svg.innerHTML = `
                 <defs>
                     <style>
-                        .cable-sheath { fill: #c6c6c6; stroke: #1d1d1b; stroke-miterlimit: 10; }
-                        .cable-wire { fill: none; stroke: #1d1d1b; stroke-miterlimit: 10; }
-                        .cable-connector { fill: url(#cableGradient); stroke: #1d1d1b; stroke-miterlimit: 10; }
+                        .cls-1 { fill: #c6c6c6; }
+                        .cls-1, .cls-2, .cls-3 { stroke: #1d1d1b; stroke-miterlimit: 10; stroke-width: 2px; }
+                        .cls-2 { fill: url(#Unbenannter_Verlauf_7); }
+                        .cls-3 { fill: none; }
                         .cable-connection-line { stroke: #1d1d1b; stroke-width: 3; }
                     </style>
-                    <linearGradient id="cableGradient" x1="19.845" y1="19.89" x2="19.845" y2="7.47" gradientUnits="userSpaceOnUse">
+                    <linearGradient id="Unbenannter_Verlauf_7" data-name="Unbenannter Verlauf 7" x1="29.84" y1="21.14" x2="29.84" y2="8.72" gradientUnits="userSpaceOnUse">
                         <stop offset="0" stop-color="#c6c6c6"/>
                         <stop offset="1" stop-color="#878787"/>
                     </linearGradient>
                 </defs>
                 
-                <!-- Kabel-Gruppe zentriert (1.5x bereits in Koordinaten berechnet) -->
-                <g transform="translate(10, 0)">
-                    <!-- Kabelmantel (Hintergrund) - Original-Größe -->
-                    <rect class="cable-sheath" x="4.61" y="0.5" width="17.24" height="17.24" rx="3.52" ry="3.52"/>
-                    <!-- Schwarzes Kabel (Linie) - Original-Größe -->
-                    <line class="cable-wire" y1="9.12" x2="26.46" y2="9.12"/>
-                    <!-- Kabelstecker/Verbinder - Original-Größe -->
-                    <rect class="cable-connector" x="9.94" y="4.98" width="6.57" height="8.28"/>
+                <!-- Deine SVG zentriert (10px Platz für linken Anschlusspunkt) -->
+                <g transform="translate(10, 1)">
+                    <rect class="cls-1" x="6.91" y="0" width="25.86" height="25.86" rx="3.52" ry="3.52"/>
+                    <line class="cls-3" y1="12.93" x2="39.68" y2="12.93"/>
+                    <rect class="cls-2" x="14.91" y="6.72" width="9.86" height="12.42"/>
                 </g>
                 
                 <!-- Linker Anschlusspunkt -->
                 <line class="cable-connection-line connection-line" 
-                      x1="0" y1="9.12" x2="10" y2="9.12"
+                      x1="0" y1="13.93" x2="10" y2="13.93"
                       data-connection-type="output-line"
                       data-connection-id="out-left"
                       data-wire-type="universal"
                       data-voltage="24"
                       data-bezier-start-x="0"
-                      data-bezier-start-y="9.12"
+                      data-bezier-start-y="13.93"
                       data-bezier-direction="-20,0,0,0"/>
                       
                 <!-- Rechter Anschlusspunkt -->
                 <line class="cable-connection-line connection-line" 
-                      x1="36.46" y1="9.12" x2="46.46" y2="9.12"
+                      x1="49.68" y1="13.93" x2="59.68" y2="13.93"
                       data-connection-type="output-line"
                       data-connection-id="out-right"
                       data-wire-type="universal"
                       data-voltage="24"
-                      data-bezier-start-x="46.46"
-                      data-bezier-start-y="9.12"
+                      data-bezier-start-x="59.68"
+                      data-bezier-start-y="13.93"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -5838,7 +5836,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.67 - KABEL-KLEIN: Original-Größe statt 1.5x für kompakteres Kabel!');
+                            console.log('🚀 LED Foundation v0.01.68 - KABEL-PERFEKT: Deine 1.5x SVG direkt übernommen ohne Skalierung!');
             
             // 1. Circuit Simulation initialisieren
             try {
