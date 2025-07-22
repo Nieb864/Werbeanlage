@@ -1323,7 +1323,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.64</div>
+                <div class="version-display">v0.01.65</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5522,41 +5522,55 @@
         // ===== KABEL FLEXIBEL =====
         function createKabelFlexibelSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 80 20');
+            // Original: 26.46 x 18.24 * 1.5 + 20px für Anschlusspunkte = 59.69 x 27.36
+            svg.setAttribute('viewBox', '0 0 59.69 27.36');
             svg.setAttribute('class', 'component-svg cable-svg');
             svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
             
             svg.innerHTML = `
                 <defs>
                     <style>
-                        .cable-line { stroke: #1d1d1b; stroke-width: 2; }
+                        .cable-sheath { fill: #c6c6c6; stroke: #1d1d1b; stroke-miterlimit: 10; }
+                        .cable-wire { fill: none; stroke: #1d1d1b; stroke-miterlimit: 10; }
+                        .cable-connector { fill: url(#cableGradient); stroke: #1d1d1b; stroke-miterlimit: 10; }
                         .cable-connection-line { stroke: #1d1d1b; stroke-width: 3; }
                     </style>
+                    <linearGradient id="cableGradient" x1="19.845" y1="19.89" x2="19.845" y2="7.47" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#c6c6c6"/>
+                        <stop offset="1" stop-color="#878787"/>
+                    </linearGradient>
                 </defs>
                 
-                <!-- Hauptkabel (horizontal, zentriert) -->
-                <line class="cable-line" x1="20" y1="10" x2="60" y2="10"/>
+                <!-- Kabel-Gruppe mit 1.5x Skalierung und Zentrierung -->
+                <g transform="translate(10, 0) scale(1.5)">
+                    <!-- Kabelmantel (Hintergrund) -->
+                    <rect class="cable-sheath" x="4.61" y="0.5" width="17.24" height="17.24" rx="3.52" ry="3.52"/>
+                    <!-- Schwarzes Kabel (Linie) -->
+                    <line class="cable-wire" y1="9.12" x2="26.46" y2="9.12"/>
+                    <!-- Kabelstecker/Verbinder -->
+                    <rect class="cable-connector" x="9.94" y="4.98" width="6.57" height="8.28"/>
+                </g>
                 
                 <!-- Linker Anschlusspunkt -->
                 <line class="cable-connection-line connection-line" 
-                      x1="10" y1="10" x2="20" y2="10"
+                      x1="0" y1="13.68" x2="10" y2="13.68"
                       data-connection-type="output-line"
                       data-connection-id="out-left"
                       data-wire-type="universal"
                       data-voltage="24"
-                      data-bezier-start-x="10"
-                      data-bezier-start-y="10"
+                      data-bezier-start-x="0"
+                      data-bezier-start-y="13.68"
                       data-bezier-direction="-20,0,0,0"/>
                       
                 <!-- Rechter Anschlusspunkt -->
                 <line class="cable-connection-line connection-line" 
-                      x1="60" y1="10" x2="70" y2="10"
+                      x1="49.69" y1="13.68" x2="59.69" y2="13.68"
                       data-connection-type="output-line"
                       data-connection-id="out-right"
                       data-wire-type="universal"
                       data-voltage="24"
-                      data-bezier-start-x="70"
-                      data-bezier-start-y="10"
+                      data-bezier-start-x="59.69"
+                      data-bezier-start-y="13.68"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -5824,7 +5838,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.64 - KLEMME-METHODE: Kabel mit festem SVG wie Klemme!');
+                            console.log('🚀 LED Foundation v0.01.65 - KABEL-PREMIUM: Realistische Kabelschelle + Mantel 1.5x skaliert!');
             
             // 1. Circuit Simulation initialisieren
             try {
