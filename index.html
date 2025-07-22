@@ -597,16 +597,22 @@
         }
 
         .connection-line {
-            stroke-width: 3;
             cursor: pointer;
             transition: all 0.3s;
             opacity: 0.8;
         }
 
+        .connection-line:not([stroke-width]) {
+            stroke-width: 3; /* Nur wenn nicht im SVG definiert */
+        }
+
         .connection-line:hover {
             opacity: 1;
-            stroke-width: 4;
             filter: drop-shadow(0 0 3px currentColor);
+        }
+        
+        .connection-line:not([stroke-width]):hover {
+            stroke-width: 4; /* Nur wenn nicht im SVG definiert */
         }
 
         .connection-area {
@@ -709,20 +715,6 @@
         .cable-svg {
             width: auto;
             height: 20px;
-        }
-        
-        /* Cable Connection Lines - same thickness as cable */
-        .cable-connection-line {
-            stroke-width: 2 !important; /* Gleich dick wie Kabel */
-            cursor: pointer;
-            transition: all 0.3s;
-            opacity: 0.8;
-        }
-        
-        .cable-connection-line:hover {
-            opacity: 1;
-            stroke-width: 2 !important; /* Bleibt dünn beim hover */
-            filter: drop-shadow(0 0 2px currentColor);
         }
         
         /* Generic Component SVG Fallback */
@@ -1331,7 +1323,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.61</div>
+                <div class="version-display">v0.01.62</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5552,7 +5544,7 @@
             leftLine.setAttribute('y2', '10');
             leftLine.setAttribute('stroke', '#1d1d1b');
             leftLine.setAttribute('stroke-width', '2');
-            leftLine.setAttribute('class', 'cable-connection-line');
+            leftLine.setAttribute('class', 'connection-line');
             leftLine.setAttribute('data-connection-type', 'output-line');
             leftLine.setAttribute('data-connection-id', 'out-left');
             leftLine.setAttribute('data-wire-type', 'universal');
@@ -5569,7 +5561,7 @@
             rightLine.setAttribute('y2', '10');
             rightLine.setAttribute('stroke', '#1d1d1b');
             rightLine.setAttribute('stroke-width', '2');
-            rightLine.setAttribute('class', 'cable-connection-line');
+            rightLine.setAttribute('class', 'connection-line');
             rightLine.setAttribute('data-connection-type', 'output-line');
             rightLine.setAttribute('data-connection-id', 'out-right');
             rightLine.setAttribute('data-wire-type', 'universal');
@@ -5847,7 +5839,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.61 - KABEL-UNIFORM: Anschlüsse genauso dick wie Kabel + sanfter Hover!');
+                            console.log('🚀 LED Foundation v0.01.62 - LED-METHODE: Kabel-Anschlüsse respektieren SVG stroke-width wie LED!');
             
             // 1. Circuit Simulation initialisieren
             try {
