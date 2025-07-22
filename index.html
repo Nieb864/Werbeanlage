@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.45</div>
+                <div class="version-display">v0.01.46</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1643,16 +1643,25 @@
                             
                             // Trafo-Ausgang hat immer seine spezifizierte Spannung, wenn er läuft
                             if (sourceType && sourceType.includes('trafo')) {
-                                // Trafo-Ausgangsspannung aus ComponentSpecs
-                                const sourceComponentSpecs = Object.values(ComponentSpecs).find(spec => 
-                                    sourceType === spec.type || sourceType.includes(spec.type)
+                                // Finde ComponentType Key für sourceType
+                                const componentTypeKey = Object.keys(ComponentTypes).find(key => 
+                                    ComponentTypes[key] === sourceType
                                 );
                                 
-                                if (sourceComponentSpecs && sourceComponentSpecs.outputVoltage) {
-                                    hasVoltage = true;
-                                    maxVoltage = Math.max(maxVoltage, sourceComponentSpecs.outputVoltage);
-                                    console.log(`⚡ Klemme ${this.elementId}: Spannung von Trafo ${terminal.sourceComponent} (${sourceComponentSpecs.outputVoltage}V)`);
-                                    break;
+                                console.log(`🔍 Klemme ${this.elementId}: ComponentType Key gefunden: ${componentTypeKey}`);
+                                
+                                if (componentTypeKey) {
+                                    const sourceComponentSpecs = ComponentSpecs[ComponentTypes[componentTypeKey]];
+                                    console.log(`🔍 Klemme ${this.elementId}: ComponentSpecs gefunden:`, sourceComponentSpecs);
+                                    
+                                    if (sourceComponentSpecs && sourceComponentSpecs.outputVoltage) {
+                                        hasVoltage = true;
+                                        maxVoltage = Math.max(maxVoltage, sourceComponentSpecs.outputVoltage);
+                                        console.log(`⚡ Klemme ${this.elementId}: Spannung von Trafo ${terminal.sourceComponent} (${sourceComponentSpecs.outputVoltage}V)`);
+                                        break;
+                                    }
+                                } else {
+                                    console.log(`⚠️ Klemme ${this.elementId}: ComponentType Key für ${sourceType} nicht gefunden`);
                                 }
                             }
                         } else {
@@ -5643,7 +5652,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.45 - KLEMMEN-PHYSIK REPARIERT: Klemmen werden korrekt als Connector behandelt und erkennen Trafo-Spannung!');
+                            console.log('🚀 LED Foundation v0.01.46 - COMPONENTSPECS LOOKUP REPARIERT: Klemmen finden jetzt korrekt die Trafo-Ausgangsspannung!');
             
             // 1. Circuit Simulation initialisieren
             try {
