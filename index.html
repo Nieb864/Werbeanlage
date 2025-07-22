@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.46</div>
+                <div class="version-display">v0.01.47</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1633,6 +1633,8 @@
                 
                 // Wenn mindestens eine Verbindung Spannung führt, sind alle ON
                 let hasVoltage = false;
+                let maxVoltage = 0; // WICHTIG: Vor dem ersten Loop deklarieren!
+                
                 for (const terminal of myTerminals) {
                     if (terminal.type === 'input') {
                         // Direkte Spannungsprüfung aus den ComponentSpecs
@@ -1670,8 +1672,7 @@
                     }
                 }
                 
-                // Durchschalten: Spannung weiterleiten
-                let maxVoltage = 0;
+                // ZUSÄTZLICH: Prüfe auch über das alte circuit.components System (falls verfügbar)
                 for (const terminal of myTerminals) {
                     if (terminal.type === 'input') {
                         if (typeof window !== 'undefined' && window.circuit && window.circuit.components) {
@@ -5652,7 +5653,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.46 - COMPONENTSPECS LOOKUP REPARIERT: Klemmen finden jetzt korrekt die Trafo-Ausgangsspannung!');
+                            console.log('🚀 LED Foundation v0.01.47 - MAXVOLTAGE VARIABLE FEHLER BEHOBEN: ReferenceError in calculateConnectorState repariert!');
             
             // 1. Circuit Simulation initialisieren
             try {
