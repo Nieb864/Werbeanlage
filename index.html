@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.42b</div>
+                <div class="version-display">v0.01.42c</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1635,11 +1635,16 @@
                 let hasVoltage = false;
                 for (const terminal of myTerminals) {
                     if (terminal.type === 'input') {
-                        const sourceComponent = circuit.components.get(terminal.sourceComponent);
-                        if (sourceComponent && sourceComponent.currentVoltage > 0) {
-                            hasVoltage = true;
-                            console.log(`⚡ Klemme ${this.elementId}: Spannung von ${terminal.sourceComponent} (${sourceComponent.currentVoltage}V)`);
-                            break;
+                        // Sicherer Zugriff auf globalen circuit über window
+                        if (typeof window !== 'undefined' && window.circuit && window.circuit.components) {
+                            const sourceComponent = window.circuit.components.get(terminal.sourceComponent);
+                            if (sourceComponent && sourceComponent.currentVoltage > 0) {
+                                hasVoltage = true;
+                                console.log(`⚡ Klemme ${this.elementId}: Spannung von ${terminal.sourceComponent} (${sourceComponent.currentVoltage}V)`);
+                                break;
+                            }
+                        } else {
+                            console.log(`⚠️ Klemme ${this.elementId}: Circuit über window nicht verfügbar`);
                         }
                     }
                 }
@@ -5592,6 +5597,8 @@
             // 1. Circuit Simulation initialisieren
             try {
                 circuit = new RealtimeSimulation();
+                // Globalen Zugriff für Component-Klassen ermöglichen
+                window.circuit = circuit;
                 circuit.addComponent('power-source-svg', ComponentTypes.POWER_SOURCE, {x: 20, y: 20});
                 circuit.start();
                 console.log('✅ Circuit Simulation initialisiert');
