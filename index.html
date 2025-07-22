@@ -822,11 +822,11 @@
         .std-wire-earth { stroke: var(--wire-yellow-green); fill: none; stroke-width: 3; }
 
         /* Standard Material-Farben */
-        .std-housing-light { fill: var(--plastic-light); stroke: var(--color-primary); stroke-width: 1; }
-        .std-housing-dark { fill: var(--plastic-dark); stroke: var(--color-primary); stroke-width: 1; }
-        .std-metal-light { fill: var(--metal-light); stroke: var(--color-primary); stroke-width: 1; }
-        .std-metal-dark { fill: var(--metal-dark); stroke: var(--color-primary); stroke-width: 1; }
-        .std-led-off { fill: #ccc; stroke: var(--color-primary); stroke-width: 1; }
+        .std-housing-light { fill: var(--plastic-light); stroke: var(--color-primary); stroke-width: 2; }
+        .std-housing-dark { fill: var(--plastic-dark); stroke: var(--color-primary); stroke-width: 2; }
+        .std-metal-light { fill: var(--metal-light); stroke: var(--color-primary); stroke-width: 2; }
+        .std-metal-dark { fill: var(--metal-dark); stroke: var(--color-primary); stroke-width: 2; }
+        .std-led-off { fill: #ccc; stroke: var(--color-primary); stroke-width: 2; }
 
         /* Standard Strichstärken */
         .std-hairline { stroke-width: 0.5; }
@@ -1303,7 +1303,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.76</div>
+                <div class="version-display">v0.01.77</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1341,7 +1341,7 @@
                                 .power-cls-4 {
                                     fill: #3c3c3b;
                                     stroke: #1d1d1b;
-                                    stroke-width: 1.6px;
+                                    stroke-width: 2px;
                                 }
                                 .power-cls-5 {
                                     fill: #878787;
@@ -5816,7 +5816,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.76 - FESTE HÖHE TEST: height: 40px statt max-height!');
+                            console.log('🚀 LED Foundation v0.01.77 - ZULEITUNG STROKE TEST: Alle stroke-width: 1 → 2!');
             
             // 1. Circuit Simulation initialisieren
             try {
