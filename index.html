@@ -757,31 +757,26 @@
         }
 
         /* LED States - JavaScript + CSS Hybrid */
-        .state-off .cls-5, 
         .state-off .led24-center,
         .state-off .led12-center {
             fill: #ddd !important;
         }
 
-        .state-on .cls-5, 
         .state-on .led24-center,
         .state-on .led12-center {
             fill: #ffff00 !important;
         }
 
-        .state-blinking .cls-5, 
         .state-blinking .led24-center,
         .state-blinking .led12-center {
             fill: #ffff00 !important;
         }
 
-        .state-broken .cls-5, 
         .state-broken .led24-center,
         .state-broken .led12-center {
             fill: #1a1a1a !important;
         }
 
-        .state-overloaded .cls-5, 
         .state-overloaded .led24-center,
         .state-overloaded .led12-center {
             fill: #e91e63 !important;
@@ -1315,7 +1310,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.83</div>
+                <div class="version-display">v0.01.84</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1851,7 +1846,7 @@
                 // Nur LEDs färben, nicht Trafos oder andere Komponenten
                 if (this.specs.type !== 'load') return;
                 
-                const ledCenters = element.querySelectorAll('.cls-5, .led24-center, .led12-center');
+                const ledCenters = element.querySelectorAll('.led24-center, .led12-center');
                 
                 ledCenters.forEach((led, index) => {
                     const color = this.blinkState ? '#ffff00' : '#ddd';
@@ -1887,7 +1882,7 @@
                 
                 // Für statische States (nicht BLINKING) nur CSS-Klassen verwenden
                 if (this.state !== ComponentStates.BLINKING) {
-                    const ledCenters = element.querySelectorAll('.cls-5, .led24-center, .led12-center');
+                    const ledCenters = element.querySelectorAll('.led24-center, .led12-center');
                     ledCenters.forEach((led, index) => {
                         const filter = this.getGlowEffect(this.state, true);
                         
@@ -4374,7 +4369,7 @@
                             const element = document.getElementById(componentId);
                             if (element && ComponentSpecs[stateMachine.type]?.type === 'load') {
                                 // LED-Kreis sichtbar machen falls verschwunden
-                                const ledCircle = element.querySelector('.cls-5, .led24-center, .led12-center');
+                                const ledCircle = element.querySelector('.led24-center, .led12-center');
                                 if (ledCircle) {
                                     ledCircle.style.display = 'block';
                                     ledCircle.style.opacity = '1';
@@ -5537,9 +5532,9 @@
                 
                 <!-- Deine SVG zentriert (10px Platz für linken Anschlusspunkt) -->
                 <g transform="translate(10, 1)">
-                    <rect class="cls-1" x="6.91" y="0" width="25.86" height="25.86" rx="3.52" ry="3.52"/>
-                    <line class="cls-3" y1="12.93" x2="39.68" y2="12.93" stroke-width="3"/>
-                    <rect class="cls-2" x="14.91" y="6.72" width="9.86" height="12.42"/>
+                    <rect class="cable-housing" x="6.91" y="0" width="25.86" height="25.86" rx="3.52" ry="3.52"/>
+                    <line class="cable-wire" y1="12.93" x2="39.68" y2="12.93" stroke-width="3"/>
+                    <rect class="cable-connector" x="14.91" y="6.72" width="9.86" height="12.42"/>
                 </g>
                 
                 <!-- Linker Anschlusspunkt -->
@@ -5829,7 +5824,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.83 - cls-KLASSEN ENTFERNT: LED-Module & Klemme verwenden semantische Klassen!');
+                            console.log('🚀 LED Foundation v0.01.84 - ALLE cls-KLASSEN VOLLSTÄNDIG ENTFERNT! 🎉');
             
             // 1. Circuit Simulation initialisieren
             try {
