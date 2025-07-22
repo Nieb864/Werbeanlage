@@ -693,15 +693,22 @@
             opacity: 0.8;
         }
 
-        /* ===== EINHEITLICHER SVG-STANDARD ===== */
-        /* TEST: Feste Höhe statt max-height */
+        /* ===== ANGEPASSTE SVG-HÖHEN ===== */
+        /* LED-Module und Kabel: 30px */
         .led-module-svg,
+        .cable-svg {
+            width: auto;
+            height: 30px;
+            min-width: 10px;
+        }
+        
+        /* Alle anderen Bauteile: 40px */
         .transformer-svg,
         .mobile-terminal-svg,
         .component-svg {
             width: auto;
-            height: 40px; /* Feste Höhe für Test */
-            min-width: 10px; /* Minimum-Breite für Lesbarkeit */
+            height: 40px;
+            min-width: 10px;
         }
 
         /* Transformer Styles */
@@ -1303,7 +1310,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.77</div>
+                <div class="version-display">v0.01.78</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5816,7 +5823,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.77 - ZULEITUNG STROKE TEST: Alle stroke-width: 1 → 2!');
+                            console.log('🚀 LED Foundation v0.01.78 - OPTIMIERTE HÖHEN: LEDs + Kabel 30px, Rest 40px!');
             
             // 1. Circuit Simulation initialisieren
             try {
