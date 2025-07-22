@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.44</div>
+                <div class="version-display">v0.01.45</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1635,16 +1635,28 @@
                 let hasVoltage = false;
                 for (const terminal of myTerminals) {
                     if (terminal.type === 'input') {
-                        // Sicherer Zugriff auf globalen circuit über window
-                        if (typeof window !== 'undefined' && window.circuit && window.circuit.components) {
-                            const sourceComponent = window.circuit.components.get(terminal.sourceComponent);
-                            if (sourceComponent && sourceComponent.currentVoltage > 0) {
-                                hasVoltage = true;
-                                console.log(`⚡ Klemme ${this.elementId}: Spannung von ${terminal.sourceComponent} (${sourceComponent.currentVoltage}V)`);
-                                break;
+                        // Direkte Spannungsprüfung aus den ComponentSpecs
+                        const sourceElement = document.getElementById(terminal.sourceComponent);
+                        if (sourceElement) {
+                            const sourceType = sourceElement.dataset.componentType;
+                            console.log(`🔍 Klemme ${this.elementId}: Prüfe Source ${terminal.sourceComponent} (Type: ${sourceType})`);
+                            
+                            // Trafo-Ausgang hat immer seine spezifizierte Spannung, wenn er läuft
+                            if (sourceType && sourceType.includes('trafo')) {
+                                // Trafo-Ausgangsspannung aus ComponentSpecs
+                                const sourceComponentSpecs = Object.values(ComponentSpecs).find(spec => 
+                                    sourceType === spec.type || sourceType.includes(spec.type)
+                                );
+                                
+                                if (sourceComponentSpecs && sourceComponentSpecs.outputVoltage) {
+                                    hasVoltage = true;
+                                    maxVoltage = Math.max(maxVoltage, sourceComponentSpecs.outputVoltage);
+                                    console.log(`⚡ Klemme ${this.elementId}: Spannung von Trafo ${terminal.sourceComponent} (${sourceComponentSpecs.outputVoltage}V)`);
+                                    break;
+                                }
                             }
                         } else {
-                            console.log(`⚠️ Klemme ${this.elementId}: Circuit über window nicht verfügbar`);
+                            console.log(`⚠️ Klemme ${this.elementId}: Source-Element ${terminal.sourceComponent} nicht gefunden`);
                         }
                     }
                 }
@@ -2267,22 +2279,31 @@
             
             calculateComponentPower(componentId) {
                 const component = this.graph.nodes.get(componentId);
+                const componentSpecs = ComponentSpecs[component.type];
                 
-                // 🚨 KAPUTTE LEDs bekommen keinen Strom - sind permanent defekt
+                // KLEMMEN: Spezialbehandlung - sie geben nur weiter, verbrauchen nicht
+                if (componentSpecs.type === 'connector') {
+                    console.log(`🔄 Klemme ${componentId}: Durchschaltung - verbraucht 0W`);
+                    return { voltage: 0, current: 0 }; // Klemmen verbrauchen nichts
+                }
+                
+                // 🚨 KAPUTTE KOMPONENTEN bekommen keinen Strom - sind permanent defekt
                 const componentState = this.graph.getComponentState(componentId);
                 if (componentState === 'broken') {
-                    console.log(`💀 LED ${componentId}: Ist permanent kaputt → 0V/0A`);
+                    console.log(`💀 Komponente ${componentId}: Ist permanent kaputt → 0V/0A`);
                     return { voltage: 0, current: 0 };
                 }
                 
-                // 🔍 NEUE PARALLELSCHALTUNG: Prüfe LED-zu-LED Verbindungen
-                const powerSource = this.findPowerSourceForLED(componentId);
-                if (powerSource) {
-                    console.log(`✅ LED ${componentId}: Bekommt ${powerSource.voltage}V über Parallelschaltung von ${powerSource.sourceType} ${powerSource.sourceId}`);
-                    return {
-                        voltage: powerSource.voltage,
-                        current: ComponentSpecs[component.type].power / powerSource.voltage
-                    };
+                // NUR FÜR LEDs: Prüfe LED-zu-LED Verbindungen
+                if (componentSpecs.type === 'led') {
+                    const powerSource = this.findPowerSourceForLED(componentId);
+                    if (powerSource) {
+                        console.log(`✅ LED ${componentId}: Bekommt ${powerSource.voltage}V über Parallelschaltung von ${powerSource.sourceType} ${powerSource.sourceId}`);
+                        return {
+                            voltage: powerSource.voltage,
+                            current: ComponentSpecs[component.type].power / powerSource.voltage
+                        };
+                    }
                 }
                 
                 console.log(`⚠️ LED ${componentId}: Keine gültige Spannungsquelle gefunden`);
@@ -5622,7 +5643,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.44 - BIDIREKTIONALE VERBINDUNGEN: LEDs können von beiden Seiten angeschlossen werden! Klemmen geben Spannung weiter!');
+                            console.log('🚀 LED Foundation v0.01.45 - KLEMMEN-PHYSIK REPARIERT: Klemmen werden korrekt als Connector behandelt und erkennen Trafo-Spannung!');
             
             // 1. Circuit Simulation initialisieren
             try {
