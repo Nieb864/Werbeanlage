@@ -1323,7 +1323,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.62</div>
+                <div class="version-display">v0.01.63</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5543,7 +5543,7 @@
             leftLine.setAttribute('x2', '20');
             leftLine.setAttribute('y2', '10');
             leftLine.setAttribute('stroke', '#1d1d1b');
-            leftLine.setAttribute('stroke-width', '2');
+            leftLine.setAttribute('stroke-width', '1.5');
             leftLine.setAttribute('class', 'connection-line');
             leftLine.setAttribute('data-connection-type', 'output-line');
             leftLine.setAttribute('data-connection-id', 'out-left');
@@ -5560,7 +5560,7 @@
             rightLine.setAttribute('x2', '70');
             rightLine.setAttribute('y2', '10');
             rightLine.setAttribute('stroke', '#1d1d1b');
-            rightLine.setAttribute('stroke-width', '2');
+            rightLine.setAttribute('stroke-width', '1.5');
             rightLine.setAttribute('class', 'connection-line');
             rightLine.setAttribute('data-connection-type', 'output-line');
             rightLine.setAttribute('data-connection-id', 'out-right');
@@ -5839,7 +5839,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.62 - LED-METHODE: Kabel-Anschlüsse respektieren SVG stroke-width wie LED!');
+                            console.log('🚀 LED Foundation v0.01.63 - VIEWBOX-FIX: Kabel stroke-width 1.5px für korrekte Skalierung!');
             
             // 1. Circuit Simulation initialisieren
             try {
