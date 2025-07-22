@@ -694,14 +694,13 @@
         }
 
         /* ===== EINHEITLICHER SVG-STANDARD ===== */
-        /* Alle Bauteile behalten ihre Illustrator-Proportionen */
+        /* TEST: Feste Höhe statt max-height */
         .led-module-svg,
         .transformer-svg,
         .mobile-terminal-svg,
         .component-svg {
             width: auto;
-            height: auto;
-            max-height: 150px; /* Maximum, aber Proportionen bleiben erhalten */
+            height: 40px; /* Feste Höhe für Test */
             min-width: 10px; /* Minimum-Breite für Lesbarkeit */
         }
 
@@ -1304,7 +1303,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.75</div>
+                <div class="version-display">v0.01.76</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5817,7 +5816,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.75 - TRAFO 10X TEST: Alle Koordinaten x10 vergrößert!');
+                            console.log('🚀 LED Foundation v0.01.76 - FESTE HÖHE TEST: height: 40px statt max-height!');
             
             // 1. Circuit Simulation initialisieren
             try {
