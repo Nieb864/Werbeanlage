@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.48</div>
+                <div class="version-display">v0.01.49</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3518,17 +3518,25 @@
                 }
                 
                 // Prüfe: plus UND minus müssen verbunden sein (BIDIREKTIONAL!)
-                // Alte IDs: in-plus, in-minus
-                // Neue IDs: plus-terminal, minus-terminal
-                const plusInput = led.querySelector('[data-connection-id="in-plus"]') || 
-                                 led.querySelector('[data-connection-id="plus-terminal"]');
-                const minusInput = led.querySelector('[data-connection-id="in-minus"]') || 
-                                  led.querySelector('[data-connection-id="minus-terminal"]');
+                // Alle möglichen Plus-Anschlüsse: in-plus, plus-terminal, out-plus
+                // Alle möglichen Minus-Anschlüsse: in-minus, minus-terminal, out-minus
+                const plusConnections = [
+                    led.querySelector('[data-connection-id="in-plus"]'),
+                    led.querySelector('[data-connection-id="plus-terminal"]'),
+                    led.querySelector('[data-connection-id="out-plus"]')
+                ].filter(el => el !== null);
                 
-                debugLog(`🔍 LED ${ledId}: plusInput=${!!plusInput}, minusInput=${!!minusInput}`);
+                const minusConnections = [
+                    led.querySelector('[data-connection-id="in-minus"]'),
+                    led.querySelector('[data-connection-id="minus-terminal"]'),
+                    led.querySelector('[data-connection-id="out-minus"]')
+                ].filter(el => el !== null);
                 
-                const hasPlusConnection = this.hasActiveConnection(plusInput);
-                const hasMinusConnection = this.hasActiveConnection(minusInput);
+                debugLog(`🔍 LED ${ledId}: plusConnections=${plusConnections.length}, minusConnections=${minusConnections.length}`);
+                
+                // Prüfe ob IRGENDEINE Plus-Verbindung aktiv ist
+                const hasPlusConnection = plusConnections.some(conn => this.hasActiveConnection(conn));
+                const hasMinusConnection = minusConnections.some(conn => this.hasActiveConnection(conn));
                 
                 debugLog(`🔍 LED ${ledId}: hasPlusConnection=${hasPlusConnection}, hasMinusConnection=${hasMinusConnection}`);
                 
@@ -5661,7 +5669,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.48 - LED VERBINDUNGS-DEBUG: Zeigt alle LED-Verbindungen zur Problemdiagnose!');
+                            console.log('🚀 LED Foundation v0.01.49 - BIDIREKTIONALE LED-LOGIK: LED prüft ALLE Anschlüsse (in/out/terminal) für Plus/Minus!');
             
             // 1. Circuit Simulation initialisieren
             try {
