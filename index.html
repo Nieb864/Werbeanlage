@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.74</div>
+                <div class="version-display">v0.01.75</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4607,10 +4607,10 @@
             return svg;
         }
 
-        // ===== TRANSFORMATOR 12V =====
+        // ===== TRANSFORMATOR 12V (10X VERGRÖßERT FÜR TEST) =====
         function createTransformer12VSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 120 80');
+            svg.setAttribute('viewBox', '0 0 1200 800');
             svg.setAttribute('class', 'transformer-svg');
             svg.setAttribute('data-component-type', 'trafo-12v-40w');
             
@@ -4630,70 +4630,70 @@
             
             svg.innerHTML = `
                 <!-- Gehäuse -->
-                <rect class="trafo-housing" x="20" y="10" width="80" height="60" rx="5"/>
+                <rect class="trafo-housing" x="200" y="100" width="800" height="600" rx="50"/>
                 
                 <!-- Beschriftung -->
-                <text class="trafo-text" x="60" y="30" text-anchor="middle">TRAFO</text>
-                <text class="trafo-text" x="60" y="45" text-anchor="middle">12V DC</text>
-                <text class="trafo-label" x="60" y="55" text-anchor="middle">40W</text>
+                <text class="trafo-text" x="600" y="300" text-anchor="middle">TRAFO</text>
+                <text class="trafo-text" x="600" y="450" text-anchor="middle">12V DC</text>
+                <text class="trafo-label" x="600" y="550" text-anchor="middle">40W</text>
                 
                 <!-- Eingangskabel (230V) -->
-                <line stroke="#683c11" stroke-width="4" x1="5" y1="25" x2="20" y2="25"/>
-                <line stroke="#1d71b8" stroke-width="4" x1="5" y1="35" x2="20" y2="35"/>
-                <line stroke="#ffed00" stroke-width="4" x1="5" y1="45" x2="20" y2="45"/>
+                <line stroke="#683c11" stroke-width="40" x1="50" y1="250" x2="200" y2="250"/>
+                <line stroke="#1d71b8" stroke-width="40" x1="50" y1="350" x2="200" y2="350"/>
+                <line stroke="#ffed00" stroke-width="40" x1="50" y1="450" x2="200" y2="450"/>
                 
                 <!-- Ausgangskabel (12V) -->
-                <line stroke="#e30613" stroke-width="4" x1="100" y1="30" x2="115" y2="30"/>
-                <line stroke="#1d1d1b" stroke-width="4" x1="100" y1="50" x2="115" y2="50"/>
+                <line stroke="#e30613" stroke-width="40" x1="1000" y1="300" x2="1150" y2="300"/>
+                <line stroke="#1d1d1b" stroke-width="40" x1="1000" y1="500" x2="1150" y2="500"/>
                 
                 <!-- Eingangs-Connection Points -->
                 <circle class="connection-socket" 
-                        cx="5" cy="25" r="4" 
+                        cx="50" cy="250" r="40" 
                         data-connection-type="input-socket"
                         data-connection-id="in-phase"
                         data-wire-type="phase"
                         data-voltage="230"
-                        data-bezier-end-x="5" data-bezier-end-y="25"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-end-x="50" data-bezier-end-y="250"
+                        data-bezier-direction="-200,0,0,0"/>
                         
                 <circle class="connection-socket" 
-                        cx="5" cy="35" r="4" 
+                        cx="50" cy="350" r="40" 
                         data-connection-type="input-socket"
                         data-connection-id="in-neutral"
                         data-wire-type="neutral"
                         data-voltage="230"
-                        data-bezier-end-x="5" data-bezier-end-y="35"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-end-x="50" data-bezier-end-y="350"
+                        data-bezier-direction="-200,0,0,0"/>
                         
                 <circle class="connection-socket" 
-                        cx="5" cy="45" r="4" 
+                        cx="50" cy="450" r="40" 
                         data-connection-type="input-socket"
                         data-connection-id="in-earth"
                         data-wire-type="earth"
                         data-voltage="230"
-                        data-bezier-end-x="5" data-bezier-end-y="45"
-                        data-bezier-direction="-20,0,0,0"/>
+                        data-bezier-end-x="50" data-bezier-end-y="450"
+                        data-bezier-direction="-200,0,0,0"/>
                 
                 <!-- Ausgangs-Connection Points -->
                 <line class="connection-line" 
-                      x1="115" y1="30" x2="120" y2="30" 
+                      x1="1150" y1="300" x2="1200" y2="300" 
                       stroke="#e30613" 
                       data-connection-type="output-line"
                       data-connection-id="out-plus"
                       data-wire-type="plus"
                       data-voltage="12"
-                      data-bezier-start-x="117" data-bezier-start-y="30"
-                      data-bezier-direction="20,0,0,0"/>
+                      data-bezier-start-x="1170" data-bezier-start-y="300"
+                      data-bezier-direction="200,0,0,0"/>
                       
                 <line class="connection-line" 
-                      x1="115" y1="50" x2="120" y2="50" 
+                      x1="1150" y1="500" x2="1200" y2="500" 
                       stroke="#1d1d1b" 
                       data-connection-type="output-line"
                       data-connection-id="out-minus"
                       data-wire-type="minus"
                       data-voltage="12"
-                      data-bezier-start-x="117" data-bezier-start-y="50"
-                      data-bezier-direction="20,0,0,0"/>
+                      data-bezier-start-x="1170" data-bezier-start-y="500"
+                      data-bezier-direction="200,0,0,0"/>
             `;
             
             return svg;
@@ -5817,7 +5817,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.74 - CSS-KONFLIKT BEHOBEN: .cable-svg entfernt!');
+                            console.log('🚀 LED Foundation v0.01.75 - TRAFO 10X TEST: Alle Koordinaten x10 vergrößert!');
             
             // 1. Circuit Simulation initialisieren
             try {
