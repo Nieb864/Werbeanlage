@@ -1310,7 +1310,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.79</div>
+                <div class="version-display">v0.01.80</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5532,7 +5532,7 @@
                 <!-- Deine SVG zentriert (10px Platz für linken Anschlusspunkt) -->
                 <g transform="translate(10, 1)">
                     <rect class="cls-1" x="6.91" y="0" width="25.86" height="25.86" rx="3.52" ry="3.52"/>
-                    <line class="cls-3" y1="12.93" x2="39.68" y2="12.93"/>
+                    <line class="cls-3" y1="12.93" x2="39.68" y2="12.93" stroke-width="3"/>
                     <rect class="cls-2" x="14.91" y="6.72" width="9.86" height="12.42"/>
                 </g>
                 
@@ -5543,7 +5543,7 @@
                       data-connection-id="out-left"
                       data-wire-type="universal"
                       data-voltage="24"
-                      data-bezier-start-x="0"
+                      data-bezier-start-x="10"
                       data-bezier-start-y="13.93"
                       data-bezier-direction="-20,0,0,0"/>
                       
@@ -5554,7 +5554,7 @@
                       data-connection-id="out-right"
                       data-wire-type="universal"
                       data-voltage="24"
-                      data-bezier-start-x="59.68"
+                      data-bezier-start-x="49.68"
                       data-bezier-start-y="13.93"
                       data-bezier-direction="20,0,0,0"/>
             `;
@@ -5823,7 +5823,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.79 - KABEL FIX: Doppelte CSS-Klassen entfernt!');
+                            console.log('🚀 LED Foundation v0.01.80 - KABEL VERBESSERUNG: 3px Linie + Bezier-Punkte korrigiert!');
             
             // 1. Circuit Simulation initialisieren
             try {
