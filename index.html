@@ -1318,7 +1318,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.56</div>
+                <div class="version-display">v0.01.57</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5521,30 +5521,33 @@
             svg.setAttribute('class', 'component-svg cable-svg');
             svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
             
-            // Schwarze Kabel-Linie (horizontal, dünner wie Bezier-Linien)
+            // Schwarze Kabel-Linie (horizontal, so dünn wie möglich)
             const cableLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             cableLine.setAttribute('x1', '15');
             cableLine.setAttribute('y1', '10');
             cableLine.setAttribute('x2', '85');
             cableLine.setAttribute('y2', '10');
             cableLine.setAttribute('stroke', '#1d1d1b');
-            cableLine.setAttribute('stroke-width', '3'); // Wie Bezier-Linien
+            cableLine.setAttribute('stroke-width', '2'); // Noch dünner!
             cableLine.setAttribute('stroke-linecap', 'round');
             cableLine.setAttribute('class', 'cable-line');
             
-            // Linker Anschlusspunkt (input-socket wie LED)
-            const leftSocket = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            leftSocket.setAttribute('cx', '8');
-            leftSocket.setAttribute('cy', '10');
-            leftSocket.setAttribute('r', '4'); // Wie LED-Anschlüsse
-            leftSocket.setAttribute('class', 'connection-socket');
-            leftSocket.setAttribute('data-connection-type', 'input-socket');
-            leftSocket.setAttribute('data-connection-id', 'in-universal');
-            leftSocket.setAttribute('data-wire-type', 'universal');
-            leftSocket.setAttribute('data-voltage', '24');
-            leftSocket.setAttribute('data-bezier-end-x', '8');
-            leftSocket.setAttribute('data-bezier-end-y', '10');
-            leftSocket.setAttribute('data-bezier-direction', '-20,0,0,0');
+            // Linker Anschlusspunkt (output-line wie rechts)
+            const leftLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            leftLine.setAttribute('x1', '5');
+            leftLine.setAttribute('y1', '10');
+            leftLine.setAttribute('x2', '15');
+            leftLine.setAttribute('y2', '10');
+            leftLine.setAttribute('stroke', '#1d1d1b');
+            leftLine.setAttribute('stroke-width', '2');
+            leftLine.setAttribute('class', 'connection-line');
+            leftLine.setAttribute('data-connection-type', 'output-line');
+            leftLine.setAttribute('data-connection-id', 'out-left');
+            leftLine.setAttribute('data-wire-type', 'universal');
+            leftLine.setAttribute('data-voltage', '24');
+            leftLine.setAttribute('data-bezier-start-x', '5');
+            leftLine.setAttribute('data-bezier-start-y', '10');
+            leftLine.setAttribute('data-bezier-direction', '-20,0,0,0');
             
             // Rechter Anschlusspunkt (output-line wie LED)
             const rightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -5553,10 +5556,10 @@
             rightLine.setAttribute('x2', '95');
             rightLine.setAttribute('y2', '10');
             rightLine.setAttribute('stroke', '#1d1d1b');
-            rightLine.setAttribute('stroke-width', '3');
+            rightLine.setAttribute('stroke-width', '2');
             rightLine.setAttribute('class', 'connection-line');
             rightLine.setAttribute('data-connection-type', 'output-line');
-            rightLine.setAttribute('data-connection-id', 'out-universal');
+            rightLine.setAttribute('data-connection-id', 'out-right');
             rightLine.setAttribute('data-wire-type', 'universal');
             rightLine.setAttribute('data-voltage', '24');
             rightLine.setAttribute('data-bezier-start-x', '95');
@@ -5565,7 +5568,7 @@
             
             // SVG zusammenbauen
             svg.appendChild(cableLine);
-            svg.appendChild(leftSocket);
+            svg.appendChild(leftLine);
             svg.appendChild(rightLine);
             
             return svg;
@@ -5832,7 +5835,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.56 - KABEL-REDESIGN: Korrekte Größe + LED-ähnliche Anschlüsse!');
+                            console.log('🚀 LED Foundation v0.01.57 - KABEL-FINE-TUNE: Beide Seiten output-line + dünner (2px)!');
             
             // 1. Circuit Simulation initialisieren
             try {
