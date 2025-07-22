@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.47</div>
+                <div class="version-display">v0.01.48</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3532,6 +3532,14 @@
                 
                 debugLog(`🔍 LED ${ledId}: hasPlusConnection=${hasPlusConnection}, hasMinusConnection=${hasMinusConnection}`);
                 
+                // DEBUGGING: Zeige alle LED-relevanten Verbindungen
+                console.log(`🔍 LED ${ledId} DEBUG: Alle Verbindungen:`);
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if (connectionData.toComponent === ledId || connectionData.fromComponent === ledId) {
+                        console.log(`   ${connectionData.fromComponent}.${connectionData.from.dataset.connectionId} → ${connectionData.toComponent}.${connectionData.to.dataset.connectionId} (${connectionData.from.dataset.wireType} → ${connectionData.to.dataset.wireType})`);
+                    }
+                }
+                
                 // ZUSÄTZLICH: Prüfe ob Polarität korrekt ist
                 const hasCorrectPolarity = this.hasCorrectLEDPolarity(ledId);
                 
@@ -5653,7 +5661,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.47 - MAXVOLTAGE VARIABLE FEHLER BEHOBEN: ReferenceError in calculateConnectorState repariert!');
+                            console.log('🚀 LED Foundation v0.01.48 - LED VERBINDUNGS-DEBUG: Zeigt alle LED-Verbindungen zur Problemdiagnose!');
             
             // 1. Circuit Simulation initialisieren
             try {
