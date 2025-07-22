@@ -1310,7 +1310,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.87</div>
+                <div class="version-display">v0.01.88</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1346,7 +1346,9 @@
                          data-component-type="power-source-230v"
                          data-connection-behavior="source"
                          data-voltage-level="230V-AC"
-                         data-power-rating="3000">
+                         data-power-rating="3000"
+                         data-possible-states="off,on,overloaded,broken"
+                         data-default-state="on">
                         <defs>
                             <style>
                                 .power-socket { fill: #3c3c3b; stroke: var(--color-primary); stroke-width: 2; }
@@ -1487,13 +1489,20 @@
             }
         };
 
-        // Zustände der Komponenten
+        // === ZUSTANDSSTANDARD C: Zustände der Komponenten ===
         const ComponentStates = {
+            // Operational States
             OFF: 'off',
             ON: 'on',
             BLINKING: 'blinking',
+            
+            // Error States  
             BROKEN: 'broken',
-            OVERLOADED: 'overloaded'
+            OVERLOADED: 'overloaded',
+            
+            // Mechanical States
+            OPEN: 'open',
+            CLOSED: 'closed'
         };
 
         // ===== COMPONENT STATE MACHINE =====
@@ -4491,6 +4500,10 @@
             // === VERBINDUNGSTYP-STANDARD B ===
             svg.setAttribute('data-connection-behavior', 'load');
             svg.setAttribute('data-voltage-level', '12V-DC');
+            
+            // === ZUSTANDSSTANDARD C ===
+            svg.setAttribute('data-available-states', JSON.stringify(['off', 'on', 'blinking', 'overloaded', 'broken']));
+            svg.setAttribute('data-default-state', 'off');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"in-plus", "to":"out-plus", "resistance":0.1},
                 {"from":"in-minus", "to":"out-minus", "resistance":0.1}
@@ -4625,6 +4638,10 @@
             svg.setAttribute('data-connection-behavior', 'transform');
             svg.setAttribute('data-input-voltage', '230V-AC');
             svg.setAttribute('data-output-voltage', '12V-DC');
+            
+            // === ZUSTANDSSTANDARD C ===
+            svg.setAttribute('data-possible-states', 'off,on,broken');
+            svg.setAttribute('data-default-state', 'off');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"in-phase", "to":"out-plus", "resistance":0.02, "efficiency":0.87},
                 {"from":"in-neutral", "to":"out-minus", "resistance":0.02, "efficiency":0.87}
@@ -4880,6 +4897,10 @@
             // === VERBINDUNGSTYP-STANDARD B ===
             svg.setAttribute('data-connection-behavior', 'load');
             svg.setAttribute('data-voltage-level', '24V-DC');
+            
+            // === ZUSTANDSSTANDARD C ===
+            svg.setAttribute('data-possible-states', 'off,on,blinking,broken,overloaded');
+            svg.setAttribute('data-default-state', 'off');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"in-plus", "to":"out-plus", "resistance":0.1},
                 {"from":"in-minus", "to":"out-minus", "resistance":0.1}
@@ -5525,6 +5546,10 @@
             // === VERBINDUNGSTYP-STANDARD B ===
             svg.setAttribute('data-connection-behavior', 'pass-through');
             svg.setAttribute('data-voltage-level', '24V-DC');
+            
+            // === ZUSTANDSSTANDARD C ===
+            svg.setAttribute('data-possible-states', 'closed,broken');
+            svg.setAttribute('data-default-state', 'closed');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"out-left", "to":"out-right", "resistance":0.1}
             ]));
@@ -5587,6 +5612,10 @@
             // === VERBINDUNGSTYP-STANDARD B ===
             svg.setAttribute('data-connection-behavior', 'bridge');
             svg.setAttribute('data-voltage-level', '230V-AC');
+            
+            // === ZUSTANDSSTANDARD C ===
+            svg.setAttribute('data-possible-states', 'closed,broken');
+            svg.setAttribute('data-default-state', 'closed');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"terminal-1", "to":"terminal-2", "resistance":0.05},
                 {"from":"terminal-1", "to":"terminal-3", "resistance":0.05},
@@ -5846,7 +5875,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.87 - POWER SOURCE STANDARD B KOMPLETT! 🔋');
+                            console.log('🚀 LED Foundation v0.01.88 - ZUSTANDSSTANDARD C DEFINIERT! 🎭');
             
             // 1. Circuit Simulation initialisieren
             try {
