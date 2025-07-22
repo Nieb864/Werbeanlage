@@ -96,7 +96,7 @@ Jedes Bauteil definiert sein Verbindungsverhalten für die korrekte Simulation.
 | Trafo 12V | `transform` | `230V-AC → 12V-DC` | ✅ |
 | LED 12V | `load` | `12V-DC` | ✅ |
 | LED 24V | `load` | `24V-DC` | ✅ |
-| Power Source | `source` | `230V-AC` | ⏳ TODO |
+| Power Source | `source` | `230V-AC` | ✅ |
 
 ## 📝 Checklist für neue Bauteile
 

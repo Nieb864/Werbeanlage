@@ -1310,7 +1310,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.86</div>
+                <div class="version-display">v0.01.87</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1342,17 +1342,15 @@
                 </div>
                 
                 <div class="power-source" id="power-source-svg">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50.29 115.10" width="50.29" height="115.10">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50.29 115.10" width="50.29" height="115.10"
+                         data-component-type="power-source-230v"
+                         data-connection-behavior="source"
+                         data-voltage-level="230V-AC"
+                         data-power-rating="3000">
                         <defs>
                             <style>
-                                .power-cls-4 {
-                                    fill: #3c3c3b;
-                                    stroke: #1d1d1b;
-                                    stroke-width: 2px;
-                                }
-                                .power-cls-5 {
-                                    fill: #878787;
-                                }
+                                .power-socket { fill: #3c3c3b; stroke: var(--color-primary); stroke-width: 2; }
+                                .power-housing { fill: #878787; stroke: var(--color-primary); stroke-width: 2; }
                             </style>
                         </defs>
                         <g data-name="Ebene_1">
@@ -5848,7 +5846,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.86 - VERBINDUNGSTYP-STANDARD B IMPLEMENTIERT! 🔌');
+                            console.log('🚀 LED Foundation v0.01.87 - POWER SOURCE STANDARD B KOMPLETT! 🔋');
             
             // 1. Circuit Simulation initialisieren
             try {
