@@ -1323,7 +1323,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.66</div>
+                <div class="version-display">v0.01.67</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5522,8 +5522,8 @@
         // ===== KABEL FLEXIBEL =====
         function createKabelFlexibelSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            // Original: 26.46 x 18.24 * 1.5 + 20px für Anschlusspunkte = 59.69 x 27.36
-            svg.setAttribute('viewBox', '0 0 59.69 27.36');
+            // Original: 26.46 x 18.24 + 20px für Anschlusspunkte = 46.46 x 18.24
+            svg.setAttribute('viewBox', '0 0 46.46 18.24');
             svg.setAttribute('class', 'component-svg cable-svg');
             svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
             
@@ -5543,34 +5543,34 @@
                 
                 <!-- Kabel-Gruppe zentriert (1.5x bereits in Koordinaten berechnet) -->
                 <g transform="translate(10, 0)">
-                    <!-- Kabelmantel (Hintergrund) - 1.5x skaliert -->
-                    <rect class="cable-sheath" x="6.92" y="0.75" width="25.86" height="25.86" rx="5.28" ry="5.28"/>
-                    <!-- Schwarzes Kabel (Linie) - 1.5x skaliert -->
-                    <line class="cable-wire" y1="13.68" x2="39.69" y2="13.68"/>
-                    <!-- Kabelstecker/Verbinder - 1.5x skaliert -->
-                    <rect class="cable-connector" x="14.91" y="7.47" width="9.86" height="12.42"/>
+                    <!-- Kabelmantel (Hintergrund) - Original-Größe -->
+                    <rect class="cable-sheath" x="4.61" y="0.5" width="17.24" height="17.24" rx="3.52" ry="3.52"/>
+                    <!-- Schwarzes Kabel (Linie) - Original-Größe -->
+                    <line class="cable-wire" y1="9.12" x2="26.46" y2="9.12"/>
+                    <!-- Kabelstecker/Verbinder - Original-Größe -->
+                    <rect class="cable-connector" x="9.94" y="4.98" width="6.57" height="8.28"/>
                 </g>
                 
                 <!-- Linker Anschlusspunkt -->
                 <line class="cable-connection-line connection-line" 
-                      x1="0" y1="13.68" x2="10" y2="13.68"
+                      x1="0" y1="9.12" x2="10" y2="9.12"
                       data-connection-type="output-line"
                       data-connection-id="out-left"
                       data-wire-type="universal"
                       data-voltage="24"
                       data-bezier-start-x="0"
-                      data-bezier-start-y="13.68"
+                      data-bezier-start-y="9.12"
                       data-bezier-direction="-20,0,0,0"/>
                       
                 <!-- Rechter Anschlusspunkt -->
                 <line class="cable-connection-line connection-line" 
-                      x1="49.69" y1="13.68" x2="59.69" y2="13.68"
+                      x1="36.46" y1="9.12" x2="46.46" y2="9.12"
                       data-connection-type="output-line"
                       data-connection-id="out-right"
                       data-wire-type="universal"
                       data-voltage="24"
-                      data-bezier-start-x="59.69"
-                      data-bezier-start-y="13.68"
+                      data-bezier-start-x="46.46"
+                      data-bezier-start-y="9.12"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -5838,7 +5838,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.66 - DOPPEL-SKALIERUNG-FIX: Scale() entfernt, nur Koordinaten 1.5x!');
+                            console.log('🚀 LED Foundation v0.01.67 - KABEL-KLEIN: Original-Größe statt 1.5x für kompakteres Kabel!');
             
             // 1. Circuit Simulation initialisieren
             try {
