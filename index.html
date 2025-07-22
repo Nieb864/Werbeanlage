@@ -1310,7 +1310,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.84</div>
+                <div class="version-display">v0.01.85</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4505,7 +4505,7 @@
             svg.innerHTML = `
                 <defs>
                     <style>
-                        .led12-housing-dark { fill: var(--metal-dark); stroke: var(--color-primary); stroke-width: 2; }
+                        .led12-housing-dark { fill: #9e9e9e; stroke: var(--color-primary); stroke-width: 2; }
                         .led12-housing-light { fill: var(--plastic-light); stroke: var(--color-primary); stroke-width: 2; }
                         .led12-center { fill: #fff; stroke: var(--color-primary); stroke-width: 2; }
                         .led12-text { fill: var(--color-primary); font-family: Arial, sans-serif; font-size: 7.77px; }
@@ -4887,7 +4887,7 @@
             svg.innerHTML = `
                 <defs>
                     <style>
-                        .led24-housing-dark { fill: var(--metal-dark); stroke: var(--color-primary); stroke-width: 2; }
+                        .led24-housing-dark { fill: #9e9e9e; stroke: var(--color-primary); stroke-width: 2; }
                         .led24-housing-light { fill: var(--plastic-light); stroke: var(--color-primary); stroke-width: 2; }
                         .led24-center { fill: #fff; stroke: var(--color-primary); stroke-width: 2; }
                         .led24-text { fill: var(--color-primary); font-family: Arial, sans-serif; font-size: 7.77px; }
@@ -5517,12 +5517,10 @@
             svg.innerHTML = `
                 <defs>
                     <style>
-                        .cls-1 { fill: #c6c6c6; }
-                        .cls-1, .cls-2 { stroke: #1d1d1b; stroke-miterlimit: 10; stroke-width: 2px; }
-                        .cls-3 { stroke: #1d1d1b; stroke-miterlimit: 10; stroke-width: 3px; }
-                        .cls-2 { fill: url(#Unbenannter_Verlauf_7); }
-                        .cls-3 { fill: none; }
-                        .cable-connection-line { stroke: #1d1d1b; stroke-width: 3; }
+                        .cable-housing { fill: #c6c6c6; stroke: var(--color-primary); stroke-width: 2; }
+                        .cable-connector { fill: url(#Unbenannter_Verlauf_7); stroke: var(--color-primary); stroke-width: 2; }
+                        .cable-wire { fill: none; stroke: var(--wire-black); stroke-width: 3; }
+                        .cable-connection-line { stroke: var(--wire-black); stroke-width: 3; }
                     </style>
                     <linearGradient id="Unbenannter_Verlauf_7" data-name="Unbenannter Verlauf 7" x1="29.84" y1="21.14" x2="29.84" y2="8.72" gradientUnits="userSpaceOnUse">
                         <stop offset="0" stop-color="#c6c6c6"/>
@@ -5824,7 +5822,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.84 - ALLE cls-KLASSEN VOLLSTÄNDIG ENTFERNT! 🎉');
+                            console.log('🚀 LED Foundation v0.01.85 - FARBFEHLER REPARIERT: LED-Ringe hell, Kabel sichtbar! 🎨');
             
             // 1. Circuit Simulation initialisieren
             try {
