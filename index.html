@@ -758,27 +758,32 @@
 
         /* LED States - JavaScript + CSS Hybrid */
         .state-off .cls-5, 
-        .state-off .led24-center {
+        .state-off .led24-center,
+        .state-off .led12-center {
             fill: #ddd !important;
         }
 
         .state-on .cls-5, 
-        .state-on .led24-center {
+        .state-on .led24-center,
+        .state-on .led12-center {
             fill: #ffff00 !important;
         }
 
         .state-blinking .cls-5, 
-        .state-blinking .led24-center {
+        .state-blinking .led24-center,
+        .state-blinking .led12-center {
             fill: #ffff00 !important;
         }
 
         .state-broken .cls-5, 
-        .state-broken .led24-center {
+        .state-broken .led24-center,
+        .state-broken .led12-center {
             fill: #1a1a1a !important;
         }
 
         .state-overloaded .cls-5, 
-        .state-overloaded .led24-center {
+        .state-overloaded .led24-center,
+        .state-overloaded .led12-center {
             fill: #e91e63 !important;
         }
 
@@ -1310,7 +1315,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.81</div>
+                <div class="version-display">v0.01.83</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1846,7 +1851,7 @@
                 // Nur LEDs färben, nicht Trafos oder andere Komponenten
                 if (this.specs.type !== 'load') return;
                 
-                const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
+                const ledCenters = element.querySelectorAll('.cls-5, .led24-center, .led12-center');
                 
                 ledCenters.forEach((led, index) => {
                     const color = this.blinkState ? '#ffff00' : '#ddd';
@@ -1882,7 +1887,7 @@
                 
                 // Für statische States (nicht BLINKING) nur CSS-Klassen verwenden
                 if (this.state !== ComponentStates.BLINKING) {
-                    const ledCenters = element.querySelectorAll('.cls-5, .led24-center');
+                    const ledCenters = element.querySelectorAll('.cls-5, .led24-center, .led12-center');
                     ledCenters.forEach((led, index) => {
                         const filter = this.getGlowEffect(this.state, true);
                         
@@ -4369,7 +4374,7 @@
                             const element = document.getElementById(componentId);
                             if (element && ComponentSpecs[stateMachine.type]?.type === 'load') {
                                 // LED-Kreis sichtbar machen falls verschwunden
-                                const ledCircle = element.querySelector('.cls-5, .led24-center');
+                                const ledCircle = element.querySelector('.cls-5, .led24-center, .led12-center');
                                 if (ledCircle) {
                                     ledCircle.style.display = 'block';
                                     ledCircle.style.opacity = '1';
@@ -4505,10 +4510,10 @@
             svg.innerHTML = `
                 <defs>
                     <style>
-                        .cls-1 { fill: #9e9e9e; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
-                        .cls-2 { fill: #e8e8e8; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
-                        .cls-5 { fill: #fff; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
-                        .cls-7 { fill: #1d1d1b; font-family: Arial, sans-serif; font-size: 7.77px; }
+                        .led12-housing-dark { fill: var(--metal-dark); stroke: var(--color-primary); stroke-width: 2; }
+                        .led12-housing-light { fill: var(--plastic-light); stroke: var(--color-primary); stroke-width: 2; }
+                        .led12-center { fill: #fff; stroke: var(--color-primary); stroke-width: 2; }
+                        .led12-text { fill: var(--color-primary); font-family: Arial, sans-serif; font-size: 7.77px; }
                     </style>
                     
                     <!-- Glow-Filter für LEDs -->
@@ -4540,28 +4545,28 @@
                 
                 <g>
                     <g>
-                        <rect class="cls-2" x="16.605" y=".75" width="100.14" height="26.04" rx="8.475" ry="8.475"/>
+                        <rect class="led12-housing-light" x="16.605" y=".75" width="100.14" height="26.04" rx="8.475" ry="8.475"/>
                         <g>
-                            <circle class="cls-1" cx="90.18" cy="13.77" r="8.25"/>
-                            <circle class="cls-5" cx="90.18" cy="13.77" r="4.125"/>
+                            <circle class="led12-housing-dark" cx="90.18" cy="13.77" r="8.25"/>
+                            <circle class="led12-center" cx="90.18" cy="13.77" r="4.125"/>
                         </g>
                         <g>
-                            <circle class="cls-1" cx="44.73" cy="13.77" r="8.25"/>
-                            <circle class="cls-5" cx="44.73" cy="13.77" r="4.125"/>
+                            <circle class="led12-housing-dark" cx="44.73" cy="13.77" r="8.25"/>
+                            <circle class="led12-center" cx="44.73" cy="13.77" r="4.125"/>
                         </g>
                         <g>
-                            <circle class="cls-1" cx="67.455" cy="13.77" r="8.25"/>
-                            <circle class="cls-5" cx="67.455" cy="13.77" r="4.125"/>
+                            <circle class="led12-housing-dark" cx="67.455" cy="13.77" r="8.25"/>
+                            <circle class="led12-center" cx="67.455" cy="13.77" r="4.125"/>
                         </g>
-                        <text class="cls-7" transform="translate(101.34 5.01) rotate(90)">
+                        <text class="led12-text" transform="translate(101.34 5.01) rotate(90)">
                             <tspan x="0" y="0">1,2 W</tspan>
                         </text>
-                        <text class="cls-7" transform="translate(24.84 20.61) rotate(-90)">
+                        <text class="led12-text" transform="translate(24.84 20.61) rotate(-90)">
                             <tspan x="0" y="0">12 V</tspan>
                             <tspan x=".195" y="9.315">WW</tspan>
                         </text>
-                        <text class="cls-7" transform="translate(113.82 17.01) rotate(-180)">+</text>
-                        <text class="cls-7" transform="translate(112.68 5.685) rotate(-180)">-</text>
+                        <text class="led12-text" transform="translate(113.82 17.01) rotate(-180)">+</text>
+                        <text class="led12-text" transform="translate(112.68 5.685) rotate(-180)">-</text>
                     </g>
                 </g>
                 
@@ -4887,10 +4892,10 @@
             svg.innerHTML = `
                 <defs>
                     <style>
-                        .cls-1 { fill: #9e9e9e; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
-                        .cls-2 { fill: #e8e8e8; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
-                        .cls-5 { fill: #fff; stroke: #1d1d1b; stroke-width: 1.5; stroke-miterlimit: 10; }
-                        .cls-7 { fill: #1d1d1b; font-family: Arial, sans-serif; font-size: 7.77px; }
+                        .led24-housing-dark { fill: var(--metal-dark); stroke: var(--color-primary); stroke-width: 2; }
+                        .led24-housing-light { fill: var(--plastic-light); stroke: var(--color-primary); stroke-width: 2; }
+                        .led24-center { fill: #fff; stroke: var(--color-primary); stroke-width: 2; }
+                        .led24-text { fill: var(--color-primary); font-family: Arial, sans-serif; font-size: 7.77px; }
                     </style>
                     
                     <!-- Glow-Filter für LEDs -->
@@ -4922,28 +4927,28 @@
                 
                 <g>
                     <g>
-                        <rect class="cls-2" x="16.605" y=".75" width="100.14" height="26.04" rx="8.475" ry="8.475"/>
+                        <rect class="led24-housing-light" x="16.605" y=".75" width="100.14" height="26.04" rx="8.475" ry="8.475"/>
                         <g>
-                            <circle class="cls-1" cx="90.18" cy="13.77" r="8.25"/>
-                            <circle class="cls-5" cx="90.18" cy="13.77" r="4.125"/>
+                            <circle class="led24-housing-dark" cx="90.18" cy="13.77" r="8.25"/>
+                            <circle class="led24-center" cx="90.18" cy="13.77" r="4.125"/>
                         </g>
                         <g>
-                            <circle class="cls-1" cx="44.73" cy="13.77" r="8.25"/>
-                            <circle class="cls-5" cx="44.73" cy="13.77" r="4.125"/>
+                            <circle class="led24-housing-dark" cx="44.73" cy="13.77" r="8.25"/>
+                            <circle class="led24-center" cx="44.73" cy="13.77" r="4.125"/>
                         </g>
                         <g>
-                            <circle class="cls-1" cx="67.455" cy="13.77" r="8.25"/>
-                            <circle class="cls-5" cx="67.455" cy="13.77" r="4.125"/>
+                            <circle class="led24-housing-dark" cx="67.455" cy="13.77" r="8.25"/>
+                            <circle class="led24-center" cx="67.455" cy="13.77" r="4.125"/>
                         </g>
-                        <text class="cls-7" transform="translate(101.34 5.01) rotate(90)">
+                        <text class="led24-text" transform="translate(101.34 5.01) rotate(90)">
                             <tspan x="0" y="0">5 W</tspan>
                         </text>
-                        <text class="cls-7" transform="translate(24.84 20.61) rotate(-90)">
+                        <text class="led24-text" transform="translate(24.84 20.61) rotate(-90)">
                             <tspan x="0" y="0">24 V</tspan>
                             <tspan x=".195" y="9.315">WW</tspan>
                         </text>
-                        <text class="cls-7" transform="translate(113.82 17.01) rotate(-180)">+</text>
-                        <text class="cls-7" transform="translate(112.68 5.685) rotate(-180)">-</text>
+                        <text class="led24-text" transform="translate(113.82 17.01) rotate(-180)">+</text>
+                        <text class="led24-text" transform="translate(112.68 5.685) rotate(-180)">-</text>
                     </g>
                 </g>
                 
@@ -5654,16 +5659,16 @@
                 <svg viewBox="0 0 26.54 12.86" xmlns="http://www.w3.org/2000/svg" style="width: 33%; height: auto; max-height: 40px;">
                     <defs>
                         <style>
-                            .cls-1 { fill: #1d1d1b; }
-                            .cls-2 { fill: none; stroke: #1d1d1b; stroke-miterlimit: 10; stroke-width: 1; }
+                            .klemme-terminal { fill: var(--color-primary); }
+                            .klemme-housing { fill: none; stroke: var(--color-primary); stroke-miterlimit: 10; stroke-width: 2; }
                         </style>
                     </defs>
                     <g>
-                        <line class="cls-2" x1="13.27" y1="1.1" x2="13.27" y2="12.36"/>
-                        <path class="cls-2" d="M.97.97v11.39h24.6V.97"/>
-                        <circle class="cls-1" cx="25.57" cy=".97" r=".97"/>
-                        <circle class="cls-1" cx=".97" cy=".97" r=".97"/>
-                        <circle class="cls-1" cx="13.27" cy=".97" r=".97"/>
+                        <line class="klemme-housing" x1="13.27" y1="1.1" x2="13.27" y2="12.36"/>
+                        <path class="klemme-housing" d="M.97.97v11.39h24.6V.97"/>
+                        <circle class="klemme-terminal" cx="25.57" cy=".97" r=".97"/>
+                        <circle class="klemme-terminal" cx=".97" cy=".97" r=".97"/>
+                        <circle class="klemme-terminal" cx="13.27" cy=".97" r=".97"/>
                     </g>
                 </svg>
             `;
@@ -5824,7 +5829,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.81 - KABEL FIX: CSS-Override für .cls-3 stroke-width behoben!');
+                            console.log('🚀 LED Foundation v0.01.83 - cls-KLASSEN ENTFERNT: LED-Module & Klemme verwenden semantische Klassen!');
             
             // 1. Circuit Simulation initialisieren
             try {
