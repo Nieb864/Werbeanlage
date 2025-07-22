@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.43</div>
+                <div class="version-display">v0.01.44</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1650,11 +1650,24 @@
                 }
                 
                 // Durchschalten: Spannung weiterleiten
+                let maxVoltage = 0;
+                for (const terminal of myTerminals) {
+                    if (terminal.type === 'input') {
+                        if (typeof window !== 'undefined' && window.circuit && window.circuit.components) {
+                            const sourceComponent = window.circuit.components.get(terminal.sourceComponent);
+                            if (sourceComponent && sourceComponent.currentVoltage > 0) {
+                                maxVoltage = Math.max(maxVoltage, sourceComponent.currentVoltage);
+                            }
+                        }
+                    }
+                }
+                
                 if (hasVoltage) {
-                    // TODO: Hier würden wir die Spannung an alle Output-Terminals weiterleiten
-                    console.log(`🔄 Klemme ${this.elementId}: Durchschaltung aktiv`);
+                    this.currentVoltage = maxVoltage; // WICHTIG: Spannung setzen für Weitergabe!
+                    console.log(`🔄 Klemme ${this.elementId}: Durchschaltung aktiv (${maxVoltage}V)`);
                     return ComponentStates.ON;
                 } else {
+                    this.currentVoltage = 0;
                     console.log(`⚫ Klemme ${this.elementId}: Keine Eingangsspannung`);
                     return ComponentStates.OFF;
                 }
@@ -3175,7 +3188,8 @@
             handleConnectionMouseUp(e) {
                 if (e.target.classList.contains('connection-socket') && 
                     (e.target.dataset.connectionType === 'input-socket' || 
-                     e.target.dataset.connectionType === 'terminal-socket')) {
+                     e.target.dataset.connectionType === 'terminal-socket' ||
+                     e.target.dataset.connectionType === 'bidirectional-socket')) {
                     
                     this.completeConnection(e.target);
                 } else {
@@ -3472,9 +3486,13 @@
                     return false;
                 }
                 
-                // Prüfe: plus UND minus müssen verbunden sein
-                const plusInput = led.querySelector('[data-connection-id="in-plus"]');
-                const minusInput = led.querySelector('[data-connection-id="in-minus"]');
+                // Prüfe: plus UND minus müssen verbunden sein (BIDIREKTIONAL!)
+                // Alte IDs: in-plus, in-minus
+                // Neue IDs: plus-terminal, minus-terminal
+                const plusInput = led.querySelector('[data-connection-id="in-plus"]') || 
+                                 led.querySelector('[data-connection-id="plus-terminal"]');
+                const minusInput = led.querySelector('[data-connection-id="in-minus"]') || 
+                                  led.querySelector('[data-connection-id="minus-terminal"]');
                 
                 debugLog(`🔍 LED ${ledId}: plusInput=${!!plusInput}, minusInput=${!!minusInput}`);
                 
@@ -4375,11 +4393,11 @@
                 <line class="visual-cable visual-cable-minus" stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
                 <line class="visual-cable visual-cable-plus" stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                 
-                <!-- Connection Points Links (Eingangsbuchsen) -->
+                <!-- Connection Points Links (BIDIREKTIONALE Buchsen) -->
                 <circle class="connection-socket" 
                         cx="8" cy="9.225" r="4" 
-                        data-connection-type="input-socket"
-                        data-connection-id="in-minus"
+                        data-connection-type="bidirectional-socket"
+                        data-connection-id="minus-terminal"
                         data-wire-type="minus"
                         data-voltage="12"
                         data-bezier-end-x="28" data-bezier-end-y="10.4"
@@ -4387,8 +4405,8 @@
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
-                        data-connection-type="input-socket"
-                        data-connection-id="in-plus"
+                        data-connection-type="bidirectional-socket"
+                        data-connection-id="plus-terminal"
                         data-wire-type="plus"
                         data-voltage="12"
                         data-bezier-end-x="28" data-bezier-end-y="18.8"
@@ -4757,11 +4775,11 @@
                 <line class="visual-cable visual-cable-minus" stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
                 <line class="visual-cable visual-cable-plus" stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                 
-                <!-- Connection Points Links (Eingangsbuchsen) -->
+                <!-- Connection Points Links (BIDIREKTIONALE Buchsen) -->
                 <circle class="connection-socket" 
                         cx="8" cy="9.225" r="4" 
-                        data-connection-type="input-socket"
-                        data-connection-id="in-minus"
+                        data-connection-type="bidirectional-socket"
+                        data-connection-id="minus-terminal"
                         data-wire-type="minus"
                         data-voltage="24"
                         data-bezier-end-x="28" data-bezier-end-y="9.7"
@@ -4769,8 +4787,8 @@
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
-                        data-connection-type="input-socket"
-                        data-connection-id="in-plus"
+                        data-connection-type="bidirectional-socket"
+                        data-connection-id="plus-terminal"
                         data-wire-type="plus"
                         data-voltage="24"
                         data-bezier-end-x="28" data-bezier-end-y="18.8"
@@ -5604,7 +5622,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.43 - INTELLIGENTE KURZSCHLUSS-ERKENNUNG: Transformatoren, Klemmen und LEDs sind keine Kurzschlüsse!');
+                            console.log('🚀 LED Foundation v0.01.44 - BIDIREKTIONALE VERBINDUNGEN: LEDs können von beiden Seiten angeschlossen werden! Klemmen geben Spannung weiter!');
             
             // 1. Circuit Simulation initialisieren
             try {
