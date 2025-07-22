@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.42a</div>
+                <div class="version-display">v0.01.42b</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1600,13 +1600,13 @@
                 // Mobile Klemme: Durchschalt-Logic
                 // Prüfe alle Anschlüsse - wenn einer Spannung hat, leite an alle anderen weiter
                 
-                // Zugriff auf globale circuit Variable
-                if (!circuit) {
-                    console.log(`⚠️ Klemme ${this.elementId}: Circuit nicht verfügbar`);
+                // Zugriff auf globale workspaceManager Variable
+                if (!workspaceManager) {
+                    console.log(`⚠️ Klemme ${this.elementId}: WorkspaceManager nicht verfügbar`);
                     return ComponentStates.OFF;
                 }
                 
-                const connections = circuit.connections;
+                const connections = workspaceManager.connections;
                 const myTerminals = [];
                 
                 // Finde alle meine Terminal-Anschlüsse
