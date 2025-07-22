@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.51</div>
+                <div class="version-display">v0.01.52</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1532,8 +1532,8 @@
                 } else if (this.specs.type === 'transformer') {
                     this.state = this.calculateTransformerState();
                 } else if (this.specs.type === 'connector') {
-                    // Mobile Klemme: Durchschalten aller Anschlüsse
-                    this.state = this.calculateConnectorState();
+                    // Klemmen sind immer passiv - leiten Strom nur durch
+                    this.state = ComponentStates.ON;
                 }
                 
                 if (previousState !== this.state) {
@@ -1594,105 +1594,6 @@
                     return ComponentStates.OVERLOADED;
                 }
                 return this.currentVoltage > 0 ? ComponentStates.ON : ComponentStates.OFF;
-            }
-            
-            calculateConnectorState() {
-                // Mobile Klemme: Durchschalt-Logic
-                // Prüfe alle Anschlüsse - wenn einer Spannung hat, leite an alle anderen weiter
-                
-                // Zugriff auf globale workspaceManager Variable
-                if (!workspaceManager) {
-                    console.log(`⚠️ Klemme ${this.elementId}: WorkspaceManager nicht verfügbar`);
-                    return ComponentStates.OFF;
-                }
-                
-                const connections = workspaceManager.connections;
-                const myTerminals = [];
-                
-                // Finde alle meine Terminal-Anschlüsse
-                for (const [connectionId, connectionData] of connections) {
-                    if (connectionData.fromComponent === this.elementId) {
-                        myTerminals.push({
-                            type: 'output',
-                            socket: connectionData.from,
-                            connectionId: connectionId,
-                            targetComponent: connectionData.toComponent
-                        });
-                    }
-                    if (connectionData.toComponent === this.elementId) {
-                        myTerminals.push({
-                            type: 'input', 
-                            socket: connectionData.to,
-                            connectionId: connectionId,
-                            sourceComponent: connectionData.fromComponent
-                        });
-                    }
-                }
-                
-                console.log(`🔗 Klemme ${this.elementId}: ${myTerminals.length} Anschlüsse gefunden`);
-                
-                // Wenn mindestens eine Verbindung Spannung führt, sind alle ON
-                let hasVoltage = false;
-                let maxVoltage = 0; // WICHTIG: Vor dem ersten Loop deklarieren!
-                
-                for (const terminal of myTerminals) {
-                    if (terminal.type === 'input') {
-                        // Direkte Spannungsprüfung aus den ComponentSpecs
-                        const sourceElement = document.getElementById(terminal.sourceComponent);
-                        if (sourceElement) {
-                            const sourceType = sourceElement.dataset.componentType;
-                            console.log(`🔍 Klemme ${this.elementId}: Prüfe Source ${terminal.sourceComponent} (Type: ${sourceType})`);
-                            
-                            // Trafo-Ausgang hat immer seine spezifizierte Spannung, wenn er läuft
-                            if (sourceType && sourceType.includes('trafo')) {
-                                // Finde ComponentType Key für sourceType
-                                const componentTypeKey = Object.keys(ComponentTypes).find(key => 
-                                    ComponentTypes[key] === sourceType
-                                );
-                                
-                                console.log(`🔍 Klemme ${this.elementId}: ComponentType Key gefunden: ${componentTypeKey}`);
-                                
-                                if (componentTypeKey) {
-                                    const sourceComponentSpecs = ComponentSpecs[ComponentTypes[componentTypeKey]];
-                                    console.log(`🔍 Klemme ${this.elementId}: ComponentSpecs gefunden:`, sourceComponentSpecs);
-                                    
-                                    if (sourceComponentSpecs && sourceComponentSpecs.outputVoltage) {
-                                        hasVoltage = true;
-                                        maxVoltage = Math.max(maxVoltage, sourceComponentSpecs.outputVoltage);
-                                        console.log(`⚡ Klemme ${this.elementId}: Spannung von Trafo ${terminal.sourceComponent} (${sourceComponentSpecs.outputVoltage}V)`);
-                                        break;
-                                    }
-                                } else {
-                                    console.log(`⚠️ Klemme ${this.elementId}: ComponentType Key für ${sourceType} nicht gefunden`);
-                                }
-                            }
-                        } else {
-                            console.log(`⚠️ Klemme ${this.elementId}: Source-Element ${terminal.sourceComponent} nicht gefunden`);
-                        }
-                    }
-                }
-                
-                // ZUSÄTZLICH: Prüfe auch über das alte circuit.components System (falls verfügbar)
-                for (const terminal of myTerminals) {
-                    if (terminal.type === 'input') {
-                        if (typeof window !== 'undefined' && window.circuit && window.circuit.components) {
-                            const sourceComponent = window.circuit.components.get(terminal.sourceComponent);
-                            if (sourceComponent && sourceComponent.currentVoltage > 0) {
-                                maxVoltage = Math.max(maxVoltage, sourceComponent.currentVoltage);
-                            }
-                        }
-                    }
-                }
-                
-                if (hasVoltage) {
-                    this.currentVoltage = maxVoltage; // WICHTIG: Spannung setzen für Weitergabe!
-                    console.log(`🔄 Klemme ${this.elementId}: Durchschaltung aktiv (${maxVoltage}V)`);
-                    return ComponentStates.ON;
-                } else {
-                    this.currentVoltage = 0;
-                    console.log(`⚫ Klemme ${this.elementId}: Keine Eingangsspannung`);
-                    return ComponentStates.OFF;
-                }
             }
             
             animateStateChange() {
@@ -2289,31 +2190,22 @@
             
             calculateComponentPower(componentId) {
                 const component = this.graph.nodes.get(componentId);
-                const componentSpecs = ComponentSpecs[component.type];
                 
-                // KLEMMEN: Spezialbehandlung - sie geben nur weiter, verbrauchen nicht
-                if (componentSpecs.type === 'connector') {
-                    console.log(`🔄 Klemme ${componentId}: Durchschaltung - verbraucht 0W`);
-                    return { voltage: 0, current: 0 }; // Klemmen verbrauchen nichts
-                }
-                
-                // 🚨 KAPUTTE KOMPONENTEN bekommen keinen Strom - sind permanent defekt
+                // 🚨 KAPUTTE LEDs bekommen keinen Strom - sind permanent defekt
                 const componentState = this.graph.getComponentState(componentId);
                 if (componentState === 'broken') {
-                    console.log(`💀 Komponente ${componentId}: Ist permanent kaputt → 0V/0A`);
+                    console.log(`💀 LED ${componentId}: Ist permanent kaputt → 0V/0A`);
                     return { voltage: 0, current: 0 };
                 }
                 
-                // NUR FÜR LEDs: Prüfe LED-zu-LED Verbindungen
-                if (componentSpecs.type === 'load') {
-                    const powerSource = this.findPowerSourceForLED(componentId);
-                    if (powerSource) {
-                        console.log(`✅ LED ${componentId}: Bekommt ${powerSource.voltage}V über Parallelschaltung von ${powerSource.sourceType} ${powerSource.sourceId}`);
-                        return {
-                            voltage: powerSource.voltage,
-                            current: ComponentSpecs[component.type].power / powerSource.voltage
-                        };
-                    }
+                // 🔍 NEUE PARALLELSCHALTUNG: Prüfe LED-zu-LED Verbindungen
+                const powerSource = this.findPowerSourceForLED(componentId);
+                if (powerSource) {
+                    console.log(`✅ LED ${componentId}: Bekommt ${powerSource.voltage}V über Parallelschaltung von ${powerSource.sourceType} ${powerSource.sourceId}`);
+                    return {
+                        voltage: powerSource.voltage,
+                        current: ComponentSpecs[component.type].power / powerSource.voltage
+                    };
                 }
                 
                 console.log(`⚠️ LED ${componentId}: Keine gültige Spannungsquelle gefunden`);
@@ -2325,26 +2217,13 @@
                 if (visited.has(ledId)) return null;
                 visited.add(ledId);
                 
-                // WICHTIG: Verwende workspaceManager.connections statt component.connections!
-                if (!window.workspaceManager || !window.workspaceManager.connections) {
-                    console.log(`⚠️ LED ${ledId}: WorkspaceManager.connections nicht verfügbar`);
-                    return null;
-                }
+                const component = this.graph.nodes.get(ledId);
+                if (!component) return null;
                 
-                debugLog(`🔍 findPowerSourceForLED: Analysiere ${ledId}, Verbindungen: ${window.workspaceManager.connections.size}`);
+                debugLog(`🔍 findPowerSourceForLED: Analysiere ${ledId}, Verbindungen: ${component.connections.size}`);
                 
-                // Prüfe alle direkten Verbindungen über workspaceManager
-                const connectedComponents = new Set();
-                for (const [connId, connectionData] of window.workspaceManager.connections) {
-                    if (connectionData.toComponent === ledId) {
-                        connectedComponents.add(connectionData.fromComponent);
-                    }
-                    if (connectionData.fromComponent === ledId) {
-                        connectedComponents.add(connectionData.toComponent);
-                    }
-                }
-                
-                for (const connectedId of connectedComponents) {
+                // Prüfe alle direkten Verbindungen
+                for (const connectedId of component.connections) {
                     const connectedComponent = this.graph.nodes.get(connectedId);
                     if (!connectedComponent) continue;
                     
@@ -2367,10 +2246,12 @@
                     
                     // DIREKTE STROMQUELLEN-VERBINDUNG (GEFÄHRLICH!)
                     if (connectedComponent.type === ComponentTypes.POWER_SOURCE) {
-                        console.log(`💥 LED ${ledId}: Direkt mit 230V Stromquelle verbunden - ÜBERSPANNUNG! LED geht kaputt!`);
-                        // LED sofort als kaputt markieren
-                        this.graph.setComponentState(ledId, 'broken');
-                        return null; // Keine gültige Spannungsquelle für LEDs!
+                        console.log(`⚠️ LED ${ledId}: Direkt mit 230V Stromquelle verbunden - GEFÄHRLICH!`);
+                        return {
+                            voltage: ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage,
+                            sourceType: 'stromquelle',
+                            sourceId: connectedId
+                        };
                     }
                     
                     // LED-ZU-LED PARALLELSCHALTUNG
@@ -3230,8 +3111,7 @@
             handleConnectionMouseUp(e) {
                 if (e.target.classList.contains('connection-socket') && 
                     (e.target.dataset.connectionType === 'input-socket' || 
-                     e.target.dataset.connectionType === 'terminal-socket' ||
-                     e.target.dataset.connectionType === 'bidirectional-socket')) {
+                     e.target.dataset.connectionType === 'terminal-socket')) {
                     
                     this.completeConnection(e.target);
                 } else {
@@ -3332,11 +3212,9 @@
             }
             
             updateVisualCables(connectionPoint) {
-                // Visual Cables bei INPUT-Sockets UND BIDIRECTIONAL-Sockets verstecken
+                // Visual Cables nur bei INPUT-Sockets verstecken, nicht bei OUTPUT-Lines
                 const connectionType = connectionPoint.getAttribute('data-connection-type');
-                if (connectionType !== 'input-socket' && connectionType !== 'bidirectional-socket' && connectionType !== 'terminal-socket') {
-                    return;  // Nur Sockets brauchen Visual Cable Hiding, nicht Output-Lines
-                }
+                if (connectionType !== 'input-socket') return;  // Nur Input-Sockets brauchen Visual Cable Hiding
                 
                 const component = connectionPoint.closest('.component');
                 if (!component) return;
@@ -3459,18 +3337,6 @@
                 // Aber: Plus-Output zu Minus-Input einer LED ist NORMAL, kein Kurzschluss!
                 // Nur direkte Kabel-zu-Kabel Verbindungen sind Kurzschlüsse
                 
-                // AUSNAHME: Transformator-Eingänge sind KEINE Kurzschlüsse!
-                const inputElement = document.querySelector(`[data-connection-id="${inputData.id}"]`);
-                const inputComponent = inputElement ? inputElement.closest('[data-component-type]') : null;
-                const inputComponentType = inputComponent ? inputComponent.dataset.componentType : '';
-                
-                // Transformatoren, Klemmen und LEDs dürfen Phase/Neutral empfangen
-                if (inputComponentType.includes('trafo') || 
-                    inputComponentType.includes('klemme') || 
-                    inputComponentType.includes('led')) {
-                    return false; // Kein Kurzschluss für Verbraucher/Transformatoren
-                }
-                
                 // Phase zu Neutral ohne Verbraucher = Kurzschluss  
                 if ((outputData.wireType === 'phase' && inputData.wireType === 'neutral') ||
                     (outputData.wireType === 'neutral' && inputData.wireType === 'phase')) {
@@ -3530,36 +3396,16 @@
                     return false;
                 }
                 
-                // Prüfe: plus UND minus müssen verbunden sein (BIDIREKTIONAL!)
-                // Alle möglichen Plus-Anschlüsse: in-plus, plus-terminal, out-plus
-                // Alle möglichen Minus-Anschlüsse: in-minus, minus-terminal, out-minus
-                const plusConnections = [
-                    led.querySelector('[data-connection-id="in-plus"]'),
-                    led.querySelector('[data-connection-id="plus-terminal"]'),
-                    led.querySelector('[data-connection-id="out-plus"]')
-                ].filter(el => el !== null);
+                // Prüfe: plus UND minus müssen verbunden sein
+                const plusInput = led.querySelector('[data-connection-id="in-plus"]');
+                const minusInput = led.querySelector('[data-connection-id="in-minus"]');
                 
-                const minusConnections = [
-                    led.querySelector('[data-connection-id="in-minus"]'),
-                    led.querySelector('[data-connection-id="minus-terminal"]'),
-                    led.querySelector('[data-connection-id="out-minus"]')
-                ].filter(el => el !== null);
+                debugLog(`🔍 LED ${ledId}: plusInput=${!!plusInput}, minusInput=${!!minusInput}`);
                 
-                debugLog(`🔍 LED ${ledId}: plusConnections=${plusConnections.length}, minusConnections=${minusConnections.length}`);
-                
-                // Prüfe ob IRGENDEINE Plus-Verbindung aktiv ist
-                const hasPlusConnection = plusConnections.some(conn => this.hasActiveConnection(conn));
-                const hasMinusConnection = minusConnections.some(conn => this.hasActiveConnection(conn));
+                const hasPlusConnection = this.hasActiveConnection(plusInput);
+                const hasMinusConnection = this.hasActiveConnection(minusInput);
                 
                 debugLog(`🔍 LED ${ledId}: hasPlusConnection=${hasPlusConnection}, hasMinusConnection=${hasMinusConnection}`);
-                
-                // DEBUGGING: Zeige alle LED-relevanten Verbindungen
-                console.log(`🔍 LED ${ledId} DEBUG: Alle Verbindungen:`);
-                for (const [connId, connectionData] of window.workspaceManager.connections) {
-                    if (connectionData.toComponent === ledId || connectionData.fromComponent === ledId) {
-                        console.log(`   ${connectionData.fromComponent}.${connectionData.from.dataset.connectionId} → ${connectionData.toComponent}.${connectionData.to.dataset.connectionId} (${connectionData.from.dataset.wireType} → ${connectionData.to.dataset.wireType})`);
-                    }
-                }
                 
                 // ZUSÄTZLICH: Prüfe ob Polarität korrekt ist
                 const hasCorrectPolarity = this.hasCorrectLEDPolarity(ledId);
@@ -4453,11 +4299,11 @@
                 <line class="visual-cable visual-cable-minus" stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
                 <line class="visual-cable visual-cable-plus" stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                 
-                <!-- Connection Points Links (BIDIREKTIONALE Buchsen) -->
+                <!-- Connection Points Links (Eingangsbuchsen) -->
                 <circle class="connection-socket" 
                         cx="8" cy="9.225" r="4" 
-                        data-connection-type="bidirectional-socket"
-                        data-connection-id="minus-terminal"
+                        data-connection-type="input-socket"
+                        data-connection-id="in-minus"
                         data-wire-type="minus"
                         data-voltage="12"
                         data-bezier-end-x="28" data-bezier-end-y="10.4"
@@ -4465,8 +4311,8 @@
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
-                        data-connection-type="bidirectional-socket"
-                        data-connection-id="plus-terminal"
+                        data-connection-type="input-socket"
+                        data-connection-id="in-plus"
                         data-wire-type="plus"
                         data-voltage="12"
                         data-bezier-end-x="28" data-bezier-end-y="18.8"
@@ -4835,11 +4681,11 @@
                 <line class="visual-cable visual-cable-minus" stroke="#1d1d1b" stroke-width="4" x1="8" y1="9.225" x2="16.53" y2="9.225"/>
                 <line class="visual-cable visual-cable-plus" stroke="#e30613" stroke-width="4" x1="8" y1="18.315" x2="16.53" y2="18.315"/>
                 
-                <!-- Connection Points Links (BIDIREKTIONALE Buchsen) -->
+                <!-- Connection Points Links (Eingangsbuchsen) -->
                 <circle class="connection-socket" 
                         cx="8" cy="9.225" r="4" 
-                        data-connection-type="bidirectional-socket"
-                        data-connection-id="minus-terminal"
+                        data-connection-type="input-socket"
+                        data-connection-id="in-minus"
                         data-wire-type="minus"
                         data-voltage="24"
                         data-bezier-end-x="28" data-bezier-end-y="9.7"
@@ -4847,8 +4693,8 @@
                         
                 <circle class="connection-socket" 
                         cx="8" cy="18.315" r="4" 
-                        data-connection-type="bidirectional-socket"
-                        data-connection-id="plus-terminal"
+                        data-connection-type="input-socket"
+                        data-connection-id="in-plus"
                         data-wire-type="plus"
                         data-voltage="24"
                         data-bezier-end-x="28" data-bezier-end-y="18.8"
@@ -5682,13 +5528,11 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.51 - LED-ÜBERSPANNUNG-FIX: type load statt led + 230V LEDs gehen kaputt!');
+                            console.log('🚀 LED Foundation v0.01.52 - RESTORE: Zurück zum funktionierenden v0.01.41c Meilenstein!');
             
             // 1. Circuit Simulation initialisieren
             try {
                 circuit = new RealtimeSimulation();
-                // Globalen Zugriff für Component-Klassen ermöglichen
-                window.circuit = circuit;
                 circuit.addComponent('power-source-svg', ComponentTypes.POWER_SOURCE, {x: 20, y: 20});
                 circuit.start();
                 console.log('✅ Circuit Simulation initialisiert');
