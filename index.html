@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.49</div>
+                <div class="version-display">v0.01.50</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2325,13 +2325,26 @@
                 if (visited.has(ledId)) return null;
                 visited.add(ledId);
                 
-                const component = this.graph.nodes.get(ledId);
-                if (!component) return null;
+                // WICHTIG: Verwende workspaceManager.connections statt component.connections!
+                if (!window.workspaceManager || !window.workspaceManager.connections) {
+                    console.log(`⚠️ LED ${ledId}: WorkspaceManager.connections nicht verfügbar`);
+                    return null;
+                }
                 
-                debugLog(`🔍 findPowerSourceForLED: Analysiere ${ledId}, Verbindungen: ${component.connections.size}`);
+                debugLog(`🔍 findPowerSourceForLED: Analysiere ${ledId}, Verbindungen: ${window.workspaceManager.connections.size}`);
                 
-                // Prüfe alle direkten Verbindungen
-                for (const connectedId of component.connections) {
+                // Prüfe alle direkten Verbindungen über workspaceManager
+                const connectedComponents = new Set();
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if (connectionData.toComponent === ledId) {
+                        connectedComponents.add(connectionData.fromComponent);
+                    }
+                    if (connectionData.fromComponent === ledId) {
+                        connectedComponents.add(connectionData.toComponent);
+                    }
+                }
+                
+                for (const connectedId of connectedComponents) {
                     const connectedComponent = this.graph.nodes.get(connectedId);
                     if (!connectedComponent) continue;
                     
@@ -3321,9 +3334,11 @@
             }
             
             updateVisualCables(connectionPoint) {
-                // Visual Cables nur bei INPUT-Sockets verstecken, nicht bei OUTPUT-Lines
+                // Visual Cables bei INPUT-Sockets UND BIDIRECTIONAL-Sockets verstecken
                 const connectionType = connectionPoint.getAttribute('data-connection-type');
-                if (connectionType !== 'input-socket') return;  // Nur Input-Sockets brauchen Visual Cable Hiding
+                if (connectionType !== 'input-socket' && connectionType !== 'bidirectional-socket' && connectionType !== 'terminal-socket') {
+                    return;  // Nur Sockets brauchen Visual Cable Hiding, nicht Output-Lines
+                }
                 
                 const component = connectionPoint.closest('.component');
                 if (!component) return;
@@ -5669,7 +5684,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.49 - BIDIREKTIONALE LED-LOGIK: LED prüft ALLE Anschlüsse (in/out/terminal) für Plus/Minus!');
+                            console.log('🚀 LED Foundation v0.01.50 - DOPPEL-FIX: findPowerSourceForLED repariert + Visual Cables für bidirektionale Sockets!');
             
             // 1. Circuit Simulation initialisieren
             try {
