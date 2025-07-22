@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.50</div>
+                <div class="version-display">v0.01.51</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2305,7 +2305,7 @@
                 }
                 
                 // NUR FÜR LEDs: Prüfe LED-zu-LED Verbindungen
-                if (componentSpecs.type === 'led') {
+                if (componentSpecs.type === 'load') {
                     const powerSource = this.findPowerSourceForLED(componentId);
                     if (powerSource) {
                         console.log(`✅ LED ${componentId}: Bekommt ${powerSource.voltage}V über Parallelschaltung von ${powerSource.sourceType} ${powerSource.sourceId}`);
@@ -2367,12 +2367,10 @@
                     
                     // DIREKTE STROMQUELLEN-VERBINDUNG (GEFÄHRLICH!)
                     if (connectedComponent.type === ComponentTypes.POWER_SOURCE) {
-                        console.log(`⚠️ LED ${ledId}: Direkt mit 230V Stromquelle verbunden - GEFÄHRLICH!`);
-                        return {
-                            voltage: ComponentSpecs[ComponentTypes.POWER_SOURCE].voltage,
-                            sourceType: 'stromquelle',
-                            sourceId: connectedId
-                        };
+                        console.log(`💥 LED ${ledId}: Direkt mit 230V Stromquelle verbunden - ÜBERSPANNUNG! LED geht kaputt!`);
+                        // LED sofort als kaputt markieren
+                        this.graph.setComponentState(ledId, 'broken');
+                        return null; // Keine gültige Spannungsquelle für LEDs!
                     }
                     
                     // LED-ZU-LED PARALLELSCHALTUNG
@@ -5684,7 +5682,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.50 - DOPPEL-FIX: findPowerSourceForLED repariert + Visual Cables für bidirektionale Sockets!');
+                            console.log('🚀 LED Foundation v0.01.51 - LED-ÜBERSPANNUNG-FIX: type load statt led + 230V LEDs gehen kaputt!');
             
             // 1. Circuit Simulation initialisieren
             try {
