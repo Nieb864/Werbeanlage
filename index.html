@@ -4640,7 +4640,7 @@
             svg.setAttribute('data-output-voltage', '12V-DC');
             
             // === ZUSTANDSSTANDARD C ===
-            svg.setAttribute('data-possible-states', 'off,on,broken');
+            svg.setAttribute('data-available-states', JSON.stringify(['off', 'on', 'overloaded', 'broken']));
             svg.setAttribute('data-default-state', 'off');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"in-phase", "to":"out-plus", "resistance":0.02, "efficiency":0.87},
@@ -4899,7 +4899,7 @@
             svg.setAttribute('data-voltage-level', '24V-DC');
             
             // === ZUSTANDSSTANDARD C ===
-            svg.setAttribute('data-possible-states', 'off,on,blinking,broken,overloaded');
+            svg.setAttribute('data-available-states', JSON.stringify(['off', 'on', 'blinking', 'overloaded', 'broken']));
             svg.setAttribute('data-default-state', 'off');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"in-plus", "to":"out-plus", "resistance":0.1},
