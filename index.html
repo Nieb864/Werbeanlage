@@ -693,35 +693,17 @@
             opacity: 0.8;
         }
 
-        /* LED Module */
-        .led-module-svg {
-            width: auto;
-            height: 30px;
-        }
-
-        /* Transformer Module */
-        .transformer-svg {
-            width: auto;
-            height: 45px; /* Trafos sind höher als LEDs */
-        }
-
-        /* Mobile Terminal */
-        .mobile-terminal-svg {
-            width: auto;
-            height: 50px; /* Groß genug für Klemme + Anschlusspunkte */
-        }
-        
-        /* Flexible Cable */
-        .cable-svg {
-            width: auto;
-            height: 20px;
-        }
-        
-        /* Generic Component SVG Fallback */
+        /* ===== EINHEITLICHER SVG-STANDARD ===== */
+        /* Alle Bauteile behalten ihre Illustrator-Proportionen */
+        .led-module-svg,
+        .transformer-svg,
+        .mobile-terminal-svg,
+        .cable-svg,
         .component-svg {
             width: auto;
-            height: 40px; /* Standard-Höhe für alle Komponenten */
-            min-width: 80px; /* Minimum-Breite */
+            height: auto;
+            max-height: 150px; /* Maximum, aber Proportionen bleiben erhalten */
+            min-width: 80px; /* Minimum-Breite für Lesbarkeit */
         }
 
         /* Transformer Styles */
