@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.41b</div>
+                <div class="version-display">v0.01.41c</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3661,8 +3661,8 @@
                     const originalToDir = this.parseDirection(toElement.dataset.bezierDirection);
                     // + Rotation des End-Bauteils = finale Richtung
                     const finalToDir = this.rotateDirection(originalToDir, toRotation);
-                    // Bezier-Kontrollpunkt berechnen (halber Offset für sanftere Kurven)
-                    const toOffset = this.directionToOffset(finalToDir, baseOffset * 0.5);
+                    // Bezier-Kontrollpunkt berechnen (voller Offset für symmetrische Kurven)
+                    const toOffset = this.directionToOffset(finalToDir, baseOffset);
                     cp2X = endPos.x + toOffset.x;
                     cp2Y = endPos.y + toOffset.y;
                 }
