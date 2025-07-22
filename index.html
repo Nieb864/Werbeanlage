@@ -1310,7 +1310,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.85</div>
+                <div class="version-display">v0.01.86</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4490,6 +4490,9 @@
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-12v-1.2w');
             
+            // === VERBINDUNGSTYP-STANDARD B ===
+            svg.setAttribute('data-connection-behavior', 'load');
+            svg.setAttribute('data-voltage-level', '12V-DC');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"in-plus", "to":"out-plus", "resistance":0.1},
                 {"from":"in-minus", "to":"out-minus", "resistance":0.1}
@@ -4620,6 +4623,10 @@
             svg.setAttribute('class', 'transformer-svg');
             svg.setAttribute('data-component-type', 'trafo-12v-40w');
             
+            // === VERBINDUNGSTYP-STANDARD B ===
+            svg.setAttribute('data-connection-behavior', 'transform');
+            svg.setAttribute('data-input-voltage', '230V-AC');
+            svg.setAttribute('data-output-voltage', '12V-DC');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"in-phase", "to":"out-plus", "resistance":0.02, "efficiency":0.87},
                 {"from":"in-neutral", "to":"out-minus", "resistance":0.02, "efficiency":0.87}
@@ -4872,6 +4879,9 @@
             svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-24v-5w');
             
+            // === VERBINDUNGSTYP-STANDARD B ===
+            svg.setAttribute('data-connection-behavior', 'load');
+            svg.setAttribute('data-voltage-level', '24V-DC');
             svg.setAttribute('data-internal-routing', JSON.stringify([
                 {"from":"in-plus", "to":"out-plus", "resistance":0.1},
                 {"from":"in-minus", "to":"out-minus", "resistance":0.1}
@@ -5514,6 +5524,13 @@
             svg.setAttribute('class', 'cable-svg');
             svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
             
+            // === VERBINDUNGSTYP-STANDARD B ===
+            svg.setAttribute('data-connection-behavior', 'pass-through');
+            svg.setAttribute('data-voltage-level', '24V-DC');
+            svg.setAttribute('data-internal-routing', JSON.stringify([
+                {"from":"out-left", "to":"out-right", "resistance":0.1}
+            ]));
+            
             svg.innerHTML = `
                 <defs>
                     <style>
@@ -5568,6 +5585,15 @@
             svg.setAttribute('viewBox', '0 0 29.24 50.32');
             svg.setAttribute('class', 'mobile-terminal-svg');
             svg.setAttribute('data-component-type', 'klemme-mobil-3l');
+            
+            // === VERBINDUNGSTYP-STANDARD B ===
+            svg.setAttribute('data-connection-behavior', 'bridge');
+            svg.setAttribute('data-voltage-level', '230V-AC');
+            svg.setAttribute('data-internal-routing', JSON.stringify([
+                {"from":"terminal-1", "to":"terminal-2", "resistance":0.05},
+                {"from":"terminal-1", "to":"terminal-3", "resistance":0.05},
+                {"from":"terminal-2", "to":"terminal-3", "resistance":0.05}
+            ]));
             
             svg.innerHTML = `
                 <defs>
@@ -5822,7 +5848,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.85 - FARBFEHLER REPARIERT: LED-Ringe hell, Kabel sichtbar! 🎨');
+                            console.log('🚀 LED Foundation v0.01.86 - VERBINDUNGSTYP-STANDARD B IMPLEMENTIERT! 🔌');
             
             // 1. Circuit Simulation initialisieren
             try {
