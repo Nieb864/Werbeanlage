@@ -1196,6 +1196,13 @@
                                 bis 24V, 100W
                             </div>
                         </div>
+                        <div class="component-item" data-component-type="kabel-flexibel-rt">
+                            <div class="component-name text-h2">Flexibles Kabel rt</div>
+                            <div class="component-specs text-small">
+                                1 mm², rot<br>
+                                bis 24V, 100W
+                            </div>
+                        </div>
                         </div>
                     </div>
                     
@@ -1323,7 +1330,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.68</div>
+                <div class="version-display">v0.01.69</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1438,7 +1445,8 @@
             FI_SWITCH: 'fi-schalter',
             LS_SWITCH: 'ls-schalter',
             MOBILE_TERMINAL_3L: 'klemme-mobil-3l',
-            FLEXIBLE_CABLE: 'kabel-flexibel-sw'
+            FLEXIBLE_CABLE: 'kabel-flexibel-sw',
+            FLEXIBLE_CABLE_RED: 'kabel-flexibel-rt'
         };
 
         // Technische Spezifikationen
@@ -2865,6 +2873,11 @@
                 name: 'Flexibles Kabel sw',
                 specs: 'Kabelquerschnitt: 1 mm²<br>Maximalleistung: 100 W<br>Spannung: bis 24V<br>Farbe: Schwarz',
                 description: 'Flexibles schwarzes Kabel für LED Installationen bis 24V.'
+            },
+            'kabel-flexibel-rt': {
+                name: 'Flexibles Kabel rt',
+                specs: 'Kabelquerschnitt: 1 mm²<br>Maximalleistung: 100 W<br>Spannung: bis 24V<br>Farbe: Rot',
+                description: 'Flexibles rotes Kabel für LED Installationen bis 24V.'
             },
             'klemme-mobil-3l': {
                 name: 'Mobile Klemme 3L',
@@ -4484,6 +4497,8 @@
                     return createDuskSwitchSVG();
                 case 'kabel-flexibel-sw':
                     return createKabelFlexibelSVG();
+                case 'kabel-flexibel-rt':
+                    return createKabelFlexibelRotSVG();
                 case 'klemme-mobil-3l':
                     return createKlemmeMobilSVG();
                 case 'dev-placeholder':
@@ -5575,6 +5590,63 @@
             return svg;
         }
         
+        // ===== KABEL FLEXIBEL ROT =====
+        function createKabelFlexibelRotSVG() {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            // Deine SVG bereits in richtiger Größe + 20px für Anschlusspunkte = 59.68 x 27.86
+            svg.setAttribute('viewBox', '0 0 59.68 27.86');
+            svg.setAttribute('class', 'component-svg cable-svg');
+            svg.setAttribute('data-component-type', 'kabel-flexibel-rt');
+            
+            svg.innerHTML = `
+                <defs>
+                    <style>
+                        .cls-1 { fill: #c6c6c6; }
+                        .cls-1, .cls-2 { stroke: #1d1d1b; stroke-width: 2px; }
+                        .cls-1, .cls-2, .cls-3 { stroke-miterlimit: 10; }
+                        .cls-2 { fill: url(#Unbenannter_Verlauf_7_rot); }
+                        .cls-3 { fill: none; stroke: #e30613; stroke-width: 4px; }
+                        .cable-connection-line { stroke: #e30613; stroke-width: 3; }
+                    </style>
+                    <linearGradient id="Unbenannter_Verlauf_7_rot" data-name="Unbenannter Verlauf 7" x1="29.84" y1="21.14" x2="29.84" y2="8.72" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#c6c6c6"/>
+                        <stop offset="1" stop-color="#878787"/>
+                    </linearGradient>
+                </defs>
+                
+                <!-- Deine SVG zentriert (10px Platz für linken Anschlusspunkt) -->
+                <g transform="translate(10, 1)">
+                    <rect class="cls-1" x="6.91" y="0" width="25.86" height="25.86" rx="3.52" ry="3.52"/>
+                    <line class="cls-3" y1="12.93" x2="39.68" y2="12.93"/>
+                    <rect class="cls-2" x="14.91" y="6.72" width="9.86" height="12.42"/>
+                </g>
+                
+                <!-- Linker Anschlusspunkt (rot) -->
+                <line class="cable-connection-line connection-line" 
+                      x1="0" y1="13.93" x2="10" y2="13.93"
+                      data-connection-type="output-line"
+                      data-connection-id="out-left"
+                      data-wire-type="plus"
+                      data-voltage="24"
+                      data-bezier-start-x="0"
+                      data-bezier-start-y="13.93"
+                      data-bezier-direction="-20,0,0,0"/>
+                      
+                <!-- Rechter Anschlusspunkt (rot) -->
+                <line class="cable-connection-line connection-line" 
+                      x1="49.68" y1="13.93" x2="59.68" y2="13.93"
+                      data-connection-type="output-line"
+                      data-connection-id="out-right"
+                      data-wire-type="plus"
+                      data-voltage="24"
+                      data-bezier-start-x="59.68"
+                      data-bezier-start-y="13.93"
+                      data-bezier-direction="20,0,0,0"/>
+            `;
+            
+            return svg;
+        }
+        
         // ===== MOBILE KLEMME =====
         function createKlemmeMobilSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -5836,7 +5908,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.68 - KABEL-PERFEKT: Deine 1.5x SVG direkt übernommen ohne Skalierung!');
+                            console.log('🚀 LED Foundation v0.01.69 - ROTES KABEL: Zweites Kabel für Größenvergleich hinzugefügt!');
             
             // 1. Circuit Simulation initialisieren
             try {
