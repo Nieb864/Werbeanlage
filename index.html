@@ -1310,7 +1310,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.88</div>
+                <div class="version-display">v0.01.89</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1347,7 +1347,7 @@
                          data-connection-behavior="source"
                          data-voltage-level="230V-AC"
                          data-power-rating="3000"
-                         data-possible-states="off,on,overloaded,broken"
+                         data-available-states='["on", "off"]'
                          data-default-state="on">
                         <defs>
                             <style>
@@ -5875,7 +5875,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.88 - ZUSTANDSSTANDARD C DEFINIERT! 🎭');
+                            console.log('🚀 LED Foundation v0.01.89 - ZUSTANDSSTANDARD C ALLE BAUTEILE! 🎭');
             
             // 1. Circuit Simulation initialisieren
             try {
