@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.42</div>
+                <div class="version-display">v0.01.41c</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1532,8 +1532,8 @@
                 } else if (this.specs.type === 'transformer') {
                     this.state = this.calculateTransformerState();
                 } else if (this.specs.type === 'connector') {
-                    // Mobile Klemme: Durchschalten aller Anschlüsse
-                    this.state = this.calculateConnectorState();
+                    // Klemmen sind immer passiv - leiten Strom nur durch
+                    this.state = ComponentStates.ON;
                 }
                 
                 if (previousState !== this.state) {
@@ -1594,59 +1594,6 @@
                     return ComponentStates.OVERLOADED;
                 }
                 return this.currentVoltage > 0 ? ComponentStates.ON : ComponentStates.OFF;
-            }
-            
-            calculateConnectorState() {
-                // Mobile Klemme: Durchschalt-Logic
-                // Prüfe alle Anschlüsse - wenn einer Spannung hat, leite an alle anderen weiter
-                
-                const connections = circuitManager.getConnections();
-                const myTerminals = [];
-                
-                // Finde alle meine Terminal-Anschlüsse
-                for (const [connectionId, connectionData] of connections) {
-                    if (connectionData.fromComponent === this.elementId) {
-                        myTerminals.push({
-                            type: 'output',
-                            socket: connectionData.from,
-                            connectionId: connectionId,
-                            targetComponent: connectionData.toComponent
-                        });
-                    }
-                    if (connectionData.toComponent === this.elementId) {
-                        myTerminals.push({
-                            type: 'input', 
-                            socket: connectionData.to,
-                            connectionId: connectionId,
-                            sourceComponent: connectionData.fromComponent
-                        });
-                    }
-                }
-                
-                console.log(`🔗 Klemme ${this.elementId}: ${myTerminals.length} Anschlüsse gefunden`);
-                
-                // Wenn mindestens eine Verbindung Spannung führt, sind alle ON
-                let hasVoltage = false;
-                for (const terminal of myTerminals) {
-                    if (terminal.type === 'input') {
-                        const sourceComponent = circuitManager.getComponent(terminal.sourceComponent);
-                        if (sourceComponent && sourceComponent.currentVoltage > 0) {
-                            hasVoltage = true;
-                            console.log(`⚡ Klemme ${this.elementId}: Spannung von ${terminal.sourceComponent} (${sourceComponent.currentVoltage}V)`);
-                            break;
-                        }
-                    }
-                }
-                
-                // Durchschalten: Spannung weiterleiten
-                if (hasVoltage) {
-                    // TODO: Hier würden wir die Spannung an alle Output-Terminals weiterleiten
-                    console.log(`🔄 Klemme ${this.elementId}: Durchschaltung aktiv`);
-                    return ComponentStates.ON;
-                } else {
-                    console.log(`⚫ Klemme ${this.elementId}: Keine Eingangsspannung`);
-                    return ComponentStates.OFF;
-                }
             }
             
             animateStateChange() {
@@ -5581,7 +5528,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.42 - KLEMME PHYSIK: Durchschalt-Logic implementiert - ein Anschluss mit Spannung schaltet alle anderen durch!');
+                            console.log('🚀 LED Foundation v0.01.41 - SAUBERES BEZIER-SYSTEM: Original-Richtung + Rotation = Finale Richtung, keine from/to Unterscheidung!');
             
             // 1. Circuit Simulation initialisieren
             try {
