@@ -704,6 +704,20 @@
             width: auto;
             height: 50px; /* Groß genug für Klemme + Anschlusspunkte */
         }
+        
+        /* Flexible Cable */
+        .cable-svg {
+            width: auto;
+            height: 30px; /* Groß genug für Kabel + Anschlusspunkte */
+            min-width: 100px; /* Minimum-Breite für gute Sichtbarkeit */
+        }
+        
+        /* Generic Component SVG Fallback */
+        .component-svg {
+            width: auto;
+            height: 40px; /* Standard-Höhe für alle Komponenten */
+            min-width: 80px; /* Minimum-Breite */
+        }
 
         /* Transformer Styles */
         .trafo-housing { 
@@ -1304,7 +1318,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.54</div>
+                <div class="version-display">v0.01.55</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5821,7 +5835,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.54 - FLEXIBLES KABEL: Physisches Kabel mit Spannungsabfall + Überlastschutz!');
+                            console.log('🚀 LED Foundation v0.01.55 - KABEL CSS-FIX: Kabel jetzt sichtbar mit korrekter Größe!');
             
             // 1. Circuit Simulation initialisieren
             try {
