@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.52</div>
+                <div class="version-display">v0.01.53</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1532,8 +1532,8 @@
                 } else if (this.specs.type === 'transformer') {
                     this.state = this.calculateTransformerState();
                 } else if (this.specs.type === 'connector') {
-                    // Klemmen sind immer passiv - leiten Strom nur durch
-                    this.state = ComponentStates.ON;
+                    // Klemmen/Verbinder: Durchschalten + Überlastschutz
+                    this.state = this.calculateConnectorState(voltage, current);
                 }
                 
                 if (previousState !== this.state) {
@@ -1594,6 +1594,92 @@
                     return ComponentStates.OVERLOADED;
                 }
                 return this.currentVoltage > 0 ? ComponentStates.ON : ComponentStates.OFF;
+            }
+            
+            calculateConnectorState(voltage, current) {
+                // Überlastschutz für Verbinder/Klemmen
+                const maxCurrent = this.specs.maxCurrent || 32; // Standard 32A
+                const actualCurrent = this.calculateConnectorCurrent();
+                
+                console.log(`🔗 Klemme ${this.elementId}: ${actualCurrent.toFixed(1)}A / ${maxCurrent}A`);
+                
+                // Klemme überlastet oder kaputt?
+                if (actualCurrent > maxCurrent * 1.2) {
+                    console.log(`💥 Klemme ${this.elementId}: ÜBERLAST! ${actualCurrent.toFixed(1)}A > ${(maxCurrent * 1.2).toFixed(1)}A → BROKEN`);
+                    return ComponentStates.BROKEN;
+                }
+                
+                if (actualCurrent > maxCurrent) {
+                    console.log(`⚠️ Klemme ${this.elementId}: Überlast ${actualCurrent.toFixed(1)}A > ${maxCurrent}A → OVERLOADED`);
+                    return ComponentStates.OVERLOADED;
+                }
+                
+                // Klemme leitet durch wenn Spannung anliegt
+                if (this.hasConnectorVoltage()) {
+                    console.log(`⚡ Klemme ${this.elementId}: Durchschaltung aktiv → ON`);
+                    return ComponentStates.ON;
+                } else {
+                    console.log(`⚫ Klemme ${this.elementId}: Keine Spannung → OFF`);
+                    return ComponentStates.OFF;
+                }
+            }
+            
+            calculateConnectorCurrent() {
+                // Berechne den Gesamtstrom durch alle Anschlüsse der Klemme
+                if (!window.workspaceManager || !window.workspaceManager.connections) return 0;
+                
+                let totalCurrent = 0;
+                
+                // Sammle alle Verbindungen zu/von dieser Klemme
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if (connectionData.toComponent === this.elementId || connectionData.fromComponent === this.elementId) {
+                        // Berechne Strom basierend auf angeschlossenen LEDs/Lasten
+                        const otherComponentId = connectionData.toComponent === this.elementId ? 
+                                                connectionData.fromComponent : connectionData.toComponent;
+                        const otherElement = document.getElementById(otherComponentId);
+                        
+                        if (otherElement) {
+                            const otherType = otherElement.dataset.componentType;
+                            const otherSpecs = ComponentSpecs[otherType];
+                            
+                            if (otherSpecs && otherSpecs.type === 'load' && otherSpecs.power) {
+                                // LED/Last-Strom: P = U * I → I = P / U
+                                const voltage = otherSpecs.ratedVoltage || 12;
+                                const current = otherSpecs.power / voltage;
+                                totalCurrent += current;
+                                console.log(`🔌 Klemme ${this.elementId}: +${current.toFixed(2)}A von ${otherComponentId}`);
+                            }
+                        }
+                    }
+                }
+                
+                return totalCurrent;
+            }
+            
+            hasConnectorVoltage() {
+                // Prüfe ob an einem der Anschlüsse Spannung anliegt
+                if (!window.workspaceManager || !window.workspaceManager.connections) return false;
+                
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if (connectionData.toComponent === this.elementId || connectionData.fromComponent === this.elementId) {
+                        const sourceComponentId = connectionData.fromComponent === this.elementId ? 
+                                                 connectionData.toComponent : connectionData.fromComponent;
+                        const sourceElement = document.getElementById(sourceComponentId);
+                        
+                        if (sourceElement) {
+                            const sourceType = sourceElement.dataset.componentType;
+                            const sourceSpecs = ComponentSpecs[sourceType];
+                            
+                            // Prüfe ob Quelle aktiv ist (Trafo oder Stromquelle)
+                            if (sourceSpecs && (sourceSpecs.type === 'transformer' || sourceSpecs.type === 'source')) {
+                                console.log(`⚡ Klemme ${this.elementId}: Spannung von ${sourceComponentId} erkannt`);
+                                return true;
+                            }
+                        }
+                    }
+                }
+                
+                return false;
             }
             
             animateStateChange() {
@@ -2217,13 +2303,26 @@
                 if (visited.has(ledId)) return null;
                 visited.add(ledId);
                 
-                const component = this.graph.nodes.get(ledId);
-                if (!component) return null;
+                // WICHTIG: Verwende workspaceManager.connections statt graph
+                if (!window.workspaceManager || !window.workspaceManager.connections) {
+                    console.log(`⚠️ LED ${ledId}: WorkspaceManager.connections nicht verfügbar`);
+                    return null;
+                }
                 
-                debugLog(`🔍 findPowerSourceForLED: Analysiere ${ledId}, Verbindungen: ${component.connections.size}`);
+                debugLog(`🔍 findPowerSourceForLED: Analysiere ${ledId}, Verbindungen: ${window.workspaceManager.connections.size}`);
                 
-                // Prüfe alle direkten Verbindungen
-                for (const connectedId of component.connections) {
+                // Prüfe alle direkten Verbindungen über workspaceManager
+                const connectedComponents = new Set();
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if (connectionData.toComponent === ledId) {
+                        connectedComponents.add(connectionData.fromComponent);
+                    }
+                    if (connectionData.fromComponent === ledId) {
+                        connectedComponents.add(connectionData.toComponent);
+                    }
+                }
+                
+                for (const connectedId of connectedComponents) {
                     const connectedComponent = this.graph.nodes.get(connectedId);
                     if (!connectedComponent) continue;
                     
@@ -2241,6 +2340,25 @@
                         } else {
                             console.log(`⚠️ LED ${ledId}: Verbundener Trafo ${connectedId} ist nicht funktionsfähig (State: ${trafoState})`);
                             continue;
+                        }
+                    }
+                    
+                    // CONNECTOR-DURCHSCHALTUNG (Klemmen, Verbinder)
+                    if (ComponentSpecs[connectedComponent.type].type === 'connector') {
+                        console.log(`🔗 LED ${ledId}: Verbunden mit Connector ${connectedId} - prüfe Durchschaltung`);
+                        
+                        // Prüfe ob Connector funktionsfähig ist
+                        const connectorState = this.graph.getComponentState(connectedId);
+                        if (connectorState === 'broken') {
+                            console.log(`💥 Connector ${connectedId} ist kaputt - keine Durchschaltung möglich`);
+                            continue;
+                        }
+                        
+                        // Suche rekursiv über den Connector nach Spannungsquellen
+                        const connectorPowerSource = this.findPowerSourceForLED(connectedId, visited);
+                        if (connectorPowerSource) {
+                            console.log(`⚡ LED ${ledId}: Bekommt ${connectorPowerSource.voltage}V über Connector ${connectedId} von ${connectorPowerSource.sourceType} ${connectorPowerSource.sourceId}`);
+                            return connectorPowerSource;
                         }
                     }
                     
@@ -5528,7 +5646,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.52 - RESTORE: Zurück zum funktionierenden v0.01.41c Meilenstein!');
+                            console.log('🚀 LED Foundation v0.01.53 - CONNECTOR-KLASSE: Bidirektionale Durchschaltung + Überlastschutz für Klemmen!');
             
             // 1. Circuit Simulation initialisieren
             try {
