@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>🚨 NOTFALL-TEST 🚨 v0.01.40 FUNKTIONIERT-ES-JETZT</title>
+            <title>🔧 SAUBERES BEZIER-SYSTEM 🔧 v0.01.41</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -1304,7 +1304,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.40</div>
+                <div class="version-display">v0.01.41</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3627,110 +3627,100 @@
                 // Basis-Offset für Kontrollpunkte
                 const baseOffset = 60;
                 
-                // Start-Kontrollpunkt mit universeller Richtungs-Detection
+                // SAUBERES SYSTEM: Original-Richtung + Rotation = Finale Richtung
+                
+                // Start-Kontrollpunkt
                 let cp1X, cp1Y;
                 const fromRotation = this.componentRotations.get(fromComponent) || 0;
                 
                 if (fromComponent.id === 'power-source-svg') {
-                    // Stromquelle: statische Richtung nach unten
+                    // Stromquelle: statische Richtung nach unten (keine Rotation)
                     cp1X = startPos.x;
                     cp1Y = startPos.y + baseOffset;
                 } else {
-                    // Universelle Richtungs-Detection für Start-Punkt
-                    const fromDirection = this.getBezierDirection(fromElement, 'from');
-                    const fromRad = (fromRotation * Math.PI) / 180;
-                    
-                    switch(fromDirection) {
-                        case 'up':
-                            cp1X = startPos.x + baseOffset * Math.sin(-fromRad);
-                            cp1Y = startPos.y - baseOffset * Math.cos(fromRad);
-                            break;
-                        case 'down':
-                            cp1X = startPos.x - baseOffset * Math.sin(-fromRad);
-                            cp1Y = startPos.y + baseOffset * Math.cos(fromRad);
-                            break;
-                        case 'left':
-                            const leftDirection = fromRad + Math.PI;
-                            cp1X = startPos.x + baseOffset * Math.cos(leftDirection);
-                            cp1Y = startPos.y + baseOffset * Math.sin(leftDirection);
-                            break;
-                        case 'right':
-                        default:
-                            cp1X = startPos.x + baseOffset * Math.cos(fromRad);
-                            cp1Y = startPos.y + baseOffset * Math.sin(fromRad);
-                            break;
-                    }
+                    // Original-Richtung aus data-bezier-direction
+                    const originalFromDir = this.parseDirection(fromElement.dataset.bezierDirection);
+                    // + Rotation des Start-Bauteils = finale Richtung
+                    const finalFromDir = this.rotateDirection(originalFromDir, fromRotation);
+                    // Bezier-Kontrollpunkt berechnen
+                    const fromOffset = this.directionToOffset(finalFromDir, baseOffset);
+                    cp1X = startPos.x + fromOffset.x;
+                    cp1Y = startPos.y + fromOffset.y;
                 }
                 
-                // End-Kontrollpunkt mit universeller Richtungs-Detection
+                // End-Kontrollpunkt
                 let cp2X, cp2Y;
                 const toRotation = this.componentRotations.get(toComponent) || 0;
                 
                 if (toComponent.id === 'power-source-svg') {
-                    // Stromquelle: statische Richtung nach oben
+                    // Stromquelle: statische Richtung nach oben (keine Rotation)
                     cp2X = endPos.x;
                     cp2Y = endPos.y - baseOffset;
                 } else {
-                    // Universelle Richtungs-Detection für End-Punkt
-                    const toDirection = this.getBezierDirection(toElement, 'to');
-                    const toRad = (toRotation * Math.PI) / 180;
-                    const endOffset = baseOffset * 0.5;
-                    
-                    switch(toDirection) {
-                        case 'up':
-                            cp2X = endPos.x - endOffset * Math.sin(-toRad);
-                            cp2Y = endPos.y + endOffset * Math.cos(toRad);
-                            break;
-                        case 'down':
-                            cp2X = endPos.x + endOffset * Math.sin(-toRad);
-                            cp2Y = endPos.y - endOffset * Math.cos(toRad);
-                            break;
-                        case 'left':
-                            const leftDirection = toRad + Math.PI;
-                            cp2X = endPos.x + endOffset * Math.cos(leftDirection);
-                            cp2Y = endPos.y + endOffset * Math.sin(leftDirection);
-                            break;
-                        case 'right':
-                        default:
-                            cp2X = endPos.x + endOffset * Math.cos(toRad);
-                            cp2Y = endPos.y + endOffset * Math.sin(toRad);
-                            break;
-                    }
+                    // Original-Richtung aus data-bezier-direction
+                    const originalToDir = this.parseDirection(toElement.dataset.bezierDirection);
+                    // + Rotation des End-Bauteils = finale Richtung
+                    const finalToDir = this.rotateDirection(originalToDir, toRotation);
+                    // Bezier-Kontrollpunkt berechnen (halber Offset für sanftere Kurven)
+                    const toOffset = this.directionToOffset(finalToDir, baseOffset * 0.5);
+                    cp2X = endPos.x + toOffset.x;
+                    cp2Y = endPos.y + toOffset.y;
                 }
                 
                 return { cp1X, cp1Y, cp2X, cp2Y };
             }
             
-            // Neue Hilfsfunktion: Universelle Richtungs-Detection
-            getBezierDirection(element, connectionType) {
-                // 1. Priorität: Explizite data-bezier-direction
-                if (element.dataset.bezierDirection) {
-                    const [x1, y1] = element.dataset.bezierDirection.split(',').map(Number);
-                    
-                    if (Math.abs(x1) > Math.abs(y1)) {
-                        // FIX: Berücksichtigung des Connection-Types für korrekte Links/Rechts-Zuordnung
-                        if (connectionType === 'from') {
-                            // Start-Punkt: Kabel geht weg - normale Interpretation
-                            return x1 > 0 ? 'right' : 'left';
-                        } else {
-                            // End-Punkt: Kabel kommt an - umgekehrte Interpretation  
-                            return x1 > 0 ? 'left' : 'right';
-                        }
-                    } else {
-                        return y1 > 0 ? 'down' : 'up';
-                    }
+            // SAUBERE RICHTUNGS-SYSTEM: 3 Hilfsfunktionen
+            
+            // 1. data-bezier-direction zu Richtung parsen
+            parseDirection(bezierDirectionString) {
+                if (!bezierDirectionString) {
+                    // Fallback: Standard nach rechts
+                    return { x: 1, y: 0, name: 'right' };
                 }
                 
-                // 2. Fallback: Legacy-Logic basierend auf Connection-ID
-                if (connectionType === 'from') {
-                    // Start-Punkt: out- = rechts, sonst links
-                    return element.dataset.connectionId?.includes('out-') ? 'right' : 'left';
+                const [x1, y1] = bezierDirectionString.split(',').map(Number);
+                
+                // Normalisieren: stärkste Richtung gewinnt
+                if (Math.abs(x1) > Math.abs(y1)) {
+                    return x1 > 0 ? 
+                        { x: 1, y: 0, name: 'right' } : 
+                        { x: -1, y: 0, name: 'left' };
                 } else {
-                    // End-Punkt: in- = links, terminal- = oben, sonst rechts
-                    if (element.dataset.connectionId?.includes('in-')) return 'left';
-                    if (element.dataset.connectionId?.includes('terminal-')) return 'up';
-                    return 'right';
+                    return y1 > 0 ? 
+                        { x: 0, y: 1, name: 'down' } : 
+                        { x: 0, y: -1, name: 'up' };
                 }
+            }
+            
+            // 2. Richtung um Winkel rotieren
+            rotateDirection(direction, angleDegrees) {
+                const rad = (angleDegrees * Math.PI) / 180;
+                const cos = Math.cos(rad);
+                const sin = Math.sin(rad);
+                
+                // 2D-Rotation-Matrix anwenden
+                const newX = direction.x * cos - direction.y * sin;
+                const newY = direction.x * sin + direction.y * cos;
+                
+                // Zurück zu diskreten Richtungen normalisieren
+                if (Math.abs(newX) > Math.abs(newY)) {
+                    return newX > 0 ? 
+                        { x: 1, y: 0, name: 'right' } : 
+                        { x: -1, y: 0, name: 'left' };
+                } else {
+                    return newY > 0 ? 
+                        { x: 0, y: 1, name: 'down' } : 
+                        { x: 0, y: -1, name: 'up' };
+                }
+            }
+            
+            // 3. Richtung zu Pixel-Offset konvertieren
+            directionToOffset(direction, distance) {
+                return {
+                    x: direction.x * distance,
+                    y: direction.y * distance
+                };
             }
         }
 
@@ -5538,7 +5528,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.40 - UNIVERSAL-BEZIER-SYSTEM: Alle Richtungen funktionieren, Links/Rechts Fix steht an...');
+                            console.log('🚀 LED Foundation v0.01.41 - SAUBERES BEZIER-SYSTEM: Original-Richtung + Rotation = Finale Richtung, keine from/to Unterscheidung!');
             
             // 1. Circuit Simulation initialisieren
             try {
