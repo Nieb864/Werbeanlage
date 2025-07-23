@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.01.40-FUNKTIONIERT-ES-JETZT-1753131847 -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.01.94-SAUBERE-PHYSIK-SCHNITTSTELLE-1753147193 -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1527,7 +1527,9 @@
             CLOSED: 'closed'
         };
 
-        // ===== COMPONENT STATE MACHINE =====
+        // ===== NEUE NETZWERK-PHYSIK (mit alter UI-Schnittstelle) =====
+        
+        // ComponentStateMachine - behält exakt die gleiche Schnittstelle für UI
         class ComponentStateMachine {
             constructor(componentType, elementId) {
                 this.type = componentType;
@@ -2039,16 +2041,176 @@
             }
         }
 
-        // ===== CIRCUIT GRAPH =====
+        // ===== NEUE NETZWERK-PHYSIK KLASSEN =====
+        
+        // NetworkNode - Elektrische Verbindungspunkte
+        class NetworkNode {
+            constructor(id, componentId, terminalId, voltage = 0) {
+                this.id = id;
+                this.componentId = componentId;
+                this.terminalId = terminalId;
+                this.voltage = voltage;
+                this.connections = new Set();
+                this.wireType = null;
+                this.electricalPolarity = null;
+            }
+            
+            addConnection(otherNodeId) {
+                this.connections.add(otherNodeId);
+            }
+            
+            removeConnection(otherNodeId) {
+                this.connections.delete(otherNodeId);
+            }
+        }
+        
+        // ElectricalComponent - Bauteile mit elektrischem Verhalten
+        class ElectricalComponent {
+            constructor(id, type) {
+                this.id = id;
+                this.type = type;
+                this.specs = ComponentSpecs[type];
+                this.state = ComponentStates.OFF;
+                this.nodes = new Map();
+                this.currentVoltage = 0;
+                this.currentCurrent = 0;
+                this.currentPower = 0;
+                this.isBroken = false;
+                
+                this.createNodes();
+            }
+            
+            createNodes() {
+                switch(this.specs.type) {
+                    case 'source':
+                        this.nodes.set('out-phase', new NetworkNode(`${this.id}-out-phase`, this.id, 'out-phase'));
+                        this.nodes.set('out-neutral', new NetworkNode(`${this.id}-out-neutral`, this.id, 'out-neutral'));
+                        this.nodes.set('out-earth', new NetworkNode(`${this.id}-out-earth`, this.id, 'out-earth'));
+                        break;
+                        
+                    case 'transformer':
+                        this.nodes.set('in-phase', new NetworkNode(`${this.id}-in-phase`, this.id, 'in-phase'));
+                        this.nodes.set('in-neutral', new NetworkNode(`${this.id}-in-neutral`, this.id, 'in-neutral'));
+                        this.nodes.set('in-earth', new NetworkNode(`${this.id}-in-earth`, this.id, 'in-earth'));
+                        this.nodes.set('out-plus', new NetworkNode(`${this.id}-out-plus`, this.id, 'out-plus'));
+                        this.nodes.set('out-minus', new NetworkNode(`${this.id}-out-minus`, this.id, 'out-minus'));
+                        break;
+                        
+                    case 'load':
+                        this.nodes.set('in-plus', new NetworkNode(`${this.id}-in-plus`, this.id, 'in-plus'));
+                        this.nodes.set('in-minus', new NetworkNode(`${this.id}-in-minus`, this.id, 'in-minus'));
+                        this.nodes.set('out-plus', new NetworkNode(`${this.id}-out-plus`, this.id, 'out-plus'));
+                        this.nodes.set('out-minus', new NetworkNode(`${this.id}-out-minus`, this.id, 'out-minus'));
+                        break;
+                        
+                    case 'connector':
+                    case 'cable':
+                        this.nodes.set('terminal-1', new NetworkNode(`${this.id}-terminal-1`, this.id, 'terminal-1'));
+                        this.nodes.set('terminal-2', new NetworkNode(`${this.id}-terminal-2`, this.id, 'terminal-2'));
+                        break;
+                        
+                    case 'switch':
+                        this.nodes.set('in', new NetworkNode(`${this.id}-in`, this.id, 'in'));
+                        this.nodes.set('out', new NetworkNode(`${this.id}-out`, this.id, 'out'));
+                        break;
+                }
+            }
+            
+            // Neue Physik-Berechnung (vereinfacht für ersten Test)
+            calculateBehavior(inputVoltage, inputCurrent) {
+                if (this.isBroken) {
+                    return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.BROKEN };
+                }
+                
+                switch(this.specs.type) {
+                    case 'source':
+                        return this.powerSourceBehavior();
+                    case 'transformer':
+                        return this.transformerBehavior(inputVoltage, inputCurrent);
+                    case 'load':
+                        return this.ledBehavior(inputVoltage, inputCurrent);
+                    default:
+                        return { outputVoltage: inputVoltage, outputCurrent: inputCurrent, state: ComponentStates.ON };
+                }
+            }
+            
+            powerSourceBehavior() {
+                if (!systemPower) {
+                    return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.OFF };
+                }
+                return { 
+                    outputVoltage: this.specs.voltage, 
+                    outputCurrent: this.specs.maxCurrent, 
+                    state: ComponentStates.ON 
+                };
+            }
+            
+            transformerBehavior(inputVoltage, inputCurrent) {
+                if (Math.abs(inputVoltage - this.specs.inputVoltage) > 20) {
+                    return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.OFF };
+                }
+                
+                const transformationRatio = this.specs.outputVoltage / this.specs.inputVoltage;
+                const outputVoltage = inputVoltage * transformationRatio;
+                const outputCurrent = inputCurrent / transformationRatio;
+                
+                return { 
+                    outputVoltage: outputVoltage, 
+                    outputCurrent: outputCurrent, 
+                    state: ComponentStates.ON 
+                };
+            }
+            
+            ledBehavior(inputVoltage, inputCurrent) {
+                if (inputVoltage === 0) {
+                    return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.OFF };
+                }
+                
+                const ratedVoltage = this.specs.ratedVoltage;
+                const tolerance = this.specs.tolerance || 1.1;
+                
+                const maxNormal = ratedVoltage * tolerance;
+                const maxBlink = ratedVoltage * (tolerance * 2);
+                const minVoltage = ratedVoltage * 0.8;
+                
+                let state = ComponentStates.OFF;
+                let current = 0;
+                
+                if (inputVoltage > maxBlink) {
+                    this.isBroken = true;
+                    state = ComponentStates.BROKEN;
+                } else if (inputVoltage > maxNormal) {
+                    state = ComponentStates.BLINKING;
+                    current = this.specs.power / ratedVoltage;
+                } else if (inputVoltage >= minVoltage) {
+                    state = ComponentStates.ON;
+                    current = this.specs.power / ratedVoltage;
+                }
+                
+                return { 
+                    outputVoltage: inputVoltage,
+                    outputCurrent: current, 
+                    state: state 
+                };
+            }
+        }
+        
+        // ===== NEUE CIRCUIT GRAPH (Netzwerk-basiert, gleiche Schnittstelle) =====
         class CircuitGraph {
             constructor() {
                 this.nodes = new Map();
                 this.edges = new Map();
                 this.stateMachines = new Map();
-                this.componentStates = new Map(); // Component states: 'on', 'off', 'broken', etc.
+                this.componentStates = new Map();
+                
+                // Neue Netzwerk-Physik darunter
+                this.networkNodes = new Map();      // Neue: Elektrische Knoten
+                this.networkComponents = new Map(); // Neue: Elektrische Komponenten
+                this.networkConnections = new Map();// Neue: Netzwerk-Verbindungen
             }
             
             addComponent(id, type, position) {
+                // Alte Schnittstelle beibehalten für UI
                 this.nodes.set(id, {
                     id: id,
                     type: type,
@@ -2058,7 +2220,16 @@
                 
                 this.stateMachines.set(id, new ComponentStateMachine(type, id));
                 
-                console.log(`Bauteil hinzugefügt: ${type} (${id})`);
+                // Neue Physik: Elektrische Komponente erstellen
+                const component = new ElectricalComponent(id, type);
+                this.networkComponents.set(id, component);
+                
+                // Alle Knoten des Bauteils registrieren
+                for (const [nodeKey, node] of component.nodes) {
+                    this.networkNodes.set(node.id, node);
+                }
+                
+                console.log(`🔧 Bauteil hinzugefügt: ${type} (${id}) mit ${component.nodes.size} Netzwerk-Knoten`);
             }
             
             addConnection(id, fromComponent, toComponent) {
