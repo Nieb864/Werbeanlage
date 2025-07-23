@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>🔧 SAUBERES BEZIER-SYSTEM 🔧 v0.01.41</title>
+            <title>Werbeanlage</title>
     <style>
         :root {
             /* Standard-Elektrofarben */
@@ -693,49 +693,18 @@
             opacity: 0.8;
         }
 
-        /* ===== BAUTEIL-STANDARD: SVG-HÖHEN ===== */
-        
-        /* Standard LED-Module: 30px */
-        .led-12v-svg,
-        .led-24v-svg {
+        /* ===== ANGEPASSTE SVG-HÖHEN ===== */
+        /* LED-Module und Kabel: 30px */
+        .led-module-svg,
+        .cable-svg {
             width: auto;
             height: 30px;
             min-width: 10px;
         }
         
-        /* Standard Kabel: 30px */
-        .kabel-flexibel-svg {
-            width: auto;
-            height: 30px;
-            min-width: 10px;
-        }
-        
-        /* Standard Transformatoren: 40px */
-        .trafo-12v-svg,
-        .trafo-24v-svg {
-            width: auto;
-            height: 40px;
-            min-width: 10px;
-        }
-        
-        /* Standard Klemmen: 40px */
-        .klemme-mobil-svg {
-            width: auto;
-            height: 40px;
-            min-width: 10px;
-        }
-        
-        /* Standard Schalter: 35px */
-        .fi-schalter-svg,
-        .ls-schalter-svg,
-        .zeitschaltuhr-svg,
-        .daemmerungsschalter-svg {
-            width: auto;
-            height: 35px;
-            min-width: 10px;
-        }
-        
-        /* Fallback für neue Bauteile */
+        /* Alle anderen Bauteile: 40px */
+        .transformer-svg,
+        .mobile-terminal-svg,
         .component-svg {
             width: auto;
             height: 40px;
@@ -813,47 +782,7 @@
             fill: #e91e63 !important;
         }
 
-        /* === KABEL-ZUSTÄNDE === */
-        .state-closed .cable-wire {
-            stroke-dasharray: none;
-            stroke: var(--wire-black);
-            opacity: 1;
-        }
-        
-        .state-open .cable-wire {
-            stroke-dasharray: 5,5;
-            stroke: #ff6b6b;
-            opacity: 0.7;
-        }
-        
-        .state-broken .cable-wire {
-            stroke: #1a1a1a;
-            stroke-dasharray: 2,8;
-            opacity: 0.5;
-        }
 
-        /* === SCHALTER-ZUSTÄNDE === */
-        .state-open .schalter-kontakt {
-            transform: rotate(-15deg);
-            transform-origin: center;
-        }
-        
-        .state-closed .schalter-kontakt {
-            transform: rotate(0deg);
-            transform-origin: center;
-        }
-
-        /* === KLEMMEN-ZUSTÄNDE === */
-        .state-closed .klemme-verbindung {
-            opacity: 1;
-            stroke: var(--metal-dark);
-        }
-        
-        .state-open .klemme-verbindung {
-            opacity: 0.3;
-            stroke: #ff6b6b;
-            stroke-dasharray: 3,3;
-        }
 
 
 
@@ -892,35 +821,7 @@
             pointer-events: none;
         }
 
-        /* === STROMFLUSS-VISUALISIERUNG === */
-        @keyframes current-flow {
-            0% { 
-                stroke-dashoffset: 0; 
-            }
-            100% { 
-                stroke-dashoffset: 20; 
-            }
-        }
-        
-        .current-flow-active {
-            stroke-dasharray: 8,4;
-            animation: current-flow 1s linear infinite;
-            stroke-width: 4;
-            filter: drop-shadow(0 0 3px currentColor);
-        }
-        
-        .current-flow-positive {
-            stroke: var(--wire-red);
-        }
-        
-        .current-flow-negative {
-            stroke: var(--wire-blue);
-        }
-        
-        .current-flow-ac {
-            stroke: var(--wire-brown);
-            animation-direction: alternate;
-        }
+
 
         /* === LED FOUNDATION SVG STANDARDS v1.0 === */
 
@@ -4109,9 +4010,7 @@
         let dragElement = null;
         let dragOffset = { x: 0, y: 0 };
         
-        // === STROMFLUSS-DEBUG STEUERUNG (Bauteil-Standard) ===
-        window.SHOW_CURRENT_FLOW = false; // Für Schüler-Modus (standardmäßig AUS)
-        // window.SHOW_CURRENT_FLOW = true; // Für Lehrer-Modus (Debug AN)
+
 
         function initializeDragAndDrop() {
             const componentItems = document.querySelectorAll('.component-item');
@@ -4601,7 +4500,7 @@
         function createLEDModuleSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '-10 0 157.29 30');
-            svg.setAttribute('class', 'led-12v-svg');
+            svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-12v-1.2w');
             
             // === VERBINDUNGSTYP-STANDARD B ===
@@ -4738,7 +4637,7 @@
         function createTransformer12VSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 1200 800');
-            svg.setAttribute('class', 'trafo-12v-svg');
+            svg.setAttribute('class', 'transformer-svg');
             svg.setAttribute('data-component-type', 'trafo-12v-40w');
             
             // === VERBINDUNGSTYP-STANDARD B ===
@@ -4998,7 +4897,7 @@
         function createLED24VSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '-10 0 157.29 30');
-            svg.setAttribute('class', 'led-24v-svg');
+            svg.setAttribute('class', 'led-module-svg');
             svg.setAttribute('data-component-type', 'led-24v-5w');
             
             // === VERBINDUNGSTYP-STANDARD B ===
@@ -5137,6 +5036,10 @@
             svg.setAttribute('viewBox', '0 0 60 80');
             svg.setAttribute('data-component-type', 'fi-schalter');
             
+            // === VERBINDUNGSTYP-STANDARD B ===
+            svg.setAttribute('data-connection-behavior', 'pass-through');
+            svg.setAttribute('data-voltage-level', '230V-AC');
+            
             svg.innerHTML = `
                 <rect fill="#e8e8e8" stroke="#1d1d1b" stroke-width="2" x="10" y="10" width="40" height="60" rx="5"/>
                 <text fill="#1d1d1b" font-family="Arial" font-size="8" x="30" y="30" text-anchor="middle">FI</text>
@@ -5151,6 +5054,10 @@
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 60 80');
             svg.setAttribute('data-component-type', 'ls-schalter');
+            
+            // === VERBINDUNGSTYP-STANDARD B ===
+            svg.setAttribute('data-connection-behavior', 'pass-through');
+            svg.setAttribute('data-voltage-level', '230V-AC');
             
             svg.innerHTML = `
                 <rect fill="#e8e8e8" stroke="#1d1d1b" stroke-width="2" x="10" y="10" width="40" height="60" rx="5"/>
@@ -5167,6 +5074,10 @@
             svg.setAttribute('viewBox', '0 0 80 60');
             svg.setAttribute('data-component-type', 'zeitschaltuhr');
             
+            // === VERBINDUNGSTYP-STANDARD B ===
+            svg.setAttribute('data-connection-behavior', 'pass-through');
+            svg.setAttribute('data-voltage-level', '230V-AC');
+            
             svg.innerHTML = `
                 <rect fill="#e8e8e8" stroke="#1d1d1b" stroke-width="2" x="10" y="10" width="60" height="40" rx="5"/>
                 <text fill="#1d1d1b" font-family="Arial" font-size="7" x="40" y="25" text-anchor="middle">TIMER</text>
@@ -5182,6 +5093,10 @@
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 80 60');
             svg.setAttribute('data-component-type', 'daemmerungsschalter');
+            
+            // === VERBINDUNGSTYP-STANDARD B ===
+            svg.setAttribute('data-connection-behavior', 'pass-through');
+            svg.setAttribute('data-voltage-level', '230V-AC');
             
             svg.innerHTML = `
                 <rect fill="#e8e8e8" stroke="#1d1d1b" stroke-width="2" x="10" y="10" width="60" height="40" rx="5"/>
@@ -5647,7 +5562,7 @@
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             // Deine SVG bereits in richtiger Größe + 20px für Anschlusspunkte = 59.68 x 27.86
             svg.setAttribute('viewBox', '0 0 59.68 27.86');
-            svg.setAttribute('class', 'kabel-flexibel-svg');
+            svg.setAttribute('class', 'cable-svg');
             svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
             
             // === VERBINDUNGSTYP-STANDARD B ===
@@ -6281,7 +6196,7 @@
             components.forEach((component, index) => {
                 const svg = component.querySelector('svg');
                 if (svg) {
-                    const isLED = svg.classList.contains('led-12v-svg') || svg.classList.contains('led-24v-svg');
+                    const isLED = svg.classList.contains('led-module-svg');
                     console.log('🔍 Component #' + index + ':', svg.classList.toString(), 'isLED:', isLED);
                     
                     if (isLED) {
