@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.98-CONNECTION-FIX</div>
+                <div class="version-display">v0.01.99-QUICK-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2262,7 +2262,7 @@
                 }
                 
                 // Echte UI-Connection-Point Zuordnung aus dem UI-Graph
-                const uiConnection = this.connections.get(connectionId);
+                const uiConnection = this.graph.connections.get(connectionId);
                 if (uiConnection) {
                     const fromTerminalId = uiConnection.from.split('.')[1]; // z.B. "out-phase" 
                     const toTerminalId = uiConnection.to.split('.')[1];     // z.B. "in-phase"
