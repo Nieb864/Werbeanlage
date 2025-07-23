@@ -2481,11 +2481,13 @@
                 for (const [componentId, networkComponent] of this.graph.networkComponents) {
                     const stateMachine = this.graph.stateMachines.get(componentId);
                     if (stateMachine) {
-                        stateMachine.updateState(
-                            networkComponent.currentVoltage, 
-                            networkComponent.currentCurrent
-                        );
+                        // Verwende nur setState mit dem vom Netzwerk berechneten Zustand
+                        // updateState() ist redundant, da setState() bereits alles macht
+                        stateMachine.currentVoltage = networkComponent.currentVoltage;
+                        stateMachine.currentPower = networkComponent.currentVoltage * networkComponent.currentCurrent;
                         stateMachine.setState(networkComponent.state);
+                        
+                        console.log(`🔄 ${componentId}: ${networkComponent.currentVoltage}V → State: ${networkComponent.state}`);
                     }
                 }
             }
