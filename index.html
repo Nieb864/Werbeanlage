@@ -1006,6 +1006,24 @@
             animation: warning-shake 0.5s ease-out;
         }
 
+        .convention-warning-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 165, 0, 0.95);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 10001;
+            border: 3px solid #ffa500;
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.8);
+            animation: warning-shake 0.5s ease-out;
+        }
+
         @keyframes warning-shake {
             0%, 100% { transform: translate(-50%, -50%); }
             10% { transform: translate(-48%, -50%); }
@@ -1314,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.89</div>
+                <div class="version-display">v0.01.90</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3721,24 +3739,50 @@
                         const fromData = window.workspaceManager.getConnectionData(connectionData.from);
                         const toData = window.workspaceManager.getConnectionData(connectionData.to);
                         
-                        debugLog(`🔍 LED ${ledId}: Verbindung ${fromData.wireType} → ${toData.wireType}`);
+                        debugLog(`🔍 LED ${ledId}: Verbindung ${fromData.electricalPolarity || fromData.wireType} → ${toData.electricalPolarity || toData.wireType}`);
                         
-                        // Plus-Ausgang sollte zu Plus-Eingang
-                        if (fromData.wireType === 'plus' && toData.wireType === 'minus') {
-                            console.log(`❌ LED ${ledId}: Plus-Ausgang an Minus-Eingang - falsche Polarität`);
+                        // NEUE LOGIK: Prüfe elektrische Polarität (nicht Kabelfarbe)
+                        const fromPolarity = fromData.electricalPolarity || fromData.wireType;
+                        const toPolarity = toData.electricalPolarity || toData.wireType;
+                        
+                        // Plus-Quelle sollte zu Plus-Eingang
+                        if (fromPolarity === 'plus' && toPolarity === 'minus') {
+                            console.log(`❌ LED ${ledId}: Plus-Quelle an Minus-Eingang - falsche Polarität`);
                             return false;
                         }
                         
-                        // Minus-Ausgang sollte zu Minus-Eingang  
-                        if (fromData.wireType === 'minus' && toData.wireType === 'plus') {
-                            console.log(`❌ LED ${ledId}: Minus-Ausgang an Plus-Eingang - falsche Polarität`);
+                        // Minus-Quelle sollte zu Minus-Eingang  
+                        if (fromPolarity === 'minus' && toPolarity === 'plus') {
+                            console.log(`❌ LED ${ledId}: Minus-Quelle an Plus-Eingang - falsche Polarität`);
                             return false;
                         }
+                        
+                        // KONVENTIONSPRÜFUNG: Prüfe Kabelfarben
+                        this.checkWireConvention(fromData, toData, ledId);
                     }
                 }
                 
-                console.log(`✅ LED ${ledId}: Polarität ist korrekt`);
+                console.log(`✅ LED ${ledId}: Elektrische Polarität ist korrekt`);
                 return true;
+            }
+            
+            checkWireConvention(fromData, toData, componentId) {
+                // Erwartete Kabelfarben basierend auf elektrischer Polarität
+                const fromPolarity = fromData.electricalPolarity || fromData.wireType;
+                const toPolarity = toData.electricalPolarity || toData.wireType;
+                
+                const expectedFromColor = fromPolarity === 'plus' ? 'red' : 'black';
+                const expectedToColor = toPolarity === 'plus' ? 'red' : 'black';
+                
+                const actualFromColor = fromData.wireColor || (fromData.wireType === 'plus' ? 'red' : 'black');
+                const actualToColor = toData.wireColor || (toData.wireType === 'plus' ? 'red' : 'black');
+                
+                // Prüfe Konventionsverstoß
+                if (actualFromColor !== expectedFromColor || actualToColor !== expectedToColor) {
+                    const message = `Kabelfarbe entspricht nicht der Konvention!\n${fromPolarity.toUpperCase()}-Leitung sollte ${expectedFromColor}, ist aber ${actualFromColor}`;
+                    console.log(`⚠️ Konventionsverstoß an ${componentId}: ${message}`);
+                    showConventionWarning(message);
+                }
             }
             
             hasActiveConnection(connectionElement) {
@@ -3768,6 +3812,8 @@
                     id: element.dataset.connectionId,
                     type: element.dataset.connectionType,
                     wireType: element.dataset.wireType,
+                    wireColor: element.dataset.wireColor,
+                    electricalPolarity: element.dataset.electricalPolarity,
                     voltage: parseFloat(element.dataset.voltage)
                 };
             }
@@ -4595,6 +4641,8 @@
                         data-connection-type="input-socket"
                         data-connection-id="in-minus"
                         data-wire-type="minus"
+                        data-wire-color="black"
+                        data-electrical-polarity="minus"
                         data-voltage="12"
                         data-bezier-end-x="28" data-bezier-end-y="10.4"
                         data-bezier-direction="-20,0,0,0"/>
@@ -4604,6 +4652,8 @@
                         data-connection-type="input-socket"
                         data-connection-id="in-plus"
                         data-wire-type="plus"
+                        data-wire-color="red"
+                        data-electrical-polarity="plus"
                         data-voltage="12"
                         data-bezier-end-x="28" data-bezier-end-y="18.8"
                         data-bezier-direction="-20,0,0,0"/>
@@ -4615,6 +4665,8 @@
                       data-connection-type="output-line"
                       data-connection-id="out-minus"
                       data-wire-type="minus"
+                      data-wire-color="black"
+                      data-electrical-polarity="minus"
                       data-voltage="12"
                       data-bezier-start-x="127" data-bezier-start-y="9.7"
                       data-bezier-direction="20,0,0,0"/>
@@ -4625,6 +4677,8 @@
                       data-connection-type="output-line"
                       data-connection-id="out-plus"
                       data-wire-type="plus"
+                      data-wire-color="red"
+                      data-electrical-polarity="plus"
                       data-voltage="12"
                       data-bezier-start-x="127" data-bezier-start-y="18.8"
                       data-bezier-direction="20,0,0,0"/>
@@ -4715,6 +4769,8 @@
                       data-connection-type="output-line"
                       data-connection-id="out-plus"
                       data-wire-type="plus"
+                      data-wire-color="red"
+                      data-electrical-polarity="plus"
                       data-voltage="12"
                       data-bezier-start-x="1170" data-bezier-start-y="300"
                       data-bezier-direction="200,0,0,0"/>
@@ -4725,6 +4781,8 @@
                       data-connection-type="output-line"
                       data-connection-id="out-minus"
                       data-wire-type="minus"
+                      data-wire-color="black"
+                      data-electrical-polarity="minus"
                       data-voltage="12"
                       data-bezier-start-x="1170" data-bezier-start-y="500"
                       data-bezier-direction="200,0,0,0"/>
@@ -4882,11 +4940,11 @@
                 
                 <line class="connection-line" x1="115" y1="30" x2="120" y2="30" stroke="#e30613" 
                       data-connection-type="output-line" data-connection-id="out-plus"
-                      data-wire-type="plus" data-voltage="24" data-bezier-start-x="117" data-bezier-start-y="30"
+                      data-wire-type="plus" data-wire-color="red" data-electrical-polarity="plus" data-voltage="24" data-bezier-start-x="117" data-bezier-start-y="30"
                       data-bezier-direction="20,0,0,0"/>
                 <line class="connection-line" x1="115" y1="50" x2="120" y2="50" stroke="#1d1d1b" 
                       data-connection-type="output-line" data-connection-id="out-minus"
-                      data-wire-type="minus" data-voltage="24" data-bezier-start-x="117" data-bezier-start-y="50"
+                      data-wire-type="minus" data-wire-color="black" data-electrical-polarity="minus" data-voltage="24" data-bezier-start-x="117" data-bezier-start-y="50"
                       data-bezier-direction="20,0,0,0"/>
             `;
             
@@ -4992,6 +5050,8 @@
                         data-connection-type="input-socket"
                         data-connection-id="in-minus"
                         data-wire-type="minus"
+                        data-wire-color="black"
+                        data-electrical-polarity="minus"
                         data-voltage="24"
                         data-bezier-end-x="28" data-bezier-end-y="9.7"
                         data-bezier-direction="-20,0,0,0"/>
@@ -5001,6 +5061,8 @@
                         data-connection-type="input-socket"
                         data-connection-id="in-plus"
                         data-wire-type="plus"
+                        data-wire-color="red"
+                        data-electrical-polarity="plus"
                         data-voltage="24"
                         data-bezier-end-x="28" data-bezier-end-y="18.8"
                         data-bezier-direction="-20,0,0,0"/>
@@ -5012,6 +5074,8 @@
                       data-connection-type="output-line"
                       data-connection-id="out-minus"
                       data-wire-type="minus"
+                      data-wire-color="black"
+                      data-electrical-polarity="minus"
                       data-voltage="24"
                                               data-bezier-start-x="127" data-bezier-start-y="9.7"
                       data-bezier-direction="20,0,0,0"/>
@@ -5022,6 +5086,8 @@
                       data-connection-type="output-line"
                       data-connection-id="out-plus"
                       data-wire-type="plus"
+                      data-wire-color="red"
+                      data-electrical-polarity="plus"
                       data-voltage="24"
                                               data-bezier-start-x="127" data-bezier-start-y="18.8"
                       data-bezier-direction="20,0,0,0"/>
@@ -5897,7 +5963,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.89 - ZUSTANDSSTANDARD C ALLE BAUTEILE! 🎭');
+                            console.log('🚀 LED Foundation v0.01.90 - KABELFARBEN-KONVENTIONEN! ⚠️🎨');
             
             // 1. Circuit Simulation initialisieren
             try {
@@ -6023,6 +6089,27 @@
             }, 3000);
             
             return false; // Verhindere weitere Aktionen
+        }
+        
+        function showConventionWarning(message) {
+            // Convention Warning (Orange, Vollbild)
+            const warningMessage = document.createElement('div');
+            warningMessage.className = 'convention-warning-message';
+            warningMessage.innerHTML = `
+                <div>⚠️ KONVENTIONSVERSTOISS ERKANNT</div>
+                <div style="font-size: 14px; margin-top: 10px;">${message}</div>
+                <div style="font-size: 12px; margin-top: 10px; color: #fff3cd;">
+                    💡 Bitte schau dir die Kabel noch einmal genau an.
+                </div>
+            `;
+            document.body.appendChild(warningMessage);
+            
+            // Aufräumen nach 4 Sekunden (länger zum Lesen)
+            setTimeout(() => {
+                if (warningMessage.parentNode) {
+                    warningMessage.parentNode.removeChild(warningMessage);
+                }
+            }, 4000);
         }
         
         function createSparkEffects(x, y) {
