@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.01.94-SAUBERE-PHYSIK-SCHNITTSTELLE-1753147193 -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.01.95-NETZWERK-PHYSIK-AKTIV-1753147695 -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.94-SAUBERE-PHYSIK</div>
+                <div class="version-display">v0.01.95-NETZWERK-PHYSIK</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2233,6 +2233,7 @@
             }
             
             addConnection(id, fromComponent, toComponent) {
+                // Alte Schnittstelle beibehalten
                 this.edges.set(id, {
                     from: fromComponent,
                     to: toComponent
@@ -2245,7 +2246,40 @@
                     this.nodes.get(toComponent).connections.add(fromComponent);
                 }
                 
-                console.log(`Verbindung erstellt: ${fromComponent} → ${toComponent}`);
+                // Neue Physik: Netzwerk-Knoten verbinden
+                this.createNetworkConnection(id, fromComponent, toComponent);
+                
+                console.log(`🔗 Verbindung erstellt: ${fromComponent} → ${toComponent}`);
+            }
+            
+            createNetworkConnection(connectionId, fromComponentId, toComponentId) {
+                const fromComponent = this.networkComponents.get(fromComponentId);
+                const toComponent = this.networkComponents.get(toComponentId);
+                
+                if (!fromComponent || !toComponent) {
+                    console.log(`⚠️ Netzwerk-Verbindung übersprungen: Komponente nicht gefunden`);
+                    return;
+                }
+                
+                // Vereinfacht: Verbinde erste verfügbare Ausgänge mit ersten verfügbaren Eingängen
+                // TODO: Später durch echte UI-Connection-Point Zuordnung ersetzen
+                const fromOutputs = Array.from(fromComponent.nodes.values()).filter(n => n.terminalId.startsWith('out-'));
+                const toInputs = Array.from(toComponent.nodes.values()).filter(n => n.terminalId.startsWith('in-'));
+                
+                if (fromOutputs.length > 0 && toInputs.length > 0) {
+                    const fromNode = fromOutputs[0];
+                    const toNode = toInputs[0];
+                    
+                    fromNode.addConnection(toNode.id);
+                    toNode.addConnection(fromNode.id);
+                    
+                    this.networkConnections.set(connectionId, {
+                        from: fromNode.id,
+                        to: toNode.id
+                    });
+                    
+                    console.log(`🔗 Netzwerk-Knoten verbunden: ${fromNode.id} → ${toNode.id}`);
+                }
             }
             
             findPath(startNode, endNode, visited = new Set()) {
@@ -2326,27 +2360,134 @@
             }
         }
 
-        // ===== PHYSICS ENGINE =====
+        // ===== NEUE NETZWERK-PHYSICS ENGINE (gleiche Schnittstelle) =====
         class PhysicsEngine {
             constructor(graph) {
                 this.graph = graph;
             }
             
             calculateCircuit() {
+                console.log(`⚡ Neue Netzwerk-Simulation startet (${this.graph.networkComponents.size} Komponenten)`);
+                
                 if (!systemPower) {
                     this.powerOffAllComponents();
                     return;
                 }
                 
-                const powerSource = this.findPowerSource();
-                if (!powerSource) {
-                    console.log('❌ Keine Stromquelle gefunden');
+                // Neue Physik: Netzwerk-basierte Simulation
+                this.simulateElectricalNetwork();
+            }
+            
+            simulateElectricalNetwork() {
+                // 1. Spannungsquellen finden
+                const powerSources = this.findPowerSources();
+                if (powerSources.length === 0) {
+                    console.log('❌ Keine Stromquellen gefunden');
+                    this.powerOffAllComponents();
                     return;
                 }
                 
-                const connectedComponents = this.graph.getConnectedComponents(powerSource);
+                // 2. Von jeder Quelle aus das Netzwerk analysieren
+                for (const sourceId of powerSources) {
+                    this.propagateVoltageFromSource(sourceId);
+                }
                 
-                this.calculateVoltagesAndCurrents(connectedComponents);
+                // 3. Alle ComponentStateMachines aktualisieren
+                this.updateAllStateMachines();
+            }
+            
+            findPowerSources() {
+                const sources = [];
+                for (const [id, component] of this.graph.networkComponents) {
+                    if (component.specs.type === 'source') {
+                        sources.push(id);
+                    }
+                }
+                return sources;
+            }
+            
+            propagateVoltageFromSource(sourceId) {
+                const sourceComponent = this.graph.networkComponents.get(sourceId);
+                if (!sourceComponent) return;
+                
+                // Verhalten der Quelle berechnen
+                const behavior = sourceComponent.calculateBehavior(0, 0);
+                sourceComponent.currentVoltage = behavior.outputVoltage;
+                sourceComponent.currentCurrent = behavior.outputCurrent;
+                sourceComponent.state = behavior.state;
+                
+                if (behavior.state === ComponentStates.OFF) {
+                    console.log(`🔌 Quelle ${sourceId} ist AUS`);
+                    return;
+                }
+                
+                console.log(`⚡ Quelle ${sourceId}: ${behavior.outputVoltage}V verfügbar`);
+                
+                // Von der Quelle ausgehend Spannung propagieren
+                const visited = new Set();
+                for (const [nodeKey, node] of sourceComponent.nodes) {
+                    if (nodeKey.startsWith('out-')) {
+                        this.propagateVoltageFromNode(node, behavior.outputVoltage, visited);
+                    }
+                }
+            }
+            
+            propagateVoltageFromNode(startNode, voltage, visited = new Set()) {
+                if (!startNode || visited.has(startNode.id)) return;
+                visited.add(startNode.id);
+                
+                startNode.voltage = voltage;
+                
+                // Durch alle Netzwerk-Verbindungen propagieren
+                for (const connectedNodeId of startNode.connections) {
+                    const connectedNode = this.graph.networkNodes.get(connectedNodeId);
+                    if (!connectedNode || visited.has(connectedNodeId)) continue;
+                    
+                    // Bauteil-Verhalten zwischen Knoten berechnen
+                    const connectionResult = this.calculateNodeConnection(startNode, connectedNode, voltage);
+                    
+                    if (connectionResult.success) {
+                        this.propagateVoltageFromNode(connectedNode, connectionResult.outputVoltage, visited);
+                    }
+                }
+            }
+            
+            calculateNodeConnection(fromNode, toNode, inputVoltage) {
+                const fromComponent = this.graph.networkComponents.get(fromNode.componentId);
+                const toComponent = this.graph.networkComponents.get(toNode.componentId);
+                
+                if (fromNode.componentId === toNode.componentId) {
+                    // Interne Verbindung (z.B. Input → Output eines Trafos)
+                    const behavior = fromComponent.calculateBehavior(inputVoltage, 0);
+                    fromComponent.currentVoltage = behavior.outputVoltage;
+                    fromComponent.currentCurrent = behavior.outputCurrent;
+                    fromComponent.state = behavior.state;
+                    
+                    return {
+                        success: behavior.outputVoltage > 0,
+                        outputVoltage: behavior.outputVoltage
+                    };
+                } else {
+                    // Verbindung zwischen verschiedenen Bauteilen (einfache Durchleitung)
+                    return {
+                        success: true,
+                        outputVoltage: inputVoltage
+                    };
+                }
+            }
+            
+            updateAllStateMachines() {
+                // Alle ComponentStateMachines mit neuen Werten aktualisieren
+                for (const [componentId, networkComponent] of this.graph.networkComponents) {
+                    const stateMachine = this.graph.stateMachines.get(componentId);
+                    if (stateMachine) {
+                        stateMachine.updateState(
+                            networkComponent.currentVoltage, 
+                            networkComponent.currentCurrent
+                        );
+                        stateMachine.setState(networkComponent.state);
+                    }
+                }
             }
             
             findPowerSource() {
@@ -2949,6 +3090,15 @@
             }
             
             powerOffAllComponents() {
+                // Neue Physik: Alle Netzwerk-Komponenten ausschalten
+                for (const [id, component] of this.graph.networkComponents) {
+                    component.currentVoltage = 0;
+                    component.currentCurrent = 0;
+                    component.currentPower = 0;
+                    component.state = ComponentStates.OFF;
+                }
+                
+                // StateMachines aktualisieren
                 for (const [id, stateMachine] of this.graph.stateMachines) {
                     stateMachine.updateState(0, 0);
                 }
@@ -6134,7 +6284,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.94 - SAUBERE PHYSIK-SCHNITTSTELLE! 🎯⚡');
+                            console.log('🚀 LED Foundation v0.01.95 - NETZWERK-PHYSIK AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
