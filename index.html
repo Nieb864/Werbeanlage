@@ -693,18 +693,49 @@
             opacity: 0.8;
         }
 
-        /* ===== ANGEPASSTE SVG-HÖHEN ===== */
-        /* LED-Module und Kabel: 30px */
-        .led-module-svg,
-        .cable-svg {
+        /* ===== BAUTEIL-STANDARD: SVG-HÖHEN ===== */
+        
+        /* Standard LED-Module: 30px */
+        .led-12v-svg,
+        .led-24v-svg {
             width: auto;
             height: 30px;
             min-width: 10px;
         }
         
-        /* Alle anderen Bauteile: 40px */
-        .transformer-svg,
-        .mobile-terminal-svg,
+        /* Standard Kabel: 30px */
+        .kabel-flexibel-svg {
+            width: auto;
+            height: 30px;
+            min-width: 10px;
+        }
+        
+        /* Standard Transformatoren: 40px */
+        .trafo-12v-svg,
+        .trafo-24v-svg {
+            width: auto;
+            height: 40px;
+            min-width: 10px;
+        }
+        
+        /* Standard Klemmen: 40px */
+        .klemme-mobil-svg {
+            width: auto;
+            height: 40px;
+            min-width: 10px;
+        }
+        
+        /* Standard Schalter: 35px */
+        .fi-schalter-svg,
+        .ls-schalter-svg,
+        .zeitschaltuhr-svg,
+        .daemmerungsschalter-svg {
+            width: auto;
+            height: 35px;
+            min-width: 10px;
+        }
+        
+        /* Fallback für neue Bauteile */
         .component-svg {
             width: auto;
             height: 40px;
@@ -782,6 +813,48 @@
             fill: #e91e63 !important;
         }
 
+        /* === KABEL-ZUSTÄNDE === */
+        .state-closed .cable-wire {
+            stroke-dasharray: none;
+            stroke: var(--wire-black);
+            opacity: 1;
+        }
+        
+        .state-open .cable-wire {
+            stroke-dasharray: 5,5;
+            stroke: #ff6b6b;
+            opacity: 0.7;
+        }
+        
+        .state-broken .cable-wire {
+            stroke: #1a1a1a;
+            stroke-dasharray: 2,8;
+            opacity: 0.5;
+        }
+
+        /* === SCHALTER-ZUSTÄNDE === */
+        .state-open .schalter-kontakt {
+            transform: rotate(-15deg);
+            transform-origin: center;
+        }
+        
+        .state-closed .schalter-kontakt {
+            transform: rotate(0deg);
+            transform-origin: center;
+        }
+
+        /* === KLEMMEN-ZUSTÄNDE === */
+        .state-closed .klemme-verbindung {
+            opacity: 1;
+            stroke: var(--metal-dark);
+        }
+        
+        .state-open .klemme-verbindung {
+            opacity: 0.3;
+            stroke: #ff6b6b;
+            stroke-dasharray: 3,3;
+        }
+
 
 
         /* Live Power Tooltip */
@@ -817,6 +890,36 @@
         .connection-line.connected {
             opacity: 0 !important;
             pointer-events: none;
+        }
+
+        /* === STROMFLUSS-VISUALISIERUNG === */
+        @keyframes current-flow {
+            0% { 
+                stroke-dashoffset: 0; 
+            }
+            100% { 
+                stroke-dashoffset: 20; 
+            }
+        }
+        
+        .current-flow-active {
+            stroke-dasharray: 8,4;
+            animation: current-flow 1s linear infinite;
+            stroke-width: 4;
+            filter: drop-shadow(0 0 3px currentColor);
+        }
+        
+        .current-flow-positive {
+            stroke: var(--wire-red);
+        }
+        
+        .current-flow-negative {
+            stroke: var(--wire-blue);
+        }
+        
+        .current-flow-ac {
+            stroke: var(--wire-brown);
+            animation-direction: alternate;
         }
 
         /* === LED FOUNDATION SVG STANDARDS v1.0 === */
@@ -4005,6 +4108,10 @@
         let isDragging = false;
         let dragElement = null;
         let dragOffset = { x: 0, y: 0 };
+        
+        // === STROMFLUSS-DEBUG STEUERUNG (Bauteil-Standard) ===
+        window.SHOW_CURRENT_FLOW = false; // Für Schüler-Modus (standardmäßig AUS)
+        // window.SHOW_CURRENT_FLOW = true; // Für Lehrer-Modus (Debug AN)
 
         function initializeDragAndDrop() {
             const componentItems = document.querySelectorAll('.component-item');
@@ -4494,7 +4601,7 @@
         function createLEDModuleSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '-10 0 157.29 30');
-            svg.setAttribute('class', 'led-module-svg');
+            svg.setAttribute('class', 'led-12v-svg');
             svg.setAttribute('data-component-type', 'led-12v-1.2w');
             
             // === VERBINDUNGSTYP-STANDARD B ===
@@ -4631,7 +4738,7 @@
         function createTransformer12VSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 1200 800');
-            svg.setAttribute('class', 'transformer-svg');
+            svg.setAttribute('class', 'trafo-12v-svg');
             svg.setAttribute('data-component-type', 'trafo-12v-40w');
             
             // === VERBINDUNGSTYP-STANDARD B ===
@@ -4891,7 +4998,7 @@
         function createLED24VSVG() {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '-10 0 157.29 30');
-            svg.setAttribute('class', 'led-module-svg');
+            svg.setAttribute('class', 'led-24v-svg');
             svg.setAttribute('data-component-type', 'led-24v-5w');
             
             // === VERBINDUNGSTYP-STANDARD B ===
@@ -5540,7 +5647,7 @@
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             // Deine SVG bereits in richtiger Größe + 20px für Anschlusspunkte = 59.68 x 27.86
             svg.setAttribute('viewBox', '0 0 59.68 27.86');
-            svg.setAttribute('class', 'cable-svg');
+            svg.setAttribute('class', 'kabel-flexibel-svg');
             svg.setAttribute('data-component-type', 'kabel-flexibel-sw');
             
             // === VERBINDUNGSTYP-STANDARD B ===
@@ -6174,7 +6281,7 @@
             components.forEach((component, index) => {
                 const svg = component.querySelector('svg');
                 if (svg) {
-                    const isLED = svg.classList.contains('led-module-svg');
+                    const isLED = svg.classList.contains('led-12v-svg') || svg.classList.contains('led-24v-svg');
                     console.log('🔍 Component #' + index + ':', svg.classList.toString(), 'isLED:', isLED);
                     
                     if (isLED) {
