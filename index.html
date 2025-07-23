@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.100-CONTEXT-FIX</div>
+                <div class="version-display">v0.01.101-PARAM-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2247,12 +2247,13 @@
                 }
                 
                 // Neue Physik: Netzwerk-Knoten verbinden
-                this.createNetworkConnection(id, fromComponent, toComponent);
+                const connectionData = this.connections.get(id);
+                this.createNetworkConnection(id, fromComponent, toComponent, connectionData);
                 
                 console.log(`🔗 Verbindung erstellt: ${fromComponent} → ${toComponent}`);
             }
             
-            createNetworkConnection(connectionId, fromComponentId, toComponentId) {
+            createNetworkConnection(connectionId, fromComponentId, toComponentId, connectionData) {
                 const fromComponent = this.networkComponents.get(fromComponentId);
                 const toComponent = this.networkComponents.get(toComponentId);
                 
@@ -2261,8 +2262,8 @@
                     return;
                 }
                 
-                // Echte UI-Connection-Point Zuordnung aus dem UI-Graph
-                const uiConnection = this.connections.get(connectionId);
+                // Echte UI-Connection-Point Zuordnung aus übergebenen Connection-Daten
+                const uiConnection = connectionData;
                 if (uiConnection) {
                     const fromTerminalId = uiConnection.from.split('.')[1]; // z.B. "out-phase" 
                     const toTerminalId = uiConnection.to.split('.')[1];     // z.B. "in-phase"
