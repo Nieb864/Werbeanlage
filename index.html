@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.97-VOLTAGE-DEBUG</div>
+                <div class="version-display">v0.01.98-CONNECTION-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2261,24 +2261,53 @@
                     return;
                 }
                 
-                // Vereinfacht: Verbinde erste verfügbare Ausgänge mit ersten verfügbaren Eingängen
-                // TODO: Später durch echte UI-Connection-Point Zuordnung ersetzen
-                const fromOutputs = Array.from(fromComponent.nodes.values()).filter(n => n.terminalId.startsWith('out-'));
-                const toInputs = Array.from(toComponent.nodes.values()).filter(n => n.terminalId.startsWith('in-'));
-                
-                if (fromOutputs.length > 0 && toInputs.length > 0) {
-                    const fromNode = fromOutputs[0];
-                    const toNode = toInputs[0];
+                // Echte UI-Connection-Point Zuordnung aus dem UI-Graph
+                const uiConnection = this.connections.get(connectionId);
+                if (uiConnection) {
+                    const fromTerminalId = uiConnection.from.split('.')[1]; // z.B. "out-phase" 
+                    const toTerminalId = uiConnection.to.split('.')[1];     // z.B. "in-phase"
                     
-                    fromNode.addConnection(toNode.id);
-                    toNode.addConnection(fromNode.id);
+                    console.log(`🔍 UI-Verbindung: ${fromTerminalId} → ${toTerminalId}`);
                     
-                    this.networkConnections.set(connectionId, {
-                        from: fromNode.id,
-                        to: toNode.id
-                    });
+                    const fromNode = Array.from(fromComponent.nodes.values()).find(n => n.terminalId === fromTerminalId);
+                    const toNode = Array.from(toComponent.nodes.values()).find(n => n.terminalId === toTerminalId);
                     
-                    console.log(`🔗 Netzwerk-Knoten verbunden: ${fromNode.id} → ${toNode.id}`);
+                    if (fromNode && toNode) {
+                        fromNode.addConnection(toNode.id);
+                        toNode.addConnection(fromNode.id);
+                        
+                        this.networkConnections.set(connectionId, {
+                            from: fromNode.id,
+                            to: toNode.id
+                        });
+                        
+                        console.log(`🔗 Netzwerk-Knoten verbunden: ${fromNode.id} → ${toNode.id}`);
+                    } else {
+                        console.log(`⚠️ Terminalpunkte nicht gefunden: ${fromTerminalId} → ${toTerminalId}`);
+                        console.log(`   From nodes: ${Array.from(fromComponent.nodes.values()).map(n => n.terminalId).join(', ')}`);
+                        console.log(`   To nodes: ${Array.from(toComponent.nodes.values()).map(n => n.terminalId).join(', ')}`);
+                    }
+                } else {
+                    console.log(`⚠️ UI-Verbindung nicht gefunden für: ${connectionId}`);
+                    
+                    // Fallback: Erste verfügbare Verbindung
+                    const fromOutputs = Array.from(fromComponent.nodes.values()).filter(n => n.terminalId.startsWith('out-'));
+                    const toInputs = Array.from(toComponent.nodes.values()).filter(n => n.terminalId.startsWith('in-'));
+                    
+                    if (fromOutputs.length > 0 && toInputs.length > 0) {
+                        const fromNode = fromOutputs[0];
+                        const toNode = toInputs[0];
+                        
+                        fromNode.addConnection(toNode.id);
+                        toNode.addConnection(fromNode.id);
+                        
+                        this.networkConnections.set(connectionId, {
+                            from: fromNode.id,
+                            to: toNode.id
+                        });
+                        
+                        console.log(`🔗 Netzwerk-Knoten verbunden (Fallback): ${fromNode.id} → ${toNode.id}`);
+                    }
                 }
             }
             
