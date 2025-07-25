@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.09-SOFORT-CLEANUP-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.10-KOLLISIONS-FIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.09-SOFORT-CLEANUP</div>
+                <div class="version-display">v0.02.10-KOLLISIONS-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -4706,8 +4706,36 @@
 
         function placeComponent(x, y, componentType) {
             const workspace = document.getElementById('workspace');
-            const svg = createComponentSVG(componentType);
             
+            // 🔄 KOLLISIONS-ERKENNUNG: Prüfe ob bereits eine Komponente an dieser Position steht
+            const existingComponents = workspace.querySelectorAll('.placed-component');
+            const tolerance = 50; // Pixel-Toleranz für Überlappung
+            
+            for (const existing of existingComponents) {
+                const existingX = parseInt(existing.style.left);
+                const existingY = parseInt(existing.style.top);
+                const distance = Math.sqrt(Math.pow(x - existingX, 2) + Math.pow(y - existingY, 2));
+                
+                if (distance < tolerance) {
+                    console.log(`🔄 KOLLISION ERKANNT: Ersetze ${existing.id} an Position ${x},${y}`);
+                    
+                    // Alte Komponente vollständig aus Netzwerk entfernen
+                    if (circuit && circuit.graph) {
+                        circuit.graph.removeComponentFromNetwork(existing.id);
+                        circuit.graph.networkComponents.delete(existing.id);
+                        circuit.graph.stateMachines.delete(existing.id);
+                        circuit.graph.componentStates.delete(existing.id);
+                        console.log(`🗑️ Alte Komponente ${existing.id} vollständig entfernt`);
+                    }
+                    
+                    // DOM-Element entfernen
+                    existing.remove();
+                    console.log(`🔄 KOLLISIONS-REPLACEMENT erfolgreich`);
+                    break;
+                }
+            }
+            
+            const svg = createComponentSVG(componentType);
             if (!svg) return;
             
             const wrapper = document.createElement('div');
@@ -6509,7 +6537,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.09 - SOFORT-CLEANUP AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.10 - KOLLISIONS-FIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
