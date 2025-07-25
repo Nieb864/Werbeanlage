@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.02-BEZIER-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.03-TRANSFORMER-FIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.02-BEZIER-FIX</div>
+                <div class="version-display">v0.02.03-TRANSFORMER-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2078,6 +2078,7 @@
                 this.isBroken = false;
                 
                 this.createNodes();
+                this.createInternalConnections();
             }
             
             createNodes() {
@@ -2118,6 +2119,33 @@
                         this.nodes.set('in', new NetworkNode(`${this.id}-in`, this.id, 'in'));
                         this.nodes.set('out', new NetworkNode(`${this.id}-out`, this.id, 'out'));
                         break;
+                }
+            }
+            
+            createInternalConnections() {
+                // Lese data-internal-routing aus dem DOM-Element
+                const domElement = document.getElementById(this.id);
+                if (!domElement) return;
+                
+                const internalRoutingData = domElement.getAttribute('data-internal-routing');
+                if (!internalRoutingData) return;
+                
+                try {
+                    const routes = JSON.parse(internalRoutingData);
+                    for (const route of routes) {
+                        const fromNode = this.nodes.get(route.from);
+                        const toNode = this.nodes.get(route.to);
+                        
+                        if (fromNode && toNode) {
+                            // Erstelle bidirektionale interne Verbindung
+                            fromNode.addConnection(toNode.id);
+                            toNode.addConnection(fromNode.id);
+                            
+                            console.log(`🔗 Interne Verbindung: ${fromNode.terminalId} → ${toNode.terminalId} (${route.efficiency || 'N/A'})`);
+                        }
+                    }
+                } catch (e) {
+                    console.error(`❌ Fehler beim Parsen von data-internal-routing für ${this.id}:`, e);
                 }
             }
             
@@ -6331,7 +6359,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.02 - BEZIER-FIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.03 - TRANSFORMER-FIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
