@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.06-NETWORK-CLEANUP-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.07-HOTFIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.06-NETWORK-CLEANUP</div>
+                <div class="version-display">v0.02.07-HOTFIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2623,6 +2623,13 @@
             calculateNodeConnection(fromNode, toNode, inputVoltage) {
                 const fromComponent = this.graph.networkComponents.get(fromNode.componentId);
                 const toComponent = this.graph.networkComponents.get(toNode.componentId);
+                
+                // 🚨 FEHLERPRÜFUNG: Component-Referenzen validieren
+                if (!fromComponent) {
+                    console.error(`❌ fromComponent nicht gefunden: ${fromNode.componentId}`);
+                    console.error(`📊 Verfügbare networkComponents:`, Array.from(this.graph.networkComponents.keys()));
+                    return { success: false, outputVoltage: 0 };
+                }
                 
                 if (fromNode.componentId === toNode.componentId) {
                     // Interne Verbindung (z.B. Input → Output eines Trafos)
@@ -6474,7 +6481,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.06 - NETWORK-CLEANUP AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.07 - HOTFIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
