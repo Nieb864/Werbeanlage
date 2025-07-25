@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.14-PARALLEL-VERKABELUNG-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.15-REKURSIVER-ÜBERLASTSCHUTZ-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.14-PARALLEL-VERKABELUNG</div>
+                <div class="version-display">v0.02.15-REKURSIVER-ÜBERLASTSCHUTZ</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2272,31 +2272,47 @@
                 };
             }
             
-            // 🔥 BERECHNE GESAMTLEISTUNG ALLER ANGESCHLOSSENEN VERBRAUCHER
+            // 🔥 BERECHNE GESAMTLEISTUNG ALLER ANGESCHLOSSENEN VERBRAUCHER (REKURSIV)
             calculateConnectedLoadPower() {
                 let totalPower = 0;
+                const visitedComponents = new Set(); // Verhindere Endlos-Schleifen
                 
-                // Finde alle Verbindungen zu diesem Trafo
                 if (!window.workspaceManager || !window.workspaceManager.connections) return 0;
                 
+                // Starte rekursive Suche von diesem Trafo aus
+                totalPower = this.findConnectedLoadsRecursive(this.id, visitedComponents);
+                
+                console.log(`⚡ TRAFO-ÜBERLAST-CHECK: ${totalPower.toFixed(1)}W Gesamtlast gefunden`);
+                return totalPower;
+            }
+            
+            // 🔄 REKURSIVE SUCHE DURCH LED-KETTEN
+            findConnectedLoadsRecursive(componentId, visitedComponents) {
+                if (visitedComponents.has(componentId)) return 0; // Bereits besucht
+                visitedComponents.add(componentId);
+                
+                let totalPower = 0;
+                const component = document.getElementById(componentId);
+                
+                // Falls es eine LED ist, zähle ihre Leistung
+                if (component) {
+                    const componentType = component.dataset.componentType;
+                    const componentSpecs = ComponentSpecs[componentType];
+                    
+                    if (componentSpecs && componentSpecs.type === 'load' && componentSpecs.power) {
+                        totalPower += componentSpecs.power;
+                        console.log(`🔌 Load gefunden: ${componentId} (${componentType}) = ${componentSpecs.power}W`);
+                    }
+                }
+                
+                // Finde alle ausgehenden Verbindungen von dieser Komponente
                 for (const [connId, connectionData] of window.workspaceManager.connections) {
-                    // Prüfe ob diese Verbindung vom Trafo ausgeht (out-plus oder out-minus)
-                    if (connectionData.fromComponent === this.id && 
+                    if (connectionData.fromComponent === componentId && 
                         (connectionData.from.includes('out-plus') || connectionData.from.includes('out-minus'))) {
                         
-                        const loadComponentId = connectionData.toComponent;
-                        const loadElement = document.getElementById(loadComponentId);
-                        
-                        if (loadElement) {
-                            const loadType = loadElement.dataset.componentType;
-                            const loadSpecs = ComponentSpecs[loadType];
-                            
-                            // Nur LEDs/Lasten zählen
-                            if (loadSpecs && loadSpecs.type === 'load' && loadSpecs.power) {
-                                totalPower += loadSpecs.power;
-                                console.log(`🔌 Load gefunden: ${loadComponentId} (${loadType}) = ${loadSpecs.power}W`);
-                            }
-                        }
+                        // Rekursiv die nächste Komponente durchsuchen
+                        const nextComponentId = connectionData.toComponent;
+                        totalPower += this.findConnectedLoadsRecursive(nextComponentId, visitedComponents);
                     }
                 }
                 
@@ -6654,7 +6670,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.14 - PARALLEL-VERKABELUNG AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.15 - REKURSIVER-ÜBERLASTSCHUTZ AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
