@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.23-TRANSFORMER-TYPE-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.24-HAUPTSCHALTER-REPAIR-ALL-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -5192,15 +5192,14 @@
             if (circuit) {
                 circuit.powerStateChanged();
                 
-                // 🔄 BEI AUSSCHALTEN: Alle Komponenten sofort auf OFF setzen
+                // 🔄 BEI AUSSCHALTEN: Alle Komponenten sofort auf OFF setzen + REPAIR ALL
                 if (!systemPower) {
-                    console.log('🔄 HAUPTSCHALTER AUS → Alle Komponenten ausschalten...');
+                    console.log('🔄 HAUPTSCHALTER AUS → Alle Komponenten ausschalten + reparieren...');
                     for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
-                        const componentState = circuit.graph.getComponentState(componentId);
-                        if (componentState !== 'broken') {
-                            stateMachine.updateState(0, 0); // Sofort ausschalten
-                            console.log(`💡 Component ${componentId} ausgeschaltet`);
-                        }
+                        // LERNSPIEL: Hauptschalter AUS = Alle Komponenten reparieren
+                        circuit.graph.resetComponentState(componentId);
+                        stateMachine.updateState(0, 0); // Sofort ausschalten
+                        console.log(`💡 Component ${componentId} ausgeschaltet + repariert`);
                     }
                 }
                 
@@ -5213,13 +5212,10 @@
                         circuit.graph.cleanupOrphanedNodes();
                     }
                     
-                    // 1. Alle StateMachines zurücksetzen (außer broken)
+                    // 1. Alle StateMachines zurücksetzen (ALLE - auch broken sind schon repariert)
                     for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
-                        const componentState = circuit.graph.getComponentState(componentId);
-                        if (componentState !== 'broken') {
-                            console.log(`🔄 StateMachine ${componentId} zurückgesetzt`);
-                            stateMachine.updateState(0, 0); // Spannung und Strom auf 0
-                        }
+                        console.log(`🔄 StateMachine ${componentId} zurückgesetzt`);
+                        stateMachine.updateState(0, 0); // Spannung und Strom auf 0
                     }
                     
                     // 2. Alle WorkspaceManager Verbindungen validieren
