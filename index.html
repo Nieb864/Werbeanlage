@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.01-CONNECTIONS-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.02-BEZIER-FIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.01-CONNECTIONS-FIX</div>
+                <div class="version-display">v0.02.02-BEZIER-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2670,8 +2670,8 @@
                 // Finde alle direkten Verbindungen zu dieser LED
                 for (const [connId, connectionData] of window.workspaceManager.connections) {
                     if (connectionData.toComponent === ledId || connectionData.fromComponent === ledId) {
-                        const fromData = window.workspaceManager.getConnectionData(connectionData.from);
-                        const toData = window.workspaceManager.getConnectionData(connectionData.to);
+                        const fromData = window.workspaceManager.getConnectionData(connectionData.fromElement);
+                        const toData = window.workspaceManager.getConnectionData(connectionData.toElement);
                         
                         connections.push({
                             fromData,
@@ -2713,8 +2713,8 @@
                     if ((connectionData.fromComponent === edge.from && connectionData.toComponent === edge.to) ||
                         (connectionData.fromComponent === edge.to && connectionData.toComponent === edge.from)) {
                         
-                        const fromData = window.workspaceManager.getConnectionData(connectionData.from);
-                        const toData = window.workspaceManager.getConnectionData(connectionData.to);
+                        const fromData = window.workspaceManager.getConnectionData(connectionData.fromElement);
+                        const toData = window.workspaceManager.getConnectionData(connectionData.toElement);
                         
                         // 1. ÜBERSPANNUNG: 230V an 12V/24V LED
                         if (this.isOvervoltage(fromData, toData, targetComponentId)) {
@@ -3912,12 +3912,12 @@
                 
                 // Connection Points wieder als "available" markieren
                 if (connection) {
-                    connection.from.classList.remove('connected');
-                    connection.to.classList.remove('connected');
+                    connection.fromElement.classList.remove('connected');
+                    connection.toElement.classList.remove('connected');
                     
                     // Visual Cable für spezifische Connection Points wieder anzeigen
-                    this.updateVisualCables(connection.from);
-                    this.updateVisualCables(connection.to);
+                    this.updateVisualCables(connection.fromElement);
+                    this.updateVisualCables(connection.toElement);
                 }
                 
                 path.remove();
@@ -4104,8 +4104,8 @@
                 // Prüfe alle Verbindungen zu diesem LED
                 for (const [connId, connectionData] of window.workspaceManager.connections) {
                     if (connectionData.toComponent === ledId) {
-                        const fromData = window.workspaceManager.getConnectionData(connectionData.from);
-                        const toData = window.workspaceManager.getConnectionData(connectionData.to);
+                        const fromData = window.workspaceManager.getConnectionData(connectionData.fromElement);
+                        const toData = window.workspaceManager.getConnectionData(connectionData.toElement);
                         
                         debugLog(`🔍 LED ${ledId}: Verbindung ${fromData.electricalPolarity || fromData.wireType} → ${toData.electricalPolarity || toData.wireType}`);
                         
@@ -4163,11 +4163,11 @@
                 for (const [connId, connectionData] of this.connections) {
                     // Prüfe ob diese Verbindung zu unserem Anschlusspunkt führt
                     if (connectionData.toComponent === componentId && 
-                        connectionData.to.dataset.connectionId === connectionId) {
+                        connectionData.toElement.dataset.connectionId === connectionId) {
                         return true;
                     }
                     if (connectionData.fromComponent === componentId && 
-                        connectionData.from.dataset.connectionId === connectionId) {
+                        connectionData.fromElement.dataset.connectionId === connectionId) {
                         return true;
                     }
                 }
@@ -4304,12 +4304,12 @@
                 
                 if (!fromComponent || !toComponent) return;
                 
-                const startPos = this.getConnectionPosition(connectionData.from, fromComponent);
-                const endPos = this.getConnectionPosition(connectionData.to, toComponent);
+                const startPos = this.getConnectionPosition(connectionData.fromElement, fromComponent);
+                const endPos = this.getConnectionPosition(connectionData.toElement, toComponent);
                 
                 // Dynamische Bezier-Berechnung mit Rotation
                 const { cp1X, cp1Y, cp2X, cp2Y } = this.calculateRotatedBezierPoints(
-                    startPos, endPos, connectionData.from, connectionData.to, fromComponent, toComponent
+                    startPos, endPos, connectionData.fromElement, connectionData.toElement, fromComponent, toComponent
                 );
                 
                 const pathData = `M ${startPos.x},${startPos.y} C ${cp1X},${cp1Y} ${cp2X},${cp2Y} ${endPos.x},${endPos.y}`;
@@ -4732,8 +4732,8 @@
                         console.log(`🔍 Validiere ${window.workspaceManager.connections.size} Verbindungen...`);
                         for (const [connId, connectionData] of window.workspaceManager.connections) {
                             const validation = window.workspaceManager.validateConnection(
-                                connectionData.from, 
-                                connectionData.to
+                                connectionData.fromElement, 
+                                connectionData.toElement
                             );
                             if (!validation.valid) {
                                 console.log(`❌ Verbindung ${connId} ungültig: ${validation.reason}`);
@@ -6331,7 +6331,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.01 - CONNECTIONS-FIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.02 - BEZIER-FIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
