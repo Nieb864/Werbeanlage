@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.21-VISUAL-UPDATE-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.22-ANIMATE-STATE-FIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1346,7 +1346,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.21-VISUAL-UPDATE-FIX</div>
+                <div class="version-display">v0.02.22-ANIMATE-STATE-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1852,6 +1852,7 @@
             
             animateStateChange() {
                 this.applyStateCSS();
+                this.applyDynamicColors(); // KRITISCH: Direkte Farb-Updates für alle States
                 console.log(`${this.type} (${this.elementId}): ${this.state} (${this.currentVoltage}V, ${this.currentPower.toFixed(2)}W)`);
             }
             
@@ -1898,7 +1899,7 @@
                     }, 500); // Blinkt alle 500ms wie im React-Code
                 } else {
                     this.blinkState = true;
-                    this.applyDynamicColors();
+                    // applyDynamicColors wird bereits in animateStateChange aufgerufen
                 }
             }
             
@@ -6812,7 +6813,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.21 - VISUAL-UPDATE-FIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.22 - ANIMATE-STATE-FIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
