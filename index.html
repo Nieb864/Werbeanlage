@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.18-LED-VERBINDUNGS-CHECK-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.19-LED-VERBINDUNGS-HOTFIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1346,7 +1346,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.18-LED-VERBINDUNGS-CHECK</div>
+                <div class="version-display">v0.02.19-LED-VERBINDUNGS-HOTFIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3450,34 +3450,6 @@
                 }
             }
             
-            // 🔌 HILFS-METHODE: Prüfe ob Komponente gültige Verbindungen hat
-            hasValidConnections(componentId) {
-                if (!window.workspaceManager || !window.workspaceManager.connections) return false;
-                
-                let hasValidConnection = false;
-                for (const [connId, connectionData] of window.workspaceManager.connections) {
-                    if (connectionData.fromComponent === componentId || connectionData.toComponent === componentId) {
-                        // Prüfe ob die verbundenen Komponenten noch existieren
-                        const fromExists = document.getElementById(connectionData.fromComponent);
-                        const toExists = document.getElementById(connectionData.toComponent);
-                        
-                        if (fromExists && toExists) {
-                            hasValidConnection = true;
-                            console.log(`🔌 LED ${componentId}: Gültige Verbindung gefunden (${connectionData.fromComponent} → ${connectionData.toComponent})`);
-                            break;
-                        } else {
-                            console.log(`❌ LED ${componentId}: Verbindung zu gelöschten Komponenten erkannt (${connectionData.fromComponent} → ${connectionData.toComponent})`);
-                        }
-                    }
-                }
-                
-                if (!hasValidConnection) {
-                    console.log(`🚫 LED ${componentId}: KEINE gültigen Verbindungen gefunden`);
-                }
-                
-                return hasValidConnection;
-            }
-            
             powerOffAllComponents() {
                 // Neue Physik: Alle Netzwerk-Komponenten ausschalten
                 for (const [id, component] of this.graph.networkComponents) {
@@ -3994,6 +3966,34 @@
                 
                 this.selectedComponents.clear();
                 console.log(`🗑️ ${deletedComponents.length} Bauteile gelöscht:`, deletedComponents);
+            }
+            
+            // 🔌 HILFS-METHODE: Prüfe ob Komponente gültige Verbindungen hat
+            hasValidConnections(componentId) {
+                if (!this.connections) return false;
+                
+                let hasValidConnection = false;
+                for (const [connId, connectionData] of this.connections) {
+                    if (connectionData.fromComponent === componentId || connectionData.toComponent === componentId) {
+                        // Prüfe ob die verbundenen Komponenten noch existieren
+                        const fromExists = document.getElementById(connectionData.fromComponent);
+                        const toExists = document.getElementById(connectionData.toComponent);
+                        
+                        if (fromExists && toExists) {
+                            hasValidConnection = true;
+                            console.log(`🔌 LED ${componentId}: Gültige Verbindung gefunden (${connectionData.fromComponent} → ${connectionData.toComponent})`);
+                            break;
+                        } else {
+                            console.log(`❌ LED ${componentId}: Verbindung zu gelöschten Komponenten erkannt (${connectionData.fromComponent} → ${connectionData.toComponent})`);
+                        }
+                    }
+                }
+                
+                if (!hasValidConnection) {
+                    console.log(`🚫 LED ${componentId}: KEINE gültigen Verbindungen gefunden`);
+                }
+                
+                return hasValidConnection;
             }
             
             // ===== RECTANGLE SELECTION SYSTEM =====
@@ -5194,7 +5194,7 @@
                                 
                                 if (componentState !== 'broken') {
                                     // Prüfe ob LED tatsächlich angeschlossen ist
-                                    const hasConnections = circuit.hasValidConnections(componentId);
+                                    const hasConnections = window.workspaceManager.hasValidConnections(componentId);
                                     
                                     if (hasConnections) {
                                         // Nur angeschlossene, nicht-kaputte LEDs: Kreis wiederherstellen
@@ -6745,7 +6745,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.18 - LED-VERBINDUNGS-CHECK AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.19 - LED-VERBINDUNGS-HOTFIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
