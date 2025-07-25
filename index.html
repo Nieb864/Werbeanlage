@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.04-INTERNAL-CONN-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.05-DEBUG-INTERNAL-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.04-INTERNAL-CONN-FIX</div>
+                <div class="version-display">v0.02.05-DEBUG-INTERNAL</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2122,15 +2122,39 @@
             }
             
             createInternalConnections() {
+                console.log(`🔧 createInternalConnections() aufgerufen für ${this.id}`);
+                
                 // Lese data-internal-routing aus dem DOM-Element
                 const domElement = document.getElementById(this.id);
-                if (!domElement) return;
+                if (!domElement) {
+                    console.log(`❌ DOM-Element ${this.id} nicht gefunden`);
+                    return;
+                }
                 
                 const internalRoutingData = domElement.getAttribute('data-internal-routing');
-                if (!internalRoutingData) return;
+                if (!internalRoutingData) {
+                    console.log(`❌ data-internal-routing nicht gefunden für ${this.id}`);
+                    // Prüfe SVG-Child-Element
+                    const svgChild = domElement.querySelector('svg');
+                    if (svgChild) {
+                        const svgRoutingData = svgChild.getAttribute('data-internal-routing');
+                        if (svgRoutingData) {
+                            console.log(`✅ data-internal-routing im SVG-Child gefunden!`);
+                            this.parseInternalRouting(svgRoutingData);
+                            return;
+                        }
+                    }
+                    return;
+                }
                 
+                this.parseInternalRouting(internalRoutingData);
+            }
+            
+            parseInternalRouting(routingData) {
                 try {
-                    const routes = JSON.parse(internalRoutingData);
+                    const routes = JSON.parse(routingData);
+                    console.log(`🔍 Parsing ${routes.length} interne Routen für ${this.id}`);
+                    
                     for (const route of routes) {
                         const fromNode = this.nodes.get(route.from);
                         const toNode = this.nodes.get(route.to);
@@ -2141,6 +2165,9 @@
                             toNode.addConnection(fromNode.id);
                             
                             console.log(`🔗 Interne Verbindung: ${fromNode.terminalId} → ${toNode.terminalId} (${route.efficiency || 'N/A'})`);
+                        } else {
+                            console.log(`❌ Knoten nicht gefunden: ${route.from} → ${route.to}`);
+                            console.log(`   Verfügbare Knoten: ${Array.from(this.nodes.keys()).join(', ')}`);
                         }
                     }
                 } catch (e) {
@@ -6363,7 +6390,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.04 - INTERNAL-CONN-FIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.05 - DEBUG-INTERNAL AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
