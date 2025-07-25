@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.19-LED-VERBINDUNGS-HOTFIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.20-STATEMACHINE-SYNC-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1346,7 +1346,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.19-LED-VERBINDUNGS-HOTFIX</div>
+                <div class="version-display">v0.02.20-STATEMACHINE-SYNC</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -5183,6 +5183,17 @@
                     console.log('🔄 Starte Physik-Berechnung...');
                     circuit.update();
                     
+                    // 3.1. KRITISCH: StateMachines nach Physik-Update synchronisieren
+                    console.log('🎨 Synchronisiere StateMachines mit Physik-Ergebnissen...');
+                    for (const [componentId, networkComponent] of circuit.graph.networkComponents) {
+                        const stateMachine = circuit.graph.stateMachines.get(componentId);
+                        if (stateMachine) {
+                            // StateMachine mit aktueller Spannung und Strom aktualisieren
+                            stateMachine.updateState(networkComponent.currentVoltage, networkComponent.currentCurrent);
+                            console.log(`🎨 StateMachine ${componentId} aktualisiert: ${networkComponent.currentVoltage}V → ${stateMachine.state}`);
+                        }
+                    }
+                    
                     // 4. Visual LEDs wiederherstellen
                     setTimeout(() => {
                         
@@ -5197,12 +5208,12 @@
                                     const hasConnections = window.workspaceManager.hasValidConnections(componentId);
                                     
                                     if (hasConnections) {
-                                        // Nur angeschlossene, nicht-kaputte LEDs: Kreis wiederherstellen
+                                        // Nur angeschlossene, nicht-kaputte LEDs: Kreis wiederherstellen (OHNE State zu überschreiben)
                                         const ledCircle = element.querySelector('.led24-center, .led12-center');
                                         if (ledCircle) {
                                             ledCircle.style.display = 'block';
-                                            ledCircle.style.opacity = '1';
-                                            console.log(`💡 LED-Kreis für ${componentId} wiederhergestellt (angeschlossen)`);
+                                            // WICHTIG: Opacity NICHT überschreiben - StateMachine hat schon korrekte Werte gesetzt!
+                                            console.log(`💡 LED-Kreis für ${componentId} sichtbar gemacht (angeschlossen)`);
                                         }
                                     } else {
                                         // Unverbundene LEDs: Kreis verstecken
@@ -6745,7 +6756,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.19 - LED-VERBINDUNGS-HOTFIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.20 - STATEMACHINE-SYNC AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
