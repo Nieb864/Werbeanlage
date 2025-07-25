@@ -2104,6 +2104,11 @@
                         break;
                         
                     case 'connector':
+                        this.nodes.set('terminal-1', new NetworkNode(`${this.id}-terminal-1`, this.id, 'terminal-1'));
+                        this.nodes.set('terminal-2', new NetworkNode(`${this.id}-terminal-2`, this.id, 'terminal-2'));
+                        this.nodes.set('terminal-3', new NetworkNode(`${this.id}-terminal-3`, this.id, 'terminal-3'));
+                        break;
+                        
                     case 'cable':
                         this.nodes.set('terminal-1', new NetworkNode(`${this.id}-terminal-1`, this.id, 'terminal-1'));
                         this.nodes.set('terminal-2', new NetworkNode(`${this.id}-terminal-2`, this.id, 'terminal-2'));
@@ -6002,7 +6007,7 @@
             svg.setAttribute('data-available-states', JSON.stringify(['closed', 'open', 'broken']));
             svg.setAttribute('data-default-state', 'closed');
             svg.setAttribute('data-internal-routing', JSON.stringify([
-                {"from":"out-left", "to":"out-right", "resistance":0.1}
+                {"from":"terminal-1", "to":"terminal-2", "resistance":0.1}
             ]));
             
             svg.innerHTML = `
@@ -6030,7 +6035,7 @@
                 <line class="cable-connection-line connection-line" 
                       x1="0" y1="13.93" x2="10" y2="13.93"
                       data-connection-type="output-line"
-                      data-connection-id="out-left"
+                      data-connection-id="terminal-1"
                       data-wire-type="universal"
                       data-voltage="24"
                       data-bezier-start-x="10"
@@ -6041,7 +6046,7 @@
                 <line class="cable-connection-line connection-line" 
                       x1="49.68" y1="13.93" x2="59.68" y2="13.93"
                       data-connection-type="output-line"
-                      data-connection-id="out-right"
+                      data-connection-id="terminal-2"
                       data-wire-type="universal"
                       data-voltage="24"
                       data-bezier-start-x="49.68"
