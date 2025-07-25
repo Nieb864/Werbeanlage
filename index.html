@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.11-LAZY-PHYSICS-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.12-CASCADE-DELETE-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.11-LAZY-PHYSICS</div>
+                <div class="version-display">v0.02.12-CASCADE-DELETE</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3728,6 +3728,46 @@
                 }
             }
             
+            // ===== CASCADE DELETE SYSTEM =====
+            deleteConnectionsForComponent(componentId) {
+                console.log(`🔗 CASCADE-DELETE: Entferne alle Verbindungen für ${componentId}`);
+                
+                const connectionsToDelete = [];
+                
+                // Alle Verbindungen finden, die dieses Bauteil betreffen
+                for (const [connectionId, connectionData] of this.connections) {
+                    if (connectionData.fromComponent === componentId || 
+                        connectionData.toComponent === componentId) {
+                        connectionsToDelete.push(connectionId);
+                    }
+                }
+                
+                // Verbindungen löschen
+                for (const connectionId of connectionsToDelete) {
+                    const connectionData = this.connections.get(connectionId);
+                    if (connectionData && connectionData.path) {
+                        // Bezier-Pfad aus DOM entfernen
+                        connectionData.path.remove();
+                        console.log(`🗑️ Bezier-Verbindung ${connectionId} gelöscht`);
+                        
+                        // Connection Points als "disconnected" markieren
+                        if (connectionData.fromElement) {
+                            connectionData.fromElement.classList.remove('connected');
+                            this.updateVisualCables(connectionData.fromElement);
+                        }
+                        if (connectionData.toElement) {
+                            connectionData.toElement.classList.remove('connected');
+                            this.updateVisualCables(connectionData.toElement);
+                        }
+                    }
+                    
+                    // Aus connections Map entfernen
+                    this.connections.delete(connectionId);
+                }
+                
+                console.log(`🔗 CASCADE-DELETE: ${connectionsToDelete.length} Verbindungen für ${componentId} entfernt`);
+            }
+            
             // ===== DELETION SYSTEM =====
             deleteSelectedComponents() {
                 // 🚨 SICHERHEITSPRÜFUNG: Kein Löschen bei eingeschaltetem Strom
@@ -3746,6 +3786,9 @@
                 this.selectedComponents.forEach(component => {
                     const componentId = component.id;
                     const componentType = component.dataset.componentType;
+                    
+                    // 🔗 CASCADE-DELETE: Alle Verbindungen zu diesem Bauteil entfernen
+                    this.deleteConnectionsForComponent(componentId);
                     
                     component.remove();
                     this.componentRotations.delete(component);
@@ -6499,7 +6542,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.11 - LAZY-PHYSICS AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.12 - CASCADE-DELETE AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
