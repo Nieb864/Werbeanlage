@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.12-CASCADE-DELETE-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.13-PHYSIK-KORREKTUREN-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.12-CASCADE-DELETE</div>
+                <div class="version-display">v0.02.13-PHYSIK-KORREKTUREN</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2213,6 +2213,18 @@
                 const outputVoltage = inputVoltage * transformationRatio;
                 const outputCurrent = inputCurrent / transformationRatio;
                 
+                // 🔥 ÜBERLASTSCHUTZ: Prüfe Gesamtleistung aller angeschlossenen Verbraucher
+                const totalLoadPower = this.calculateConnectedLoadPower();
+                const maxPower = this.specs.maxPower || 999; // Default: unbegrenzt
+                
+                if (totalLoadPower > maxPower) {
+                    console.log(`🔥 ÜBERLAST! Trafo ${this.id}: ${totalLoadPower.toFixed(1)}W > ${maxPower}W → BROKEN`);
+                    this.isBroken = true;
+                    return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.BROKEN };
+                }
+                
+                console.log(`⚡ Trafo ${this.id}: ${totalLoadPower.toFixed(1)}W / ${maxPower}W (${((totalLoadPower/maxPower)*100).toFixed(0)}%)`);
+                
                 return { 
                     outputVoltage: outputVoltage, 
                     outputCurrent: outputCurrent, 
@@ -2222,6 +2234,13 @@
             
             ledBehavior(inputVoltage, inputCurrent) {
                 if (inputVoltage === 0) {
+                    return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.OFF };
+                }
+                
+                // ⚡ DC-POLARITÄTS-PRÜFUNG: LEDs funktionieren nur bei korrekter Polung
+                const polarityCorrect = this.checkDCPolarity();
+                if (!polarityCorrect) {
+                    console.log(`⚡ VERPOLUNG! LED ${this.id}: Plus/Minus vertauscht → OFF`);
                     return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.OFF };
                 }
                 
@@ -2251,6 +2270,97 @@
                     outputCurrent: current, 
                     state: state 
                 };
+            }
+            
+            // 🔥 BERECHNE GESAMTLEISTUNG ALLER ANGESCHLOSSENEN VERBRAUCHER
+            calculateConnectedLoadPower() {
+                let totalPower = 0;
+                
+                // Finde alle Verbindungen zu diesem Trafo
+                if (!window.workspaceManager || !window.workspaceManager.connections) return 0;
+                
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    // Prüfe ob diese Verbindung vom Trafo ausgeht (out-plus oder out-minus)
+                    if (connectionData.fromComponent === this.id && 
+                        (connectionData.from.includes('out-plus') || connectionData.from.includes('out-minus'))) {
+                        
+                        const loadComponentId = connectionData.toComponent;
+                        const loadElement = document.getElementById(loadComponentId);
+                        
+                        if (loadElement) {
+                            const loadType = loadElement.dataset.componentType;
+                            const loadSpecs = ComponentSpecs[loadType];
+                            
+                            // Nur LEDs/Lasten zählen
+                            if (loadSpecs && loadSpecs.type === 'load' && loadSpecs.power) {
+                                totalPower += loadSpecs.power;
+                                console.log(`🔌 Load gefunden: ${loadComponentId} (${loadType}) = ${loadSpecs.power}W`);
+                            }
+                        }
+                    }
+                }
+                
+                return totalPower;
+            }
+            
+            // ⚡ PRÜFE DC-POLARITÄT FÜR LEDs
+            checkDCPolarity() {
+                if (!window.workspaceManager || !window.workspaceManager.connections) return false;
+                
+                let plusConnected = false;
+                let minusConnected = false;
+                let plusFromTrafo = false;
+                let minusFromTrafo = false;
+                
+                // Prüfe alle Verbindungen zu dieser LED
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    // Verbindungen ZU dieser LED
+                    if (connectionData.toComponent === this.id) {
+                        const fromComponentId = connectionData.fromComponent;
+                        const fromElement = document.getElementById(fromComponentId);
+                        
+                        if (fromElement) {
+                            const fromType = fromElement.dataset.componentType;
+                            const fromSpecs = ComponentSpecs[fromType];
+                            
+                            // Prüfe ob die Quelle ein Trafo ist (DC-Ausgabe)
+                            if (fromSpecs && fromSpecs.type === 'transformer') {
+                                // Plus-Verbindung
+                                if (connectionData.to.includes('in-plus') && connectionData.from.includes('out-plus')) {
+                                    plusConnected = true;
+                                    plusFromTrafo = true;
+                                    console.log(`✅ LED ${this.id}: Plus korrekt von Trafo ${fromComponentId}`);
+                                }
+                                
+                                // Minus-Verbindung  
+                                if (connectionData.to.includes('in-minus') && connectionData.from.includes('out-minus')) {
+                                    minusConnected = true;
+                                    minusFromTrafo = true;
+                                    console.log(`✅ LED ${this.id}: Minus korrekt von Trafo ${fromComponentId}`);
+                                }
+                                
+                                // VERPOLUNG erkannt
+                                if (connectionData.to.includes('in-plus') && connectionData.from.includes('out-minus')) {
+                                    console.log(`❌ LED ${this.id}: VERPOLUNG! Plus mit Minus verbunden`);
+                                    return false;
+                                }
+                                if (connectionData.to.includes('in-minus') && connectionData.from.includes('out-plus')) {
+                                    console.log(`❌ LED ${this.id}: VERPOLUNG! Minus mit Plus verbunden`);
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // LED braucht beide Pole korrekt angeschlossen
+                const polarityOK = (plusConnected && minusConnected && plusFromTrafo && minusFromTrafo);
+                
+                if (!polarityOK) {
+                    console.log(`⚠️ LED ${this.id}: Unvollständige Verschaltung (Plus:${plusConnected}, Minus:${minusConnected})`);
+                }
+                
+                return polarityOK;
             }
         }
         
@@ -6542,7 +6652,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.12 - CASCADE-DELETE AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.13 - PHYSIK-KORREKTUREN AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
