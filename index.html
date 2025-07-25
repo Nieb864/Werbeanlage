@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.08-GEISTER-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.09-SOFORT-CLEANUP-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.08-GEISTER-FIX</div>
+                <div class="version-display">v0.02.09-SOFORT-CLEANUP</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2465,7 +2465,7 @@
                     console.log(`🗑️ Edge ${edgeId} entfernt`);
                 }
                 
-                // 2. Alle Knoten entfernen, die zu dieser Komponente gehören
+                // 2. Alle Knoten in this.nodes entfernen, die zu dieser Komponente gehören
                 const nodesToRemove = [];
                 for (const nodeId of this.nodes.keys()) {
                     if (nodeId.startsWith(componentId)) {
@@ -2476,6 +2476,19 @@
                 for (const nodeId of nodesToRemove) {
                     this.nodes.delete(nodeId);
                     console.log(`🗑️ Node ${nodeId} entfernt`);
+                }
+                
+                // 3. Alle Knoten in this.networkNodes entfernen, die zu dieser Komponente gehören  
+                const networkNodesToRemove = [];
+                for (const nodeId of this.networkNodes.keys()) {
+                    if (nodeId.startsWith(componentId)) {
+                        networkNodesToRemove.push(nodeId);
+                    }
+                }
+                
+                for (const nodeId of networkNodesToRemove) {
+                    this.networkNodes.delete(nodeId);
+                    console.log(`🗑️ NetworkNode ${nodeId} entfernt`);
                 }
             }
             
@@ -6496,7 +6509,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.08 - GEISTER-FIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.09 - SOFORT-CLEANUP AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
