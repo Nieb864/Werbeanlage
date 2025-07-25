@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.25-CSS-SELECTOR-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.26-DOM-DEBUG-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1341,7 +1341,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.25-CSS-SELECTOR-FIX</div>
+                <div class="version-display">v0.02.26-DOM-DEBUG</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1977,17 +1977,40 @@
             updateTransformerVisuals(element) {
                 console.log(`🎨 Trafo-Visuals für ${this.elementId}: ${this.state}`);
                 
+                // 🔍 DEBUGGING: Was ist tatsächlich im DOM?
+                console.log(`🔍 DOM Debug für ${this.elementId}:`);
+                const allChildren = element.querySelectorAll('*');
+                allChildren.forEach((child, index) => {
+                    console.log(`  ${index}: ${child.tagName} class="${child.className || 'KEINE'}" id="${child.id || 'KEINE'}"`);
+                });
+                
                 if (this.state === ComponentStates.BROKEN) {
-                    // Transformer schwarz färben
-                    const trafoElements = element.querySelectorAll('rect, path, .transformer-housing, .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .trafo-body, .trafo-label');
-                    trafoElements.forEach(el => {
-                        el.style.setProperty('fill', '#1a1a1a', 'important');
+                    // Alle möglichen Selektoren testen
+                    const selectors = [
+                        'rect', 'path', 'text', 'line', 'circle',
+                        '.trafo-housing', '.trafo-text', '.trafo-label',
+                        '.transformer-housing', '.cls-1', '.cls-2', '.cls-3', '.cls-4', '.cls-5', '.trafo-body'
+                    ];
+                    
+                    let totalElements = 0;
+                    selectors.forEach(selector => {
+                        const elements = element.querySelectorAll(selector);
+                        if (elements.length > 0) {
+                            console.log(`  ✅ Selector '${selector}': ${elements.length} Elemente gefunden`);
+                            elements.forEach(el => {
+                                el.style.setProperty('fill', '#1a1a1a', 'important');
+                                totalElements++;
+                            });
+                        } else {
+                            console.log(`  ❌ Selector '${selector}': 0 Elemente`);
+                        }
                     });
-                    console.log(`🖤 Trafo schwarz gefärbt: ${this.elementId} (${trafoElements.length} Elemente)`);
+                    
+                    console.log(`🖤 Trafo schwarz gefärbt: ${this.elementId} (${totalElements} Elemente TOTAL)`);
                 } else {
-                    // Transformer-Farben zurücksetzen (Original-Farben)
-                    const trafoElements = element.querySelectorAll('rect, path, .transformer-housing, .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .trafo-body, .trafo-label');
-                    trafoElements.forEach(el => {
+                    // Reset
+                    const allElements = element.querySelectorAll('*');
+                    allElements.forEach(el => {
                         el.style.removeProperty('fill');
                     });
                     console.log(`🔄 Trafo-Farben zurückgesetzt: ${this.elementId}`);
@@ -6804,7 +6827,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.25 - CSS-SELECTOR-FIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.26 - DOM-DEBUG AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
