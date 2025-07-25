@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.10-KOLLISIONS-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.11-LAZY-PHYSICS-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.10-KOLLISIONS-FIX</div>
+                <div class="version-display">v0.02.11-LAZY-PHYSICS</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3335,12 +3335,18 @@
             
             addComponent(id, type, position) {
                 this.graph.addComponent(id, type, position);
-                this.update();
+                // 🔄 LAZY-PHYSICS: Nur bei eingeschaltetem Hauptschalter berechnen
+                if (systemPower) {
+                    this.update();
+                }
             }
             
             addConnection(id, fromComponent, toComponent, connectionData = null) {
                 this.graph.addConnection(id, fromComponent, toComponent, connectionData);
-                this.update();
+                // 🔄 LAZY-PHYSICS: Nur bei eingeschaltetem Hauptschalter berechnen
+                if (systemPower) {
+                    this.update();
+                }
             }
             
             powerStateChanged() {
@@ -4914,26 +4920,25 @@
                     }
                 }
                 
-                // 🔄 NEUBERECHNUNG: Bei EINSCHALTEN alle Verbindungen neu analysieren
+                // 🔄 LAZY-PHYSICS: Bei EINSCHALTEN komplett neu scannen was da ist
                 if (systemPower) {
-                    console.log('🔄 HAUPTSCHALTER EIN → Vollständige Neuberechnung startet...');
+                    console.log('🔄 HAUPTSCHALTER EIN → LAZY-PHYSICS Vollscan startet...');
                     
                     // 🧹 NETWORK-CLEANUP: Verwaiste Knoten bereinigen BEVOR Neuberechnung
                     if (circuit && circuit.graph) {
                         circuit.graph.cleanupOrphanedNodes();
                     }
                     
-                    // 1. Alle nicht-kaputten Komponenten zurücksetzen
-                    for (const [componentId, state] of circuit.graph.componentStates) {
-                        if (state !== 'broken') {
-                            circuit.graph.componentStates.set(componentId, 'off');
-                            console.log(`🔄 Component ${componentId} zurückgesetzt auf OFF`);
-                        } else {
-                            console.log(`🚫 Component ${componentId} bleibt BROKEN`);
+                    // 1. Alle StateMachines zurücksetzen (außer broken)
+                    for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
+                        const componentState = circuit.graph.getComponentState(componentId);
+                        if (componentState !== 'broken') {
+                            console.log(`🔄 StateMachine ${componentId} zurückgesetzt`);
+                            stateMachine.updateState(0, 0); // Spannung und Strom auf 0
                         }
                     }
                     
-                    // 2. Alle WorkspaceManager Verbindungen neu validieren
+                    // 2. Alle WorkspaceManager Verbindungen validieren
                     if (window.workspaceManager && window.workspaceManager.connections) {
                         console.log(`🔍 Validiere ${window.workspaceManager.connections.size} Verbindungen...`);
                         for (const [connId, connectionData] of window.workspaceManager.connections) {
@@ -4947,57 +4952,14 @@
                         }
                     }
                     
-                    // 3. Alle Komponenten neu analysieren
-                    const powerSource = circuit.physics.findPowerSource();
-                    if (powerSource) {
-                        const connectedComponents = circuit.graph.getConnectedComponents(powerSource);
-                        console.log(`🔍 Analysiere ${connectedComponents.length} verbundene Komponenten...`);
-                        
-                        for (const componentId of connectedComponents) {
-                            const component = circuit.graph.nodes.get(componentId);
-                            if (!component) continue;
-                            
-                            // Nur nicht-kaputte Komponenten neu berechnen
-                            const componentState = circuit.graph.getComponentState(componentId);
-                            if (componentState === 'broken') {
-                                console.log(`🚫 ${componentId} bleibt broken - wird übersprungen`);
-                                continue;
-                            }
-                            
-                            console.log(`🔄 Analysiere ${componentId}...`);
-                            
-                            // Verbindungsqualität prüfen
-                            const isConnected = circuit.physics.isComponentProperlyConnected(componentId);
-                            console.log(`🔍 ${componentId} - Verbindung vollständig: ${isConnected}`);
-                            
-                            if (isConnected) {
-                                // Gefährliche Bedingungen prüfen
-                                const danger = circuit.physics.checkForDangerousConditions(componentId);
-                                if (danger) {
-                                    console.log(`💥 ${componentId} BESCHÄDIGT: ${danger}`);
-                                    circuit.graph.setComponentState(componentId, 'broken');
-                                }
-                            }
-                        }
-                    }
+                    // 3. 🔄 LAZY-PHYSICS: Jetzt erst die komplette Physik berechnen
+                    console.log('🔄 Starte Physik-Berechnung...');
+                    circuit.update();
                     
-                    // 4. Alle StateMachines zurücksetzen (für visuelle LEDs)
-                    for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
-                        const componentState = circuit.graph.getComponentState(componentId);
-                        if (componentState !== 'broken') {
-                            console.log(`🔄 StateMachine ${componentId} zurückgesetzt`);
-                            stateMachine.updateState(0, 0); // Spannung und Strom auf 0
-                        } else {
-                            console.log(`🚫 StateMachine ${componentId} bleibt broken`);
-                        }
-                    }
-                    
-                    // 5. Physik-Update erzwingen
+                    // 4. Visual LEDs wiederherstellen
                     setTimeout(() => {
-                        console.log('🔄 Starte Physik-Berechnung...');
-                        circuit.physics.calculateCircuit();
                         
-                        // 6. Zusätzlich: Alle LED-Kreise wiederherstellen
+                        // 5. Alle LED-Kreise wiederherstellen
                         for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
                             const element = document.getElementById(componentId);
                             if (element && ComponentSpecs[stateMachine.type]?.type === 'load') {
@@ -5011,14 +4973,14 @@
                             }
                         }
                         
-                        // 7. Status-Report
-                        console.log('📊 NEUBERECHNUNG - STATUS REPORT:');
+                        // 6. Status-Report
+                        console.log('📊 LAZY-PHYSICS - STATUS REPORT:');
                         for (const [componentId, state] of circuit.graph.componentStates) {
                             const component = circuit.graph.nodes.get(componentId);
                             const type = component ? component.type : 'unknown';
                             console.log(`   ${componentId} (${type}): ${state}`);
                         }
-                        console.log('✅ Neuberechnung abgeschlossen!');
+                        console.log('✅ LAZY-PHYSICS abgeschlossen!');
                     }, 100);
                 }
             }
@@ -6537,7 +6499,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.10 - KOLLISIONS-FIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.11 - LAZY-PHYSICS AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
