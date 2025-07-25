@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.26-DOM-DEBUG-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.27-SVG-CLASSNAME-FIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1341,7 +1341,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.26-DOM-DEBUG</div>
+                <div class="version-display">v0.02.27-SVG-CLASSNAME-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1981,7 +1981,9 @@
                 console.log(`🔍 DOM Debug für ${this.elementId}:`);
                 const allChildren = element.querySelectorAll('*');
                 allChildren.forEach((child, index) => {
-                    console.log(`  ${index}: ${child.tagName} class="${child.className || 'KEINE'}" id="${child.id || 'KEINE'}"`);
+                    const className = child.className?.baseVal || child.className || 'KEINE';
+                const childId = child.id || 'KEINE';
+                console.log(`  ${index}: ${child.tagName} class="${className}" id="${childId}"`);
                 });
                 
                 if (this.state === ComponentStates.BROKEN) {
@@ -6827,7 +6829,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.26 - DOM-DEBUG AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.27 - SVG-CLASSNAME-FIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
