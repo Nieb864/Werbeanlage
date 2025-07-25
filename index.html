@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.01.95-NETZWERK-PHYSIK-AKTIV-1753147695 -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.01-CONNECTIONS-FIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.01.101-PARAM-FIX</div>
+                <div class="version-display">v0.02.01-CONNECTIONS-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2232,7 +2232,7 @@
                 console.log(`🔧 Bauteil hinzugefügt: ${type} (${id}) mit ${component.nodes.size} Netzwerk-Knoten`);
             }
             
-            addConnection(id, fromComponent, toComponent) {
+            addConnection(id, fromComponent, toComponent, connectionData = null) {
                 // Alte Schnittstelle beibehalten
                 this.edges.set(id, {
                     from: fromComponent,
@@ -2247,7 +2247,7 @@
                 }
                 
                 // Neue Physik: Netzwerk-Knoten verbinden
-                const connectionData = this.connections.get(id);
+                // connectionData wird jetzt als Parameter übergeben
                 this.createNetworkConnection(id, fromComponent, toComponent, connectionData);
                 
                 console.log(`🔗 Verbindung erstellt: ${fromComponent} → ${toComponent}`);
@@ -3169,8 +3169,8 @@
                 this.update();
             }
             
-            addConnection(id, fromComponent, toComponent) {
-                this.graph.addConnection(id, fromComponent, toComponent);
+            addConnection(id, fromComponent, toComponent, connectionData = null) {
+                this.graph.addConnection(id, fromComponent, toComponent, connectionData);
                 this.update();
             }
             
@@ -3840,21 +3840,27 @@
                 
                 svg.appendChild(path);
                 
+                // Verbindungsdata erstellen mit Terminal-IDs für die Physik
+                const connectionData = {
+                    path: path,
+                    from: `${this.activeConnection.componentId}.${this.activeConnection.outputData.id}`,
+                    to: `${targetComponent ? targetComponent.id : 'unknown'}.${this.getConnectionData(inputSocket).id}`,
+                    fromComponent: this.activeConnection.componentId,
+                    toComponent: targetComponent ? targetComponent.id : 'unknown',
+                    fromElement: outputLine,
+                    toElement: inputSocket
+                };
+                
+                this.connections.set(connectionId, connectionData);
+                
                 // Verbindung in der Physik-Engine registrieren
                 if (circuit) {
                     circuit.addConnection(connectionId, 
                         this.activeConnection.componentId, 
-                        targetComponent ? targetComponent.id : 'unknown'
+                        targetComponent ? targetComponent.id : 'unknown',
+                        connectionData
                     );
                 }
-                
-                this.connections.set(connectionId, {
-                    path: path,
-                    from: outputLine,
-                    to: inputSocket,
-                    fromComponent: this.activeConnection.componentId,
-                    toComponent: targetComponent ? targetComponent.id : 'unknown'
-                });
                 
                 // Connection Points als "connected" markieren
                 outputLine.classList.add('connected');
@@ -6320,7 +6326,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.01.95 - NETZWERK-PHYSIK AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.01 - CONNECTIONS-FIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
