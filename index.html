@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.13-PHYSIK-KORREKTUREN-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.14-PARALLEL-VERKABELUNG-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.13-PHYSIK-KORREKTUREN</div>
+                <div class="version-display">v0.02.14-PARALLEL-VERKABELUNG</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2323,29 +2323,31 @@
                             const fromType = fromElement.dataset.componentType;
                             const fromSpecs = ComponentSpecs[fromType];
                             
-                            // Prüfe ob die Quelle ein Trafo ist (DC-Ausgabe)
-                            if (fromSpecs && fromSpecs.type === 'transformer') {
+                            // Prüfe ob die Quelle ein Trafo ODER eine andere LED ist (Parallel-Verkabelung)
+                            if (fromSpecs && (fromSpecs.type === 'transformer' || fromSpecs.type === 'load')) {
+                                const sourceType = fromSpecs.type === 'transformer' ? 'Trafo' : 'LED';
+                                
                                 // Plus-Verbindung
                                 if (connectionData.to.includes('in-plus') && connectionData.from.includes('out-plus')) {
                                     plusConnected = true;
-                                    plusFromTrafo = true;
-                                    console.log(`✅ LED ${this.id}: Plus korrekt von Trafo ${fromComponentId}`);
+                                    plusFromTrafo = true; // "Trafo" bedeutet hier "gültige DC-Quelle"
+                                    console.log(`✅ LED ${this.id}: Plus korrekt von ${sourceType} ${fromComponentId}`);
                                 }
                                 
                                 // Minus-Verbindung  
                                 if (connectionData.to.includes('in-minus') && connectionData.from.includes('out-minus')) {
                                     minusConnected = true;
-                                    minusFromTrafo = true;
-                                    console.log(`✅ LED ${this.id}: Minus korrekt von Trafo ${fromComponentId}`);
+                                    minusFromTrafo = true; // "Trafo" bedeutet hier "gültige DC-Quelle"
+                                    console.log(`✅ LED ${this.id}: Minus korrekt von ${sourceType} ${fromComponentId}`);
                                 }
                                 
                                 // VERPOLUNG erkannt
                                 if (connectionData.to.includes('in-plus') && connectionData.from.includes('out-minus')) {
-                                    console.log(`❌ LED ${this.id}: VERPOLUNG! Plus mit Minus verbunden`);
+                                    console.log(`❌ LED ${this.id}: VERPOLUNG! Plus mit Minus verbunden (von ${sourceType})`);
                                     return false;
                                 }
                                 if (connectionData.to.includes('in-minus') && connectionData.from.includes('out-plus')) {
-                                    console.log(`❌ LED ${this.id}: VERPOLUNG! Minus mit Plus verbunden`);
+                                    console.log(`❌ LED ${this.id}: VERPOLUNG! Minus mit Plus verbunden (von ${sourceType})`);
                                     return false;
                                 }
                             }
@@ -6652,7 +6654,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.13 - PHYSIK-KORREKTUREN AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.14 - PARALLEL-VERKABELUNG AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
