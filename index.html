@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.15-REKURSIVER-ÜBERLASTSCHUTZ-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.16-BROKEN-STATES-VISUAL-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -776,6 +776,14 @@
         .state-broken .led12-center {
             fill: #1a1a1a !important;
         }
+        
+        .state-broken .transformer-housing,
+        .state-broken .cls-1,
+        .state-broken .cls-2,
+        .state-broken .cls-3 {
+            fill: #1a1a1a !important;
+            stroke: #000 !important;
+        }
 
         .state-overloaded .led24-center,
         .state-overloaded .led12-center {
@@ -1332,7 +1340,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.15-REKURSIVER-ÜBERLASTSCHUTZ</div>
+                <div class="version-display">v0.02.16-BROKEN-STATES-VISUAL</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2237,13 +2245,6 @@
                     return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.OFF };
                 }
                 
-                // ⚡ DC-POLARITÄTS-PRÜFUNG: LEDs funktionieren nur bei korrekter Polung
-                const polarityCorrect = this.checkDCPolarity();
-                if (!polarityCorrect) {
-                    console.log(`⚡ VERPOLUNG! LED ${this.id}: Plus/Minus vertauscht → OFF`);
-                    return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.OFF };
-                }
-                
                 const ratedVoltage = this.specs.ratedVoltage;
                 const tolerance = this.specs.tolerance || 1.1;
                 
@@ -2251,18 +2252,31 @@
                 const maxBlink = ratedVoltage * (tolerance * 2);
                 const minVoltage = ratedVoltage * 0.8;
                 
+                // 💥 ÜBERSPANNUNGS-SCHUTZ: Prüfe ZUERST ob LED durch Überspannung zerstört wird
+                if (inputVoltage > maxBlink) {
+                    this.isBroken = true;
+                    console.log(`💥 ÜBERSPANNUNG! LED ${this.id}: ${inputVoltage}V > ${maxBlink}V → HARDWARE DESTROYED!`);
+                    return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.BROKEN };
+                }
+                
+                // ⚡ DC-POLARITÄTS-PRÜFUNG: LEDs funktionieren nur bei korrekter Polung
+                const polarityCorrect = this.checkDCPolarity();
+                if (!polarityCorrect) {
+                    console.log(`⚡ VERPOLUNG! LED ${this.id}: Plus/Minus vertauscht → OFF`);
+                    return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.OFF };
+                }
+                
                 let state = ComponentStates.OFF;
                 let current = 0;
                 
-                if (inputVoltage > maxBlink) {
-                    this.isBroken = true;
-                    state = ComponentStates.BROKEN;
-                } else if (inputVoltage > maxNormal) {
+                if (inputVoltage > maxNormal) {
                     state = ComponentStates.BLINKING;
                     current = this.specs.power / ratedVoltage;
+                    console.log(`⚡ LED ${this.id}: ÜBERLAST ${inputVoltage}V → BLINKING`);
                 } else if (inputVoltage >= minVoltage) {
                     state = ComponentStates.ON;
                     current = this.specs.power / ratedVoltage;
+                    console.log(`✅ LED ${this.id}: Normal ${inputVoltage}V → ON`);
                 }
                 
                 return { 
@@ -6670,7 +6684,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.15 - REKURSIVER-ÜBERLASTSCHUTZ AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.16 - BROKEN-STATES-VISUAL AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
