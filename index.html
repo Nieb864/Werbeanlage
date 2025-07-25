@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.05-DEBUG-INTERNAL-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.06-NETWORK-CLEANUP-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.05-DEBUG-INTERNAL</div>
+                <div class="version-display">v0.02.06-NETWORK-CLEANUP</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2445,6 +2445,81 @@
                 if (element) {
                     element.classList.remove('component-on', 'component-off', 'component-broken');
                     element.classList.add('component-off');
+                }
+            }
+            
+            // 🧹 NETWORK-CLEANUP: Komponente vollständig aus Netzwerk entfernen
+            removeComponentFromNetwork(componentId) {
+                console.log(`🧹 Bereinige Netzwerk für gelöschte Komponente: ${componentId}`);
+                
+                // 1. Alle Edges entfernen, die diese Komponente betreffen
+                const edgesToRemove = [];
+                for (const [edgeId, edge] of this.edges) {
+                    if (edge.from.startsWith(componentId) || edge.to.startsWith(componentId)) {
+                        edgesToRemove.push(edgeId);
+                    }
+                }
+                
+                for (const edgeId of edgesToRemove) {
+                    this.edges.delete(edgeId);
+                    console.log(`🗑️ Edge ${edgeId} entfernt`);
+                }
+                
+                // 2. Alle Knoten entfernen, die zu dieser Komponente gehören
+                const nodesToRemove = [];
+                for (const nodeId of this.nodes.keys()) {
+                    if (nodeId.startsWith(componentId)) {
+                        nodesToRemove.push(nodeId);
+                    }
+                }
+                
+                for (const nodeId of nodesToRemove) {
+                    this.nodes.delete(nodeId);
+                    console.log(`🗑️ Node ${nodeId} entfernt`);
+                }
+            }
+            
+            // 🧹 ORPHANED-CLEANUP: Verwaiste Knoten und Edges bereinigen
+            cleanupOrphanedNodes() {
+                console.log('🧹 Starte Cleanup verwaister Netzwerk-Knoten...');
+                
+                const validComponentIds = new Set(this.networkComponents.keys());
+                const orphanedNodes = [];
+                const orphanedEdges = [];
+                
+                // 1. Verwaiste Knoten finden
+                for (const [nodeId, node] of this.nodes) {
+                    const componentId = nodeId.split('-')[0] + '-' + nodeId.split('-')[1]; // "component-123" extrahieren
+                    if (!validComponentIds.has(componentId)) {
+                        orphanedNodes.push(nodeId);
+                    }
+                }
+                
+                // 2. Verwaiste Edges finden
+                for (const [edgeId, edge] of this.edges) {
+                    const fromComponent = edge.from.split('-').slice(0, 2).join('-');
+                    const toComponent = edge.to.split('-').slice(0, 2).join('-');
+                    
+                    if (!validComponentIds.has(fromComponent) || !validComponentIds.has(toComponent)) {
+                        orphanedEdges.push(edgeId);
+                    }
+                }
+                
+                // 3. Cleanup durchführen
+                for (const nodeId of orphanedNodes) {
+                    this.nodes.delete(nodeId);
+                    console.log(`🧹 Verwaister Knoten entfernt: ${nodeId}`);
+                }
+                
+                for (const edgeId of orphanedEdges) {
+                    this.edges.delete(edgeId);
+                    console.log(`🧹 Verwaiste Edge entfernt: ${edgeId}`);
+                }
+                
+                if (orphanedNodes.length > 0 || orphanedEdges.length > 0) {
+                    console.log(`✅ Cleanup abgeschlossen: ${orphanedNodes.length} Knoten, ${orphanedEdges.length} Edges entfernt`);
+                } else {
+                    console.log('✅ Kein Cleanup nötig - Netzwerk ist sauber');
                 }
             }
         }
@@ -3635,11 +3710,15 @@
                     this.componentRotations.delete(component);
                     
                     if (circuit && circuit.graph && circuit.graph.nodes.has(componentId)) {
+                        // 🧹 NETWORK-CLEANUP: Alle Edges der Komponente entfernen
+                        circuit.graph.removeComponentFromNetwork(componentId);
+                        
                         circuit.graph.nodes.delete(componentId);
                         circuit.graph.stateMachines.delete(componentId);
-                        // CLEANUP: Component State löschen
                         circuit.graph.componentStates.delete(componentId);
-                        console.log(`🧹 Component State für ${componentId} gelöscht`);
+                        circuit.graph.networkComponents.delete(componentId);
+                        
+                        console.log(`🧹 Component ${componentId} vollständig aus Netzwerk entfernt`);
                     }
                     
                     deletedComponents.push(`${componentType} (${componentId})`);
@@ -4775,6 +4854,11 @@
                 // 🔄 NEUBERECHNUNG: Bei EINSCHALTEN alle Verbindungen neu analysieren
                 if (systemPower) {
                     console.log('🔄 HAUPTSCHALTER EIN → Vollständige Neuberechnung startet...');
+                    
+                    // 🧹 NETWORK-CLEANUP: Verwaiste Knoten bereinigen BEVOR Neuberechnung
+                    if (circuit && circuit.graph) {
+                        circuit.graph.cleanupOrphanedNodes();
+                    }
                     
                     // 1. Alle nicht-kaputten Komponenten zurücksetzen
                     for (const [componentId, state] of circuit.graph.componentStates) {
@@ -6390,7 +6474,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.05 - DEBUG-INTERNAL AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.06 - NETWORK-CLEANUP AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
