@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.27-SVG-CLASSNAME-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.28-LAZY-PHYSICS-BROKEN-FIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1341,7 +1341,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.27-SVG-CLASSNAME-FIX</div>
+                <div class="version-display">v0.02.28-LAZY-PHYSICS-BROKEN-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1574,13 +1574,13 @@
                 const isSystemPowered = window.systemPower || false;
                 
                 if (componentState === 'broken') {
-                    // Kaputte LEDs bleiben kaputt - zeigen aber unterschiedlich je nach Hauptschalter
+                    // Kaputte Komponenten bleiben kaputt - zeigen aber unterschiedlich je nach Hauptschalter
                     if (isSystemPowered) {
                         this.state = ComponentStates.BROKEN;
-                        console.log(`💀 LED ${this.elementId}: Ist PERMANENT kaputt und Hauptschalter EIN → BROKEN`);
+                        console.log(`💀 Component ${this.elementId}: Ist PERMANENT kaputt und Hauptschalter EIN → BROKEN`);
                     } else {
                         this.state = ComponentStates.OFF;
-                        console.log(`🔧 LED ${this.elementId}: Ist PERMANENT kaputt, aber Hauptschalter AUS → OFF`);
+                        console.log(`🔧 Component ${this.elementId}: Ist PERMANENT kaputt, aber Hauptschalter AUS → OFF`);
                     }
                 } else if (this.specs.type === 'load') {
                     // Nur nicht-kaputte LEDs können normal funktionieren
@@ -6829,7 +6829,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.27 - SVG-CLASSNAME-FIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.28 - LAZY-PHYSICS-BROKEN-FIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
