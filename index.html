@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.20-STATEMACHINE-SYNC-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.21-VISUAL-UPDATE-FIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1346,7 +1346,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.20-STATEMACHINE-SYNC</div>
+                <div class="version-display">v0.02.21-VISUAL-UPDATE-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -1857,10 +1857,28 @@
             
             applyStateCSS() {
                 const element = document.getElementById(this.elementId);
-                if (!element) return;
+                if (!element) {
+                    console.log(`❌ Element ${this.elementId} nicht gefunden für State ${this.state}`);
+                    return;
+                }
                 
+                // Entferne alle State-Klassen
                 element.classList.remove('state-off', 'state-on', 'state-blinking', 'state-broken', 'state-overloaded');
+                
+                // Füge neue State-Klasse hinzu
                 element.classList.add(`state-${this.state}`);
+                
+                console.log(`🎨 CSS-State angewendet: ${this.elementId} → state-${this.state}`);
+                console.log(`🔍 Element Klassen: ${element.className}`);
+                
+                // DEBUGGING: Speziell für BROKEN-State prüfen
+                if (this.state === ComponentStates.BROKEN) {
+                    console.log(`🖤 BROKEN-STATE DEBUG für ${this.elementId}:`);
+                    console.log(`   Element Tag: ${element.tagName}`);
+                    console.log(`   Element Type: ${element.dataset.componentType}`);
+                    console.log(`   CSS Klassen: ${element.className}`);
+                    console.log(`   Hat state-broken: ${element.classList.contains('state-broken')}`);
+                }
             }
             
             updateBlinkAnimation() {
@@ -1918,17 +1936,33 @@
                     return;
                 }
                 
-                // Nur LEDs färben, nicht Trafos oder andere Komponenten
-                if (this.specs.type !== 'load') {
+                // LEDs UND Transformatoren visuell updaten
+                if (this.specs.type === 'load') {
+                    // LED-spezifische Updates
+                    this.updateLEDVisuals(element);
+                } else if (this.specs.type === 'transform') {
+                    // Transformer-spezifische Updates
+                    this.updateTransformerVisuals(element);
+                } else {
+                    // Andere Komponenten: Nur CSS-Klassen
+                    console.log(`🎨 Andere Komponente ${this.elementId}: Nur CSS-Klassen angewendet`);
                     return;
                 }
                 
-                console.log(`🎨 Setze LED State für ${this.elementId}: ${this.state}`);
+            }
+            
+            updateLEDVisuals(element) {
+                console.log(`🎨 LED-Visuals für ${this.elementId}: ${this.state}`);
                 
-                // Für statische States (nicht BLINKING) nur CSS-Klassen verwenden
+                // Für statische States (nicht BLINKING) Farben UND Filter setzen
                 if (this.state !== ComponentStates.BLINKING) {
                     const ledCenters = element.querySelectorAll('.led24-center, .led12-center');
                     ledCenters.forEach((led, index) => {
+                        // Korrekte Farbe für den State setzen
+                        const color = this.getLedColor(this.state, false);
+                        led.style.setProperty('fill', color, 'important');
+                        
+                        // Filter-Effekt setzen
                         const filter = this.getGlowEffect(this.state, true);
                         
                         if (filter) {
@@ -1938,7 +1972,29 @@
                             led.style.filter = '';
                             led.removeAttribute('filter');
                         }
+                        
+                        console.log(`🎨 LED-Farbe gesetzt: ${this.elementId} → ${color} (${this.state})`);
                     });
+                }
+            }
+            
+            updateTransformerVisuals(element) {
+                console.log(`🎨 Trafo-Visuals für ${this.elementId}: ${this.state}`);
+                
+                if (this.state === ComponentStates.BROKEN) {
+                    // Transformer schwarz färben
+                    const trafoElements = element.querySelectorAll('rect, path, .transformer-housing, .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .trafo-body, .trafo-label');
+                    trafoElements.forEach(el => {
+                        el.style.setProperty('fill', '#1a1a1a', 'important');
+                    });
+                    console.log(`🖤 Trafo schwarz gefärbt: ${this.elementId} (${trafoElements.length} Elemente)`);
+                } else {
+                    // Transformer-Farben zurücksetzen (Original-Farben)
+                    const trafoElements = element.querySelectorAll('rect, path, .transformer-housing, .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .trafo-body, .trafo-label');
+                    trafoElements.forEach(el => {
+                        el.style.removeProperty('fill');
+                    });
+                    console.log(`🔄 Trafo-Farben zurückgesetzt: ${this.elementId}`);
                 }
             }
             
@@ -6756,7 +6812,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.20 - STATEMACHINE-SYNC AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.21 - VISUAL-UPDATE-FIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
