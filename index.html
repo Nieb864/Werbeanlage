@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.03-TRANSFORMER-FIX-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.04-INTERNAL-CONN-FIX-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1332,7 +1332,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.03-TRANSFORMER-FIX</div>
+                <div class="version-display">v0.02.04-INTERNAL-CONN-FIX</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2078,7 +2078,6 @@
                 this.isBroken = false;
                 
                 this.createNodes();
-                this.createInternalConnections();
             }
             
             createNodes() {
@@ -4583,6 +4582,11 @@
             
             if (circuit) {
                 circuit.addComponent(wrapper.id, componentType, {x: x, y: y});
+                // Interne Verbindungen nach DOM-Element-Creation initialisieren
+                const component = circuit.graph.networkComponents.get(wrapper.id);
+                if (component) {
+                    component.createInternalConnections();
+                }
             }
         }
 
@@ -6359,7 +6363,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.03 - TRANSFORMER-FIX AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.04 - INTERNAL-CONN-FIX AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
