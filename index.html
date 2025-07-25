@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.16-BROKEN-STATES-VISUAL-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.17-BROKEN-STATE-PERSISTENZ-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -780,7 +780,13 @@
         .state-broken .transformer-housing,
         .state-broken .cls-1,
         .state-broken .cls-2,
-        .state-broken .cls-3 {
+        .state-broken .cls-3,
+        .state-broken .cls-4,
+        .state-broken .cls-5,
+        .state-broken .trafo-body,
+        .state-broken .trafo-label,
+        .state-broken rect,
+        .state-broken path {
             fill: #1a1a1a !important;
             stroke: #000 !important;
         }
@@ -1340,7 +1346,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.16-BROKEN-STATES-VISUAL</div>
+                <div class="version-display">v0.02.17-BROKEN-STATE-PERSISTENZ</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -2228,6 +2234,10 @@
                 if (totalLoadPower > maxPower) {
                     console.log(`🔥 ÜBERLAST! Trafo ${this.id}: ${totalLoadPower.toFixed(1)}W > ${maxPower}W → BROKEN`);
                     this.isBroken = true;
+                    // 🔥 KRITISCH: ComponentStates mit isBroken synchronisieren!
+                    if (window.circuit && window.circuit.graph) {
+                        window.circuit.graph.componentStates.set(this.id, 'broken');
+                    }
                     return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.BROKEN };
                 }
                 
@@ -2255,6 +2265,10 @@
                 // 💥 ÜBERSPANNUNGS-SCHUTZ: Prüfe ZUERST ob LED durch Überspannung zerstört wird
                 if (inputVoltage > maxBlink) {
                     this.isBroken = true;
+                    // 💥 KRITISCH: ComponentStates mit isBroken synchronisieren!
+                    if (window.circuit && window.circuit.graph) {
+                        window.circuit.graph.componentStates.set(this.id, 'broken');
+                    }
                     console.log(`💥 ÜBERSPANNUNG! LED ${this.id}: ${inputVoltage}V > ${maxBlink}V → HARDWARE DESTROYED!`);
                     return { outputVoltage: 0, outputCurrent: 0, state: ComponentStates.BROKEN };
                 }
@@ -5144,16 +5158,22 @@
                     // 4. Visual LEDs wiederherstellen
                     setTimeout(() => {
                         
-                        // 5. Alle LED-Kreise wiederherstellen
+                        // 5. LED-Kreise wiederherstellen (nur für nicht-kaputte LEDs!)
                         for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
                             const element = document.getElementById(componentId);
                             if (element && ComponentSpecs[stateMachine.type]?.type === 'load') {
-                                // LED-Kreis sichtbar machen falls verschwunden
-                                const ledCircle = element.querySelector('.led24-center, .led12-center');
-                                if (ledCircle) {
-                                    ledCircle.style.display = 'block';
-                                    ledCircle.style.opacity = '1';
-                                    console.log(`💡 LED-Kreis für ${componentId} wiederhergestellt`);
+                                const componentState = circuit.graph.getComponentState(componentId);
+                                
+                                if (componentState !== 'broken') {
+                                    // Nur nicht-kaputte LEDs: Kreis wiederherstellen
+                                    const ledCircle = element.querySelector('.led24-center, .led12-center');
+                                    if (ledCircle) {
+                                        ledCircle.style.display = 'block';
+                                        ledCircle.style.opacity = '1';
+                                        console.log(`💡 LED-Kreis für ${componentId} wiederhergestellt`);
+                                    }
+                                } else {
+                                    console.log(`💀 LED ${componentId} ist PERMANENT kaputt - Kreis bleibt unsichtbar`);
                                 }
                             }
                         }
@@ -6684,7 +6704,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.16 - BROKEN-STATES-VISUAL AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.17 - BROKEN-STATE-PERSISTENZ AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
