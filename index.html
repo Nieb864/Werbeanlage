@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.17-BROKEN-STATE-PERSISTENZ-AKTIV -->
+<!-- 🚨 NOTFALL-CACHE-BUST: v0.02.18-LED-VERBINDUNGS-CHECK-AKTIV -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -1346,7 +1346,7 @@
             </div>
             
             <div class="workspace" id="workspace">
-                <div class="version-display">v0.02.17-BROKEN-STATE-PERSISTENZ</div>
+                <div class="version-display">v0.02.18-LED-VERBINDUNGS-CHECK</div>
                 <div class="workspace-info-btn" id="info-btn">
                     i
                 </div>
@@ -3450,6 +3450,34 @@
                 }
             }
             
+            // 🔌 HILFS-METHODE: Prüfe ob Komponente gültige Verbindungen hat
+            hasValidConnections(componentId) {
+                if (!window.workspaceManager || !window.workspaceManager.connections) return false;
+                
+                let hasValidConnection = false;
+                for (const [connId, connectionData] of window.workspaceManager.connections) {
+                    if (connectionData.fromComponent === componentId || connectionData.toComponent === componentId) {
+                        // Prüfe ob die verbundenen Komponenten noch existieren
+                        const fromExists = document.getElementById(connectionData.fromComponent);
+                        const toExists = document.getElementById(connectionData.toComponent);
+                        
+                        if (fromExists && toExists) {
+                            hasValidConnection = true;
+                            console.log(`🔌 LED ${componentId}: Gültige Verbindung gefunden (${connectionData.fromComponent} → ${connectionData.toComponent})`);
+                            break;
+                        } else {
+                            console.log(`❌ LED ${componentId}: Verbindung zu gelöschten Komponenten erkannt (${connectionData.fromComponent} → ${connectionData.toComponent})`);
+                        }
+                    }
+                }
+                
+                if (!hasValidConnection) {
+                    console.log(`🚫 LED ${componentId}: KEINE gültigen Verbindungen gefunden`);
+                }
+                
+                return hasValidConnection;
+            }
+            
             powerOffAllComponents() {
                 // Neue Physik: Alle Netzwerk-Komponenten ausschalten
                 for (const [id, component] of this.graph.networkComponents) {
@@ -5158,19 +5186,32 @@
                     // 4. Visual LEDs wiederherstellen
                     setTimeout(() => {
                         
-                        // 5. LED-Kreise wiederherstellen (nur für nicht-kaputte LEDs!)
+                        // 5. LED-Kreise wiederherstellen (nur für nicht-kaputte UND angeschlossene LEDs!)
                         for (const [componentId, stateMachine] of circuit.graph.stateMachines) {
                             const element = document.getElementById(componentId);
                             if (element && ComponentSpecs[stateMachine.type]?.type === 'load') {
                                 const componentState = circuit.graph.getComponentState(componentId);
                                 
                                 if (componentState !== 'broken') {
-                                    // Nur nicht-kaputte LEDs: Kreis wiederherstellen
-                                    const ledCircle = element.querySelector('.led24-center, .led12-center');
-                                    if (ledCircle) {
-                                        ledCircle.style.display = 'block';
-                                        ledCircle.style.opacity = '1';
-                                        console.log(`💡 LED-Kreis für ${componentId} wiederhergestellt`);
+                                    // Prüfe ob LED tatsächlich angeschlossen ist
+                                    const hasConnections = circuit.hasValidConnections(componentId);
+                                    
+                                    if (hasConnections) {
+                                        // Nur angeschlossene, nicht-kaputte LEDs: Kreis wiederherstellen
+                                        const ledCircle = element.querySelector('.led24-center, .led12-center');
+                                        if (ledCircle) {
+                                            ledCircle.style.display = 'block';
+                                            ledCircle.style.opacity = '1';
+                                            console.log(`💡 LED-Kreis für ${componentId} wiederhergestellt (angeschlossen)`);
+                                        }
+                                    } else {
+                                        // Unverbundene LEDs: Kreis verstecken
+                                        const ledCircle = element.querySelector('.led24-center, .led12-center');
+                                        if (ledCircle) {
+                                            ledCircle.style.display = 'none';
+                                            ledCircle.style.opacity = '0';
+                                        }
+                                        console.log(`🔌 LED ${componentId} hat keine gültigen Verbindungen - Kreis versteckt`);
                                     }
                                 } else {
                                     console.log(`💀 LED ${componentId} ist PERMANENT kaputt - Kreis bleibt unsichtbar`);
@@ -6704,7 +6745,7 @@
 
         // ===== ANWENDUNGS-INITIALISIERUNG =====
         function initializeApplication() {
-                            console.log('🚀 LED Foundation v0.02.17 - BROKEN-STATE-PERSISTENZ AKTIV! ⚡🎯');
+                            console.log('🚀 LED Foundation v0.02.18 - LED-VERBINDUNGS-CHECK AKTIV! ⚡🎯');
             
             // 1. Circuit Simulation initialisieren
             try {
